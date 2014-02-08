@@ -9,7 +9,7 @@ Utility that can extract the internal forms representation from both EFI and UEF
 Changelog:
 
 v0.2 2/7/2014
-* I think I fix the issue that prevented it from running on Windows XP.
+* I think I fixed the issue that prevented it from running on Windows XP.
 * Doesn't require any additional DLLs anymore.
 * The extract dialog now starts in the selected modules directory.
 * Fix the issue where it crashed on a few Acer BIOS. Thanks BDMaster!
