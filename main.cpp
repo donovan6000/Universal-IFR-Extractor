@@ -124,7 +124,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 	UpdateWindow(hwnd);
 
 	// Message loop
-	while (GetMessage(&msg, NULL, 0, 0)) {
+	while(GetMessage(&msg, NULL, 0, 0)) {
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 	}
@@ -217,7 +217,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) 
 				NULL);
 			SendMessage(fileLocationEdit, WM_SETFONT, WPARAM(GetStockObject(DEFAULT_GUI_FONT)), MAKELPARAM(FALSE, 0));
 			TCHAR fileLocationEditValue[MAX_PATH];
-			if (__argc < 2) {
+			if(__argc < 2) {
 				GetEnvironmentVariable(("userprofile"), fileLocationEditValue, MAX_PATH);
 				strcat_s(fileLocationEditValue, TEXT("\\module.rom"));
 			}
@@ -258,7 +258,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) 
 		case WM_COMMAND:
 
 			// Check if extract button action
-			if (LOWORD(wParam) == EXTRACT_BUTTON_ACTION) {
+			if(LOWORD(wParam) == EXTRACT_BUTTON_ACTION) {
 
 				// Reset error code
 				errorCode = IFR_EXTRACTED;
@@ -267,10 +267,10 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) 
 				SetWindowText(fileLocationEdit, TEXT(fileLocation.c_str()));
 
 				// Check if file exists
-				if (fileExists(fileLocation)) {
+				if(fileExists(fileLocation)) {
 
 					// Check if protocol is unknown
-					if (protocol == UNKNOWN) {
+					if(protocol == UNKNOWN) {
 
 						// Set error code
 						errorCode = UNKNOWN_PROTOCOL;
@@ -292,7 +292,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) 
 						break;
 
 					// Check if protocol is EFI
-					if (protocol == EFI) {
+					if(protocol == EFI) {
 
 						// Initialize EFI variables
 						vector<EFI_IFR_STRING_PACK> stringPackages;
@@ -312,7 +312,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) 
 					}
 
 					// Otherwise check if protocol is UEFI
-					else if (protocol == UEFI) {
+					else if(protocol == UEFI) {
 
 						// Initialize UEFI variables
 						vector<UEFI_IFR_STRING_PACK> stringPackages;
@@ -343,16 +343,16 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) 
 			}
 
 			// Otherwise check if browse button action
-			else if (LOWORD(wParam) == BROWSE_BUTTON_ACTION)
+			else if(LOWORD(wParam) == BROWSE_BUTTON_ACTION)
 
 				// Browse folders
 				fileBrowser(hwnd);
 
 			// Otherwise check if file location edit action
-			else if (LOWORD(wParam) == FILE_LOCATION_EDIT_ACTION)
+			else if(LOWORD(wParam) == FILE_LOCATION_EDIT_ACTION)
 
 				// Check if file location edit was changed
-				if (HIWORD(wParam) == EN_CHANGE) {
+				if(HIWORD(wParam) == EN_CHANGE) {
 
 					// Set file location
 					TCHAR tempBuffer[MAX_PATH];
@@ -360,7 +360,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) 
 					fileLocation = tempBuffer;
 
 					// Check if file exists
-					if (fileExists(fileLocation)) {
+					if(fileExists(fileLocation)) {
 
 						// Read in file
 						readFile(fileLocation, buffer);
@@ -396,10 +396,10 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) 
 			hdcStatic = (HDC)wParam;
 			
 			// Check if caller is type text
-			if ((HWND)lParam == typeText) {
+			if((HWND)lParam == typeText) {
 			
 				// Check if protocol is unknown
-				if (protocol == UNKNOWN) {
+				if(protocol == UNKNOWN) {
 				
 					// Set text
 					SetWindowText(typeText, TEXT("Unknown"));
@@ -412,13 +412,13 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) 
 				else {
 
 					// Check if protocol is EFI
-					if (protocol == EFI)
+					if(protocol == EFI)
 					
 						// Set text
 						SetWindowText(typeText, TEXT("EFI"));
 
 					// Otherwise check if protocol is UEFI
-					else if (protocol == UEFI)
+					else if(protocol == UEFI)
 					
 						// Set text
 						SetWindowText(typeText, TEXT("UEFI"));
@@ -470,7 +470,7 @@ void fileBrowser(HWND hwnd) {
 	browserInfo.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
 
 	// Check if file was selected
-	if (GetOpenFileName(&browserInfo))
+	if(GetOpenFileName(&browserInfo))
 
 		// Update file location edit
 		SetWindowText(fileLocationEdit, TEXT(browserInfo.lpstrFile));
@@ -493,7 +493,7 @@ bool saveFile(HWND hwnd) {
 	browserInfo.lpstrDefExt = (LPCSTR)"txt";
 
 	// Check if file was selected
-	if (GetSaveFileName(&browserInfo)) {
+	if(GetSaveFileName(&browserInfo)) {
 
 		// Set output file
 		outputFile = browserInfo.lpstrFile;
@@ -512,7 +512,7 @@ void showDialog(HWND hwnd) {
 	string header, message;
 
 	// Check if error code is IFR extracted
-	if (errorCode == IFR_EXTRACTED) {
+	if(errorCode == IFR_EXTRACTED) {
 
 		// Set header
 		header = "Message";
@@ -531,13 +531,13 @@ void showDialog(HWND hwnd) {
 		header = "Error";
 
 		// Check if error code equals file not found
-		if (errorCode == FILE_NOT_FOUND)
+		if(errorCode == FILE_NOT_FOUND)
 
 			// Set message
 			message = "File not found";
 
 		// Otherwise check if error code equals unknown protocol
-		else if (errorCode == UNKNOWN_PROTOCOL)
+		else if(errorCode == UNKNOWN_PROTOCOL)
 
 			// Set message
 			message = "Unknown protocol detected";
@@ -565,7 +565,7 @@ void readFile(const string &file, string &buffer) {
 	buffer.clear();
 
 	// Read in file
-	while (fin.peek() != EOF)
+	while(fin.peek() != EOF)
 		buffer.push_back(fin.get());
 
 	// Close file
