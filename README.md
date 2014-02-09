@@ -3,6 +3,8 @@ Universal IFR Extractor
 
 Utility that can extract the internal forms representation from both EFI and UEFI modules and convert it into a human readable format.
 
+You can download an executable <a href="http://bios-mods.com/pub/donovan6000/Software/Universal%20IFR%20Extractor/Universal%20IFR%20Extractor.exe">here.</a>
+
 © 2014 donovan6000
 <br /><br /><br />
 Changelog:
