@@ -1,6 +1,7 @@
 // Header files
 #include <iostream>
 #include <fstream>
+#include <iomanip>
 #include "UEFI.h"
 
 
@@ -239,7 +240,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 	for(uint32_t i = 0; i < formSets.size(); i++)
 
 		// Go through all the form set's operations
-		for(uint32_t j = formSets[i].header.offset + 4; j < formSets[i].header.offset + formSets[i].header.length; j += static_cast<unsigned char>(buffer[j + 1]) & 0x7F)
+		for(uint32_t j = formSets[i].header.offset + 4; j < formSets[i].header.offset + formSets[i].header.length; j += static_cast<unsigned char>(buffer[j + 1]) & 0x7F) {
 
 			// Check if opcode if UEFI_IFR_FORM_OP 0x01
 			if(buffer[j] == UEFI_IFR_FORM_OP) {
@@ -263,7 +264,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Form: " << strings[temp.titleString] << ", Form ID: 0x" << hex << uppercase << temp.formId << endl;
+				fout << "Form: " << strings[temp.titleString] << ", Form ID: 0x" << hex << uppercase << temp.formId;
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -299,7 +300,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Subtitle: " << strings[temp.statement.promptString] << endl;
+				fout << "Subtitle: " << strings[temp.statement.promptString];
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -335,7 +336,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Text: " << strings[temp.statement.promptString] << endl;
+				fout << "Text: " << strings[temp.statement.promptString];
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -369,7 +370,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Image" << endl;
+				fout << "Image";
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -430,7 +431,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Setting: " << strings[temp.question.statement.promptString] << ", Variable: 0x" << hex << uppercase << temp.question.varOffset << endl;
+				fout << "Setting: " << strings[temp.question.statement.promptString] << ", Variable: 0x" << hex << uppercase << temp.question.varOffset;
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -470,7 +471,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Checkbox: " << strings[temp.question.statement.promptString] << ", Variable: 0x" << hex << uppercase << temp.question.varOffset << endl;
+				fout << "Checkbox: " << strings[temp.question.statement.promptString] << ", Variable: 0x" << hex << uppercase << temp.question.varOffset;
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -531,7 +532,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Numeric: " << strings[temp.question.statement.promptString] << dec << " (" << temp.data.minimumValue << '-' << temp.data.maximumValue << ") , Variable: 0x" << hex << uppercase << temp.question.varOffset << endl;
+				fout << "Numeric: " << strings[temp.question.statement.promptString] << dec << " (" << temp.data.minimumValue << '-' << temp.data.maximumValue << ") , Variable: 0x" << hex << uppercase << temp.question.varOffset;
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -572,7 +573,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Password: " << strings[temp.question.statement.promptString] << ", Variable: 0x" << hex << uppercase << temp.question.varOffset << endl;
+				fout << "Password: " << strings[temp.question.statement.promptString] << ", Variable: 0x" << hex << uppercase << temp.question.varOffset;
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -642,7 +643,6 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << " (default)";
 				else if(temp.flags == 0x20)
 					fout << " (default MFG)";
-				fout << endl;
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -675,7 +675,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Suppress If:" << endl;
+				fout << "Suppress If:";
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -708,7 +708,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Locked" << endl;
+				fout << "Locked";
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -748,7 +748,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Action: " << strings[temp.question.statement.promptString] << ", Variable: 0x" << hex << uppercase << temp.question.varOffset << endl;
+				fout << "Action: " << strings[temp.question.statement.promptString] << ", Variable: 0x" << hex << uppercase << temp.question.varOffset;
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -784,7 +784,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Reset: " << strings[temp.statement.promptString] << endl;
+				fout << "Reset: " << strings[temp.statement.promptString];
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -928,7 +928,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Form Set: " << strings[temp.titleString] << endl;
+				fout << "Form Set: " << strings[temp.titleString];
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -968,7 +968,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Ref: " << strings[temp.question.statement.promptString] << ", Variable: 0x" << hex << uppercase << temp.question.varOffset << endl;
+				fout << "Ref: " << strings[temp.question.statement.promptString] << ", Variable: 0x" << hex << uppercase << temp.question.varOffset;
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -1001,7 +1001,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "No Submit If:" << endl;
+				fout << "No Submit If:";
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -1034,7 +1034,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Inconsistent If:" << endl;
+				fout << "Inconsistent If:";
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -1069,7 +1069,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Variable 0x" << hex << uppercase << temp.questionId << " equals 0x" << hex << uppercase << temp.value << endl;
+				fout << "Variable 0x" << hex << uppercase << temp.questionId << " equals 0x" << hex << uppercase << temp.value;
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -1104,7 +1104,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Variable 0x" << hex << uppercase << temp.primaryQuestionId << " equals variable 0x" << hex << uppercase << temp.secondaryQuestionId << endl;
+				fout << "Variable 0x" << hex << uppercase << temp.primaryQuestionId << " equals variable 0x" << hex << uppercase << temp.secondaryQuestionId;
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -1151,7 +1151,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					if(k != temp.listLength - 1)
 						fout << ", ";
 					else
-						fout << ')' << endl;
+						fout << ')';
 				}
 
 				// Check if scope
@@ -1185,7 +1185,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "And" << endl;
+				fout << "And";
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -1218,7 +1218,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Or" << endl;
+				fout << "Or";
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -1251,7 +1251,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Not" << endl;
+				fout << "Not";
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -1285,7 +1285,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Rule" << endl;
+				fout << "Rule";
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -1318,7 +1318,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Grayout If:" << endl;
+				fout << "Grayout If:";
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -1358,7 +1358,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Date: " << strings[temp.question.statement.promptString] << ", Variable: 0x" << hex << uppercase << temp.question.varOffset << endl;
+				fout << "Date: " << strings[temp.question.statement.promptString] << ", Variable: 0x" << hex << uppercase << temp.question.varOffset;
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -1398,7 +1398,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Time: " << strings[temp.question.statement.promptString] << ", Variable: 0x" << hex << uppercase << temp.question.varOffset << endl;
+				fout << "Time: " << strings[temp.question.statement.promptString] << ", Variable: 0x" << hex << uppercase << temp.question.varOffset;
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -1440,7 +1440,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "String: " << strings[temp.question.statement.promptString] << ", Variable: 0x" << hex << uppercase << temp.question.varOffset << endl;
+				fout << "String: " << strings[temp.question.statement.promptString] << ", Variable: 0x" << hex << uppercase << temp.question.varOffset;
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -1474,7 +1474,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Refresh" << endl;
+				fout << "Refresh";
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -1507,7 +1507,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Disable If:" << endl;
+				fout << "Disable If:";
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -1541,7 +1541,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Animation" << endl;
+				fout << "Animation";
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -1574,7 +1574,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Convert to Lower" << endl;
+				fout << "Convert to Lower";
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -1607,7 +1607,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Convert to Upper" << endl;
+				fout << "Convert to Upper";
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -1640,7 +1640,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Map" << endl;
+				fout << "Map";
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -1681,7 +1681,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Ordered List: " << strings[temp.question.statement.promptString] << ", Variable: 0x" << hex << uppercase << temp.question.varOffset << endl;
+				fout << "Ordered List: " << strings[temp.question.statement.promptString] << ", Variable: 0x" << hex << uppercase << temp.question.varOffset;
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -1772,7 +1772,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Var Store: 0x" << hex << uppercase << temp.varStoreId << "[" << dec << temp.size << "] (" << temp.name << ')' << endl;
+				fout << "Var Store: 0x" << hex << uppercase << temp.varStoreId << "[" << dec << temp.size << "] (" << temp.name << ')';
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -1860,7 +1860,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Var Store Name Value: 0x" << hex << uppercase << temp.varStoreId << endl;
+				fout << "Var Store Name Value: 0x" << hex << uppercase << temp.varStoreId;
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -1949,7 +1949,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Var Store EFI: 0x" << hex << uppercase << temp.varStoreId << endl;
+				fout << "Var Store EFI: 0x" << hex << uppercase << temp.varStoreId;
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -1982,7 +1982,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Var Store Device" << endl;
+				fout << "Var Store Device";
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -2015,7 +2015,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Version" << endl;
+				fout << "Version";
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -2064,7 +2064,6 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << " If";
 				else if(temp.condition == OPTION)
 					fout << " of Options";
-				fout << endl;
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -2097,7 +2096,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Match" << endl;
+				fout << "Match";
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -2133,7 +2132,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Get: 0x" << hex << uppercase << temp.varOffset << endl;
+				fout << "Get: 0x" << hex << uppercase << temp.varOffset;
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -2170,7 +2169,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Set: 0x" << hex << uppercase << temp.varOffset << endl;
+				fout << "Set: 0x" << hex << uppercase << temp.varOffset;
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -2203,7 +2202,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Read" << endl;
+				fout << "Read";
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -2236,7 +2235,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Write" << endl;
+				fout << "Write";
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -2269,7 +2268,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Equal" << endl;
+				fout << "Equal";
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -2302,7 +2301,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Not Equal" << endl;
+				fout << "Not Equal";
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -2335,7 +2334,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Greater Than" << endl;
+				fout << "Greater Than";
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -2368,7 +2367,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Greater Than or Equal" << endl;
+				fout << "Greater Than or Equal";
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -2401,7 +2400,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Less Than" << endl;
+				fout << "Less Than";
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -2434,7 +2433,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Less Than or Equal" << endl;
+				fout << "Less Than or Equal";
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -2467,7 +2466,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Bitwise And" << endl;
+				fout << "Bitwise And";
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -2500,7 +2499,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Bitwise Or" << endl;
+				fout << "Bitwise Or";
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -2533,7 +2532,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Bitwise Not" << endl;
+				fout << "Bitwise Not";
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -2566,7 +2565,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Shift Left" << endl;
+				fout << "Shift Left";
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -2599,7 +2598,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Shift Right" << endl;
+				fout << "Shift Right";
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -2632,7 +2631,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Add" << endl;
+				fout << "Add";
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -2665,7 +2664,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Subtract" << endl;
+				fout << "Subtract";
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -2698,7 +2697,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Multiply" << endl;
+				fout << "Multiply";
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -2731,7 +2730,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Divide" << endl;
+				fout << "Divide";
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -2764,7 +2763,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Modulo" << endl;
+				fout << "Modulo";
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -2798,7 +2797,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Rule Ref" << endl;
+				fout << "Rule Ref";
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -2832,7 +2831,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Question Ref: 0x" << hex << uppercase << temp.questionId << endl;
+				fout << "Question Ref: 0x" << hex << uppercase << temp.questionId;
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -2865,7 +2864,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Question Ref" << endl;
+				fout << "Question Ref";
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -2899,7 +2898,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "8 Bit Unsigned Int: 0x" << hex << uppercase << temp.value << endl;
+				fout << "8 Bit Unsigned Int: 0x" << hex << uppercase << temp.value;
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -2933,7 +2932,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "16 Bit Unsigned Int: 0x" << hex << uppercase << temp.value << endl;
+				fout << "16 Bit Unsigned Int: 0x" << hex << uppercase << temp.value;
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -2967,7 +2966,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "32 Bit Unsigned Int: 0x" << hex << uppercase << temp.value << endl;
+				fout << "32 Bit Unsigned Int: 0x" << hex << uppercase << temp.value;
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -3001,7 +3000,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "64 Bit Unsigned Int: 0x" << hex << uppercase << temp.value << endl;
+				fout << "64 Bit Unsigned Int: 0x" << hex << uppercase << temp.value;
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -3034,7 +3033,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "True" << endl;
+				fout << "True";
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -3067,7 +3066,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "False" << endl;
+				fout << "False";
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -3100,7 +3099,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Convert to Unsigned Int" << endl;
+				fout << "Convert to Unsigned Int";
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -3134,7 +3133,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Convert to String" << endl;
+				fout << "Convert to String";
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -3167,7 +3166,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Boolean" << endl;
+				fout << "Boolean";
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -3200,7 +3199,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Mid" << endl;
+				fout << "Mid";
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -3234,7 +3233,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Find" << endl;
+				fout << "Find";
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -3267,7 +3266,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Token" << endl;
+				fout << "Token";
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -3301,7 +3300,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "String Ref: " << strings[temp.stringId] << endl;
+				fout << "String Ref: " << strings[temp.stringId];
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -3334,7 +3333,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "String Ref" << endl;
+				fout << "String Ref";
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -3367,7 +3366,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Conditional" << endl;
+				fout << "Conditional";
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -3400,7 +3399,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Question Ref" << endl;
+				fout << "Question Ref";
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -3433,7 +3432,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Zero" << endl;
+				fout << "Zero";
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -3466,7 +3465,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "One" << endl;
+				fout << "One";
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -3499,7 +3498,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Ones" << endl;
+				fout << "Ones";
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -3532,7 +3531,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Undefined" << endl;
+				fout << "Undefined";
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -3565,7 +3564,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Length" << endl;
+				fout << "Length";
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -3598,7 +3597,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Dup" << endl;
+				fout << "Dup";
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -3631,7 +3630,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "This" << endl;
+				fout << "This";
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -3665,7 +3664,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Span" << endl;
+				fout << "Span";
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -3698,7 +3697,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Value" << endl;
+				fout << "Value";
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -3770,7 +3769,6 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 
 				if(temp.type >= 0x00 && temp.type <= 0x03)
 					fout << ", Value: 0x" << hex << uppercase << temp.value;
-				fout << endl;
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -3805,7 +3803,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Default Store: " << strings[temp.defaultNameString] << " 0x" << hex << uppercase << temp.defaultId << endl;
+				fout << "Default Store: " << strings[temp.defaultNameString] << " 0x" << hex << uppercase << temp.defaultId;
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -3839,7 +3837,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Form Map: 0x" << hex << uppercase << temp.formId << endl;
+				fout << "Form Map: 0x" << hex << uppercase << temp.formId;
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -3872,7 +3870,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Catenate" << endl;
+				fout << "Catenate";
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -3959,7 +3957,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Guid: " << temp.guid << endl;
+				fout << "Guid: " << temp.guid;
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -4046,7 +4044,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Security: " << temp.permission << endl;
+				fout << "Security: " << temp.permission;
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -4058,6 +4056,16 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					conditionalStack.push_back(OTHER);
 				}
 			}
+		
+			// Display code
+			fout << " {";
+			for(int k = 0; k < static_cast<unsigned char>(buffer[j + 1] & 0x7F); k++) {
+				fout << hex << uppercase << setw(2) << setfill('0') << static_cast<unsigned int>(static_cast<unsigned char>(buffer[j + k]));
+				if(k != static_cast<unsigned char>(buffer[j + 1] & 0x7F) - 1)
+					fout << ' ';
+			}
+			fout << '}' << endl;
+		}
 	
 	// Close file
 	fout.close();

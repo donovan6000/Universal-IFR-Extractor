@@ -1,6 +1,7 @@
 // Header files
 #include <iostream>
 #include <fstream>
+#include <iomanip>
 #include "EFI.h"
 
 
@@ -238,7 +239,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 	for(uint32_t i = 0; i < formSets.size(); i++)
 
 		// Go through all the form set's operations
-		for(uint32_t j = formSets[i].header.offset + 6; j < formSets[i].header.offset + formSets[i].header.length; j += static_cast<unsigned char>(buffer[j + 1]))
+		for(uint32_t j = formSets[i].header.offset + 6; j < formSets[i].header.offset + formSets[i].header.length; j += static_cast<unsigned char>(buffer[j + 1])) {
 
 			// Check if opcode is EFI_IFR_FORM_OP 0x01
 			if(buffer[j] == EFI_IFR_FORM_OP) {
@@ -261,7 +262,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 					fout << '\t';
 
 				// Display temp
-				fout << "Form: " << strings[temp.titleString] << ", Form ID: 0x" << hex << uppercase << temp.formId << endl;
+				fout << "Form: " << strings[temp.titleString] << ", Form ID: 0x" << hex << uppercase << temp.formId;
 
 				// Increment number of tabs
 				numberOfTabs++;
@@ -287,7 +288,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 					fout << '\t';
 
 				// Display temp
-				fout << "Subtitle: " << strings[temp.subtitleString] << endl;
+				fout << "Subtitle: " << strings[temp.subtitleString];
 			}
 
 			// Otherwise check if opcode is EFI_IFR_TEXT_OP 0x03
@@ -314,7 +315,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 					fout << '\t';
 
 				// Display temp
-				fout << "Text: " << strings[temp.primaryTextString] << endl;
+				fout << "Text: " << strings[temp.primaryTextString];
 			}
 
 			// Otherwise chec if opcode is EFI_IFR_GRAPHIC_OP 0x04
@@ -328,7 +329,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 					fout << '\t';
 
 				// Display temp
-				fout << "Graphic:" << endl;
+				fout << "Graphic:";
 			}
 
 			// Otherwise check if opcode is EFI_IFR_ONE_OF_OP 0x05
@@ -354,7 +355,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 					fout << '\t';
 
 				// Display temp
-				fout << "Setting: " << strings[temp.promptString] << ", Variable: 0x" << hex << uppercase << temp.questionId << '[' << dec << static_cast<unsigned int>(temp.width) << ']' << endl;
+				fout << "Setting: " << strings[temp.promptString] << ", Variable: 0x" << hex << uppercase << temp.questionId << '[' << dec << static_cast<unsigned int>(temp.width) << ']';
 
 				// Increment number of tabs
 				numberOfTabs++;
@@ -385,7 +386,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 					fout << '\t';
 
 				// Display temp
-				fout << "Checkbox: " << strings[temp.promptString] << ", Variable: 0x" << hex << uppercase << temp.questionId << '[' << dec << static_cast<unsigned int>(temp.width) << ']' << endl;
+				fout << "Checkbox: " << strings[temp.promptString] << ", Variable: 0x" << hex << uppercase << temp.questionId << '[' << dec << static_cast<unsigned int>(temp.width) << ']';
 			}
 
 			// Otherwise check if opcode is EFI_IFR_NUMERIC_OP 0x07
@@ -416,7 +417,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 					fout << '\t';
 
 				// Display temp
-				fout << "Numeric: " << strings[temp.promptString] << " (" << dec << temp.minimum << '-' << temp.maximum << "), Variable: 0x" << hex << uppercase << temp.questionId << '[' << dec << static_cast<unsigned int>(temp.width) << ']' << endl;
+				fout << "Numeric: " << strings[temp.promptString] << " (" << dec << temp.minimum << '-' << temp.maximum << "), Variable: 0x" << hex << uppercase << temp.questionId << '[' << dec << static_cast<unsigned int>(temp.width) << ']';
 			}
 
 			// Otherwise check if opcode is EFI_IFR_PASSWORD_OP 0x08
@@ -447,7 +448,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 					fout << '\t';
 
 				// Display temp
-				fout << "Password: " << strings[temp.promptString] << ", Variable: 0x" << hex << uppercase << temp.questionId << '[' << dec << static_cast<unsigned int>(temp.width) << ']' << endl;
+				fout << "Password: " << strings[temp.promptString] << ", Variable: 0x" << hex << uppercase << temp.questionId << '[' << dec << static_cast<unsigned int>(temp.width) << ']';
 			}
 
 			// Otherwise check if opcode is EFI_IFR_ONE_OF_OPTION_OP 0x09
@@ -473,7 +474,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 					fout << '\t';
 
 				// Display temp
-				fout << "Option: " << strings[temp.optionString] << ", Value: 0x" << hex << uppercase << temp.value << endl;
+				fout << "Option: " << strings[temp.optionString] << ", Value: 0x" << hex << uppercase << temp.value;
 			}
 
 			// Otherwise check if opcode is EFI_IFR_SUPPRESS_IF_OP 0x0A
@@ -496,7 +497,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 					fout << '\t';
 
 				// Display temp
-				fout << "Suppress If:" << endl;
+				fout << "Suppress If:";
 
 				// Increment number of ifs
 				numberOfIfs++;
@@ -524,7 +525,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 					fout << '\t';
 
 				// Display temp
-				fout << "End Form" << endl;
+				fout << "End Form";
 			}
 
 			// Otherwise check if opcode is EFI_IFR_HIDDEN_OP 0x0C
@@ -548,7 +549,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 					fout << '\t';
 
 				// Display temp
-				fout << "Hidden:" << endl;
+				fout << "Hidden:";
 			}
 
 			// Otherwise check if opcode is EFI_IFR_END_FORM_SET_OP 0x0D
@@ -573,7 +574,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 					fout << '\t';
 
 				// Display temp
-				fout << "End Form Set" << endl;
+				fout << "End Form Set";
 			}
 
 			// Otherwise check if opcode is EFI_IFR_FORM_SET_OP 0x0E
@@ -655,7 +656,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 					fout << '\t';
 
 				// Display temp
-				fout << "Form Set: " << strings[temp.titleString] << endl;
+				fout << "Form Set: " << strings[temp.titleString];
 
 				// Increment number of tabs
 				numberOfTabs++;
@@ -685,7 +686,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 					fout << '\t';
 
 				// Display temp
-				fout << "Selectable: " << strings[temp.promptString] << ", Form ID: 0x" << hex << uppercase << temp.formId << endl;
+				fout << "Selectable: " << strings[temp.promptString] << ", Form ID: 0x" << hex << uppercase << temp.formId;
 			}
 
 			// Otherwise check if opcode is EFI_IFR_END_OP 0x10
@@ -710,7 +711,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 					fout << '\t';
 
 				// Display temp
-				fout << "End of Options" << endl;
+				fout << "End of Options";
 			}
 
 			// Otherwise check if opcode is EFI_IFR_INCONSISTENT_IF_OP 0x11
@@ -734,7 +735,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 					fout << '\t';
 
 				// Display inconsistent
-				fout << "Inconsistent If:" << endl;
+				fout << "Inconsistent If:";
 
 				// Increment number of ifs
 				numberOfIfs++;
@@ -762,7 +763,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 					fout << '\t';
 
 				// Display temp
-				fout << "Variable 0x" << hex << uppercase << temp.questionId << '[' << dec << static_cast<unsigned int>(temp.width) << ']' << " equals 0x" << hex << uppercase << temp.value << endl;
+				fout << "Variable 0x" << hex << uppercase << temp.questionId << '[' << dec << static_cast<unsigned int>(temp.width) << ']' << " equals 0x" << hex << uppercase << temp.value;
 
 				// Check if there isn't a following conditional statement
 				if(endEFICondition(buffer, j))
@@ -793,7 +794,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 					fout << '\t';
 
 				// Display temp
-				fout << "Variable 0x" << hex << uppercase << temp.primaryQuestionId << '[' << dec << static_cast<unsigned int>(temp.width) << ']' << " equals variable 0x" << hex << uppercase << temp.secondaryQuestionId << endl;
+				fout << "Variable 0x" << hex << uppercase << temp.primaryQuestionId << '[' << dec << static_cast<unsigned int>(temp.width) << ']' << " equals variable 0x" << hex << uppercase << temp.secondaryQuestionId;
 
 				// Check if there isn't a following conditional statement
 				if(endEFICondition(buffer, j))
@@ -836,7 +837,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 					if(k != temp.listLength - 1)
 						fout << ", ";
 					else
-						fout << ')' << endl;
+						fout << ')';
 				}
 
 				// Check if there isn't a following conditional statement
@@ -865,7 +866,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 					fout << '\t';
 
 				// Display temp
-				fout << "And" << endl;
+				fout << "And";
 
 				// Check if there isn't a following conditional statement
 				if(endEFICondition(buffer, j))
@@ -893,7 +894,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 					fout << '\t';
 
 				// Display temp
-				fout << "Or" << endl;
+				fout << "Or";
 
 				// Check if there isn't a following conditional statement
 				if(endEFICondition(buffer, j))
@@ -921,7 +922,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 					fout << '\t';
 
 				// Display temp
-				fout << "Not" << endl;
+				fout << "Not";
 
 				// Check if there isn't a following conditional statement
 				if(endEFICondition(buffer, j))
@@ -955,7 +956,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 						fout << '\t';
 
 					// Display temp
-					fout << "End If" << endl;
+					fout << "End If";
 				}
 
 				// Clear number of ifs
@@ -982,7 +983,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 					fout << '\t';
 
 				// Display temp
-				fout << "Grayout If:" << endl;
+				fout << "Grayout If:";
 
 				// Increment number of ifs
 				numberOfIfs++;
@@ -1053,7 +1054,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 					fout << '\t';
 
 				// Display temp
-				fout << "Date: Day (" << dec << temp.day.minimum << '-' << temp.day.maximum << "), Month (" << temp.month.minimum << '-' << temp.month.maximum << "), Year (" << temp.year.minimum << '-' << temp.year.maximum << "), Variables: 0x" << hex << uppercase << temp.day.questionId << '[' << dec << static_cast<unsigned int>(temp.day.width) << ']' << ", 0x" << hex << uppercase << temp.month.questionId << '[' << dec << static_cast<unsigned int>(temp.month.width) << ']' << ", 0x" << hex << uppercase << temp.year.questionId << '[' << dec << static_cast<unsigned int>(temp.year.width) << ']' << endl;
+				fout << "Date: Day (" << dec << temp.day.minimum << '-' << temp.day.maximum << "), Month (" << temp.month.minimum << '-' << temp.month.maximum << "), Year (" << temp.year.minimum << '-' << temp.year.maximum << "), Variables: 0x" << hex << uppercase << temp.day.questionId << '[' << dec << static_cast<unsigned int>(temp.day.width) << ']' << ", 0x" << hex << uppercase << temp.month.questionId << '[' << dec << static_cast<unsigned int>(temp.month.width) << ']' << ", 0x" << hex << uppercase << temp.year.questionId << '[' << dec << static_cast<unsigned int>(temp.year.width) << ']';
 			}
 
 			// Otherwise check if opcode is EFI_IFR_TIME_OP 0x1B
@@ -1121,7 +1122,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 					fout << '\t';
 
 				// Display temp
-				fout << "Time: Hour (" << dec << temp.hour.minimum << '-' << temp.hour.maximum << "), Minute (" << temp.minute.minimum << '-' << temp.minute.maximum << "), Second (" << temp.second.minimum << '-' << temp.second.maximum << "), Variables: 0x" << hex << uppercase << temp.hour.questionId << '[' << dec << static_cast<unsigned int>(temp.hour.width) << ']' << ", 0x" << hex << uppercase << temp.minute.questionId << '[' << dec << static_cast<unsigned int>(temp.minute.width) << ']' << ", 0x" << hex << uppercase << temp.second.questionId << '[' << dec << static_cast<unsigned int>(temp.second.width) << ']' << endl;
+				fout << "Time: Hour (" << dec << temp.hour.minimum << '-' << temp.hour.maximum << "), Minute (" << temp.minute.minimum << '-' << temp.minute.maximum << "), Second (" << temp.second.minimum << '-' << temp.second.maximum << "), Variables: 0x" << hex << uppercase << temp.hour.questionId << '[' << dec << static_cast<unsigned int>(temp.hour.width) << ']' << ", 0x" << hex << uppercase << temp.minute.questionId << '[' << dec << static_cast<unsigned int>(temp.minute.width) << ']' << ", 0x" << hex << uppercase << temp.second.questionId << '[' << dec << static_cast<unsigned int>(temp.second.width) << ']';
 			}
 
 			// Otherwise check if opcode is EFI_IFR_STRING_OP 0x1C
@@ -1151,7 +1152,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 					fout << '\t';
 
 				// Display temp
-				fout << "String: " << strings[temp.promptString] << ", Variable: 0x" << hex << uppercase << temp.questionId << '[' << dec << static_cast<unsigned int>(temp.width) << ']' << endl;
+				fout << "String: " << strings[temp.promptString] << ", Variable: 0x" << hex << uppercase << temp.questionId << '[' << dec << static_cast<unsigned int>(temp.width) << ']';
 			}
 
 			// Otherwise check if opcode is EFI_IFR_LABEL_OP 0x1D
@@ -1174,7 +1175,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 					fout << '\t';
 
 				// Display temp
-				fout << "Label: 0x" << hex << uppercase << temp.labelId << endl;
+				fout << "Label: 0x" << hex << uppercase << temp.labelId;
 			}
 
 			// Otherwise check if opcode is EFI_IFR_SAVE_DEFAULTS_OP 0x1E
@@ -1201,7 +1202,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 					fout << '\t';
 
 				// Display temp
-				fout << "Save Defaults: " << strings[temp.promptString] << ", Form ID: 0x" << hex << uppercase << temp.formId << endl;
+				fout << "Save Defaults: " << strings[temp.promptString] << ", Form ID: 0x" << hex << uppercase << temp.formId;
 			}
 
 			// Otherwise check if opcode is EFI_IFR_RESTORE_DEFAULTS_OP 0x1F
@@ -1228,7 +1229,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 					fout << '\t';
 
 				// Display temp
-				fout << "Restore Defaults: " << strings[temp.promptString] << ", Form ID: 0x" << hex << uppercase << temp.formId << endl;
+				fout << "Restore Defaults: " << strings[temp.promptString] << ", Form ID: 0x" << hex << uppercase << temp.formId;
 			}
 
 			// Otherwise check if opcode is EFI_IFR_BANNER_OP 0x20
@@ -1253,7 +1254,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 					fout << '\t';
 
 				// Display temp
-				fout << "Banner: " << strings[temp.titleString] << endl;
+				fout << "Banner: " << strings[temp.titleString];
 			}
 
 			// Otherwise check if opcode is EFI_IFR_INVENTORY_OP 0x21
@@ -1278,7 +1279,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 					fout << '\t';
 
 				// Display temp
-				fout << "Inventory: " << strings[temp.primaryTextString] << endl;
+				fout << "Inventory: " << strings[temp.primaryTextString];
 			}
 
 			// Otherwise check if opcode is EFI_IFR_EQ_VAR_VAL_OP 0x22
@@ -1302,7 +1303,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 					fout << '\t';
 
 				// Display temp
-				fout << "Variable 0x" << hex << uppercase << temp.variableId << " equals 0x" << temp.value << endl;
+				fout << "Variable 0x" << hex << uppercase << temp.variableId << " equals 0x" << temp.value;
 
 				// Check if there isn't a following conditional statement
 				if(endEFICondition(buffer, j))
@@ -1334,7 +1335,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 					fout << '\t';
 
 				// Display temp
-				fout << "Ordered List: " << strings[temp.promptString] << ", Variable: 0x" << hex << uppercase << temp.questionId << endl;
+				fout << "Ordered List: " << strings[temp.promptString] << ", Variable: 0x" << hex << uppercase << temp.questionId;
 			}
 
 			// Otherwise check if opcode is EFI_IFR_VARSTORE_OP 0x24
@@ -1412,7 +1413,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 					fout << '\t';
 
 				// Display temp
-				fout << "Variable Store: 0x" << hex << uppercase << temp.varId << endl;
+				fout << "Variable Store: 0x" << hex << uppercase << temp.varId;
 			}
 
 			// Otherwise check if opcode is EFI_IFR_VARSTORE_SELECT_OP 0x25
@@ -1435,7 +1436,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 					fout << '\t';
 
 				// Display temp
-				fout << "Variable Store Select: 0x" << hex << uppercase << temp.varId << endl;
+				fout << "Variable Store Select: 0x" << hex << uppercase << temp.varId;
 			}
 
 			// Otherwise check if opcode is EFI_IFR_VARSTORE_SELECT_PAIR_OP 0x26
@@ -1459,7 +1460,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 					fout << '\t';
 
 				// Display temp
-				fout << "Variable Store Select Pair: 0x" << hex << uppercase << temp.primaryVarId << "and 0x" << temp.secondaryVarId << endl;
+				fout << "Variable Store Select Pair: 0x" << hex << uppercase << temp.primaryVarId << "and 0x" << temp.secondaryVarId;
 			}
 
 			// Otherwise check if opcode is EFI_IFR_TRUE_OP 0x27
@@ -1481,7 +1482,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 					fout << '\t';
 
 				// Display temp
-				fout << "True" << endl;
+				fout << "True";
 
 				// Check if there isn't a following conditional statement
 				if(endEFICondition(buffer, j))
@@ -1509,7 +1510,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 					fout << '\t';
 
 				// Display temp
-				fout << "False" << endl;
+				fout << "False";
 
 				// Check if there isn't a following conditional statement
 				if(endEFICondition(buffer, j))
@@ -1537,7 +1538,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 					fout << '\t';
 
 				// Display temp
-				fout << "GT" << endl;
+				fout << "GT";
 				
 				// Check if there isn't a following conditional statement
 				if(endEFICondition(buffer, j))
@@ -1565,7 +1566,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 					fout << '\t';
 
 				// Display temp
-				fout << "GE" << endl;
+				fout << "GE";
 				
 				// Check if there isn't a following conditional statement
 				if(endEFICondition(buffer, j))
@@ -1585,7 +1586,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 					fout << '\t';
 
 				// Display temp
-				fout << "OEM Defined:" << endl;
+				fout << "OEM Defined:";
 			}
 
 			// Otherwise check if opcode is EFI_IFR_OEM_OP 0xFE
@@ -1599,7 +1600,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 					fout << '\t';
 
 				// Display temp
-				fout << "OEM:" << endl;
+				fout << "OEM:";
 			}
 
 			// Otherwise check if opcode is EFI_IFR_NV_ACCESS_COMMAND 0xFF
@@ -1613,8 +1614,18 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 					fout << '\t';
 
 				// Display temp
-				fout << "NV Access Command:" << endl;
+				fout << "NV Access Command:";
 			}
+		
+			// Display code
+			fout << " {";
+			for(int k = 0; k < static_cast<unsigned char>(buffer[j + 1]); k++) {
+				fout << hex << uppercase << setw(2) << setfill('0') << static_cast<unsigned int>(static_cast<unsigned char>(buffer[j + k]));
+				if(k != static_cast<unsigned char>(buffer[j + 1]) - 1)
+					fout << ' ';
+			}
+			fout << '}' << endl;
+		}
 	
 	// Close file
 	fout.close();
