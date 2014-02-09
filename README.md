@@ -7,6 +7,7 @@ You can download an executable <a href="http://bios-mods.com/pub/donovan6000/Sof
 
 © 2014 donovan6000
 <br /><br /><br />
+=======================
 Changelog:
 
 v0.3 2/8/2014
