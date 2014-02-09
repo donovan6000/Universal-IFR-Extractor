@@ -6,7 +6,13 @@ Utility that can extract the internal forms representation from both EFI and UEF
 © 2014 donovan6000
 
 
+
+
+
 Changelog:
+
+v0.3 2/8/2014
+* Shows entire command's hex sequence in output.
 
 v0.2 2/7/2014
 * I think I fixed the issue that prevented it from running on Windows XP.
