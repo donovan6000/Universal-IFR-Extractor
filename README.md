@@ -9,6 +9,9 @@ You can download an executable <a href="http://bios-mods.com/pub/donovan6000/Sof
 <br /><br /><br />
 Changelog:
 
+v0.4 2/10/2014
+* Fixed an issue with ASROCK FM2-A55M's Setup module. 
+
 v0.3 2/8/2014
 * Shows entire command's hex sequence in output.
 
