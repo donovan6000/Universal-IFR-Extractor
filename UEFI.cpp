@@ -97,6 +97,10 @@ void getUEFIStrings(const vector<UEFI_IFR_STRING_PACK> &stringPackages, vector<s
 
 		// Clear temp
 		temp.clear();
+		
+		// Skip % padding
+		while(buffer[index + 1] == '\x25')
+			index += 2;
 	}
 
 	// Go through strings
@@ -142,14 +146,14 @@ void getUEFIFormSets(vector<UEFI_IFR_FORM_SET_PACK> &formSets, const string &buf
 
 		// Check if form set was found
 		if((buffer[i] != '\x00' || buffer[i + 1] != '\x00' || buffer[i + 2] != '\x00') && buffer[i + 3] == '\x02' && buffer[i + 4] == '\x0E' && i + static_cast<unsigned char>(buffer[i]) + (static_cast<unsigned char>(buffer[i + 1]) << 8) + (static_cast<unsigned char>(buffer[i + 2]) << 16) < buffer.size() && buffer[i + static_cast<unsigned char>(buffer[i]) + (static_cast<unsigned char>(buffer[i + 1]) << 8) + (static_cast<unsigned char>(buffer[i + 2]) << 16) - 1] == '\x02' && buffer[i + static_cast<unsigned char>(buffer[i]) + (static_cast<unsigned char>(buffer[i + 1]) << 8) + (static_cast<unsigned char>(buffer[i + 2]) << 16) - 2] == '\x29') {
-
+		
 			// Set temp form set
 			tempFormSet.header.offset = i;
 			tempFormSet.header.length = static_cast<uint32_t>(static_cast<unsigned char>(buffer[i]) + (static_cast<unsigned char>(buffer[i + 1]) << 8) + (static_cast<unsigned char>(buffer[i + 2]) << 16));
 			tempFormSet.header.type = static_cast<unsigned char>(buffer[i + 3]);
 			tempFormSet.titleString = static_cast<uint16_t>(static_cast<unsigned char>(buffer[i + 22]) + (static_cast<unsigned char>(buffer[i + 23]) << 8));
 			tempFormSet.title = strings[tempFormSet.titleString];
-
+			
 			// Add temp form set to list
 			formSets.push_back(tempFormSet);
 		}
