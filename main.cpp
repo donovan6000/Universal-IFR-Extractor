@@ -110,7 +110,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 
 	// Create window
 	hwnd = CreateWindow(appName,
-		TEXT("Universal IFR Extractor v0.3"),
+		TEXT("Universal IFR Extractor v0.4"),
 		WS_SYSMENU | WS_MINIMIZEBOX,
 		0, 0,
 		354, 135,
