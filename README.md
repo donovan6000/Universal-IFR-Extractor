@@ -11,6 +11,7 @@ Changelog:
 
 v0.5 3/2/2014
 * Fixed an issue that caused it to crash older versions of Windows.
+* Corrected form set offsets that were off by four bytes.
 
 v0.4 2/10/2014
 * Fixed an issue with ASROCK FM2-A55M's Setup module. 
