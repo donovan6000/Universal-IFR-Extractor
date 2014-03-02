@@ -90,7 +90,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 	HWND hwnd;
 	MSG msg;
 	WNDCLASSEX wndclass;
-
+	
 	// Initialize window class
 	wndclass.cbSize = sizeof(WNDCLASSEX);
 	wndclass.style = 0;
