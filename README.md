@@ -9,6 +9,9 @@ You can download an executable <a href="http://bios-mods.com/pub/donovan6000/Sof
 <br /><br /><br />
 Changelog:
 
+v0.5 3/2/2014
+* Fixed an issue that caused it to crash older versions of Windows.
+
 v0.4 2/10/2014
 * Fixed an issue with ASROCK FM2-A55M's Setup module. 
 

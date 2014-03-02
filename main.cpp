@@ -110,7 +110,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 
 	// Create window
 	hwnd = CreateWindow(appName,
-		TEXT("Universal IFR Extractor v0.4"),
+		TEXT("Universal IFR Extractor v0.5"),
 		WS_SYSMENU | WS_MINIMIZEBOX,
 		0, 0,
 		354, 135,
@@ -458,15 +458,19 @@ void fileBrowser(HWND hwnd) {
 
 	// Initialize variables
 	OPENFILENAME browserInfo;
-	string fileName = fileLocation;
+	CHAR szFile[MAX_PATH];
 
 	// Set dialog options
 	ZeroMemory(&browserInfo, sizeof(browserInfo));
 	browserInfo.lStructSize = sizeof(browserInfo);
 	browserInfo.hwndOwner = hwnd;
 	browserInfo.lpstrFilter = TEXT("All files(*.*)\0*.*\0");
-	browserInfo.lpstrFile = (LPSTR)fileName.c_str();
+	browserInfo.lpstrFile = szFile;
+	browserInfo.lpstrFile[0] = '\0';
 	browserInfo.nMaxFile = MAX_PATH;
+	browserInfo.nFilterIndex = 1;
+	browserInfo.lpstrInitialDir = NULL;
+	browserInfo.lpstrFileTitle = NULL;
 	browserInfo.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
 
 	// Check if file was selected
