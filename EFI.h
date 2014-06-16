@@ -73,11 +73,13 @@ struct EFI_IFR_STRING_PACK {
 	uint32_t numberOfStrings;
 	uint32_t attributes;
 	string language;
+	uint32_t structureOffset;
 };
 
 struct EFI_IFR_FORM_SET_PACK {
 	EFI_HII_PACK_HEADER header;
 	uint16_t titleString;
+	uint32_t usingStringPackage;
 	string title;
 };
 
@@ -394,7 +396,7 @@ void displayEFIStringPackages(const vector<EFI_IFR_STRING_PACK> &stringPackages)
 Name: getEFIStrings
 Purpose: Gets strings from string package
 */
-void getEFIStrings(const vector<EFI_IFR_STRING_PACK> &stringPackages, vector<string> &strings, const string &buffer);
+void getEFIStrings(vector<EFI_IFR_STRING_PACK> &stringPackages, vector<string> &strings, const string &buffer);
 
 /*
 Name: displayEFIStrings
@@ -406,7 +408,7 @@ void displayEFIStrings(const vector<string> &strings);
 Name: getEFIFormSets
 Purpose: Gets EFI form sets
 */
-void getEFIFormSets(vector<EFI_IFR_FORM_SET_PACK> &formSets, const string &buffer, const vector<string> &strings);
+void getEFIFormSets(vector<EFI_IFR_FORM_SET_PACK> &formSets, const string &buffer, const vector<EFI_IFR_STRING_PACK> &stringPackages, const vector<string> &strings);
 
 /*
 Name: displayEFIFormSets

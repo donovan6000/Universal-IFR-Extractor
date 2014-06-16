@@ -125,11 +125,13 @@ struct UEFI_IFR_STRING_PACK {
 	uint32_t stringOffset;
 	vector<uint16_t> languageWindow;
 	string language;
+	uint32_t structureOffset;
 };
 
 struct UEFI_IFR_FORM_SET_PACK {
 	UEFI_HII_PACK_HEADER header;
 	uint16_t titleString;
+	uint32_t usingStringPackage;
 	string title;
 };
 
@@ -652,7 +654,7 @@ void displayUEFIStringPackages(const vector<UEFI_IFR_STRING_PACK> &stringPackage
 Name: getUEFIStrings
 Purpose: Gets strings from string package
 */
-void getUEFIStrings(const vector<UEFI_IFR_STRING_PACK> &stringPackages, vector<string> &strings, const string &buffer);
+void getUEFIStrings(vector<UEFI_IFR_STRING_PACK> &stringPackages, vector<string> &strings, const string &buffer);
 
 /*
 Name: displayUEFIStrings
@@ -664,7 +666,7 @@ void displayUEFIStrings(const vector<string> &strings);
 Name: getUEFIFormSets
 Purpose: Gets UEFI form sets
 */
-void getUEFIFormSets(vector<UEFI_IFR_FORM_SET_PACK> &formSets, const string &buffer, const vector<string> &strings);
+void getUEFIFormSets(vector<UEFI_IFR_FORM_SET_PACK> &formSets, const string &buffer, const vector<UEFI_IFR_STRING_PACK> &stringPackages, const vector<string> &strings);
 
 /*
 Name: displayUEFIFormSets

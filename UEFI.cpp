@@ -32,6 +32,8 @@ void getUEFIStringPackages(vector<UEFI_IFR_STRING_PACK> &stringPackages, const s
 
 			for(int j = i + 46; buffer[j] != '\x00'; j++)
 				tempStringPackage.language.push_back(buffer[j]);
+			
+			tempStringPackage.structureOffset = 0;
 
 			// Add string package to list
 			stringPackages.push_back(tempStringPackage);
@@ -60,47 +62,44 @@ void displayUEFIStringPackages(const vector<UEFI_IFR_STRING_PACK> &stringPackage
 	cout << endl;
 }
 
-void getUEFIStrings(const vector<UEFI_IFR_STRING_PACK> &stringPackages, vector<string> &strings, const string &buffer) {
+void getUEFIStrings(vector<UEFI_IFR_STRING_PACK> &stringPackages, vector<string> &strings, const string &buffer) {
 
 	// Initialize variables
-	int selection = 0, index;
+	int index;
 	string temp;
 
-	// Go through strin packages
-	for(unsigned int i = 0; i < stringPackages.size(); i++)
+	// Go through string packages
+	for(unsigned int i = 0; i < stringPackages.size(); i++) {
 
-		// Check if language is english
-		if(stringPackages[i].language == "en-US") {
+		// Check if language isn't english
+		if(stringPackages[i].language != "en-US")
 
-			// Set selection
-			selection = i;
-
-			// Break
-			break;
-		}
-
-	// Add language string to list
-	strings.push_back(stringPackages[selection].language);
-
-	// Set index
-	index = stringPackages[selection].stringOffset;
-
-	// Loop while string exists
-	for(; buffer[index] == '\x14'; index += 2) {
-
-		// Fill string
-		for(index++; buffer[index] != '\x00'; index += 2)
-			temp.push_back(buffer[index]);
-
-		// Add string to list
-		strings.push_back(temp);
-
-		// Clear temp
-		temp.clear();
+			// Continue
+			continue;
 		
-		// Skip padding
-		while(buffer[index + 1] == '\x25')
-			index += 2;
+		// Set structure offset
+		stringPackages[i].structureOffset = strings.size();
+		
+		// Add language string to list
+		strings.push_back(stringPackages[i].language);
+		
+		// Loop while string exists
+		for(index = stringPackages[i].stringOffset; buffer[index] == '\x14'; index += 2) {
+
+			// Fill string
+			for(index++; buffer[index] != '\x00'; index += 2)
+				temp.push_back(buffer[index]);
+
+			// Add string to list
+			strings.push_back(temp);
+
+			// Clear temp
+			temp.clear();
+		
+			// Skip % padding
+			while(buffer[index + 1] == '\x25')
+				index += 2;
+		}
 	}
 
 	// Go through strings
@@ -136,10 +135,25 @@ void displayUEFIStrings(const vector<string> &strings) {
 	cout << endl;
 }
 
-void getUEFIFormSets(vector<UEFI_IFR_FORM_SET_PACK> &formSets, const string &buffer, const vector<string> &strings) {
+void getUEFIFormSets(vector<UEFI_IFR_FORM_SET_PACK> &formSets, const string &buffer, const vector<UEFI_IFR_STRING_PACK> &stringPackages, const vector<string> &strings) {
 
 	// Initialize variables
 	UEFI_IFR_FORM_SET_PACK tempFormSet;
+	vector<uint32_t> stringCandidates;
+	uint32_t chosenCandidate;
+	
+	// Go through string packages
+	for(unsigned int i = 0; i < stringPackages.size(); i++) {
+
+		// Check if language isn't english
+		if(stringPackages[i].language != "en-US")
+
+			// Continue
+			continue;
+		
+		// Get string candidate
+		stringCandidates.push_back(i);
+	}
 
 	// Go through buffer
 	for(uint32_t i = 0; i < buffer.size() - 4; i++)
@@ -147,12 +161,19 @@ void getUEFIFormSets(vector<UEFI_IFR_FORM_SET_PACK> &formSets, const string &buf
 		// Check if form set was found
 		if((buffer[i] != '\x00' || buffer[i + 1] != '\x00' || buffer[i + 2] != '\x00') && buffer[i + 3] == '\x02' && buffer[i + 4] == '\x0E' && i + static_cast<unsigned char>(buffer[i]) + (static_cast<unsigned char>(buffer[i + 1]) << 8) + (static_cast<unsigned char>(buffer[i + 2]) << 16) < buffer.size() && buffer[i + static_cast<unsigned char>(buffer[i]) + (static_cast<unsigned char>(buffer[i + 1]) << 8) + (static_cast<unsigned char>(buffer[i + 2]) << 16) - 1] == '\x02' && buffer[i + static_cast<unsigned char>(buffer[i]) + (static_cast<unsigned char>(buffer[i + 1]) << 8) + (static_cast<unsigned char>(buffer[i + 2]) << 16) - 2] == '\x29') {
 		
+			// Get chosen candidate for form set's string package
+			chosenCandidate = stringCandidates[0];
+			for(unsigned int j = 1; j < stringCandidates.size(); j++)
+				if(abs(static_cast<signed>(stringPackages[j].header.offset - i)) < abs(static_cast<signed>(stringPackages[chosenCandidate].header.offset - i)))
+					chosenCandidate = j;
+			
 			// Set temp form set
 			tempFormSet.header.offset = i;
 			tempFormSet.header.length = static_cast<uint32_t>(static_cast<unsigned char>(buffer[i]) + (static_cast<unsigned char>(buffer[i + 1]) << 8) + (static_cast<unsigned char>(buffer[i + 2]) << 16));
 			tempFormSet.header.type = static_cast<unsigned char>(buffer[i + 3]);
 			tempFormSet.titleString = static_cast<uint16_t>(static_cast<unsigned char>(buffer[i + 22]) + (static_cast<unsigned char>(buffer[i + 23]) << 8));
-			tempFormSet.title = strings[tempFormSet.titleString];
+			tempFormSet.usingStringPackage = stringCandidates[chosenCandidate];
+			tempFormSet.title = strings[tempFormSet.titleString + stringPackages[tempFormSet.usingStringPackage].structureOffset];
 			
 			// Add temp form set to list
 			formSets.push_back(tempFormSet);
@@ -207,7 +228,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 	fout << endl;
 	for(uint8_t i = 0; i < stringPackages.size(); i++) {
 		fout << "0x" << hex << uppercase << stringPackages[i].header.offset;
-		fout << "\t\t" << stringPackages[i].language << endl;
+		fout << "\t\t" << stringPackages[i].language << " (0x" << hex << uppercase << static_cast<unsigned int>(i) << ')' << endl;
 	}
 	fout << endl << endl;
 
@@ -223,12 +244,8 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 		fout << '-';
 	fout << endl;
 	for(uint8_t i = 0; i < formSets.size(); i++) {
-		fout << "0x" << hex << uppercase;
-		if(static_cast<uint32_t>(static_cast<unsigned char>(buffer[formSets[i].header.offset - 4]) + (static_cast<unsigned char>(buffer[formSets[i].header.offset - 3]) << 8) + (static_cast<unsigned char>(buffer[formSets[i].header.offset - 2]) << 16)) - formSets[i].header.length == 4)
-			fout << formSets[i].header.offset - 4;
-		else
-			fout << formSets[i].header.offset;
-		fout << "\t\t" << formSets[i].title << " (0x" << hex << uppercase << formSets[i].titleString << ')' << endl;
+		fout << "0x" << hex << uppercase << formSets[i].header.offset;
+		fout << "\t\t" << formSets[i].title << " (0x" << hex << uppercase << formSets[i].titleString << " from string package 0x" << formSets[i].usingStringPackage << ')' << endl;
 	}
 	fout << endl << endl;
 
@@ -272,8 +289,8 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Form: " << strings[temp.titleString] << ", Form ID: 0x" << hex << uppercase << temp.formId;
-
+				fout << "Form: " << strings[temp.titleString + stringPackages[formSets[i].usingStringPackage].structureOffset] << ", Form ID: 0x" << hex << uppercase << temp.formId;
+				
 				// Check if scope
 				if(temp.header.scope) {
 
@@ -308,7 +325,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Subtitle: " << strings[temp.statement.promptString];
+				fout << "Subtitle: " << strings[temp.statement.promptString + stringPackages[formSets[i].usingStringPackage].structureOffset];
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -344,7 +361,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Text: " << strings[temp.statement.promptString];
+				fout << "Text: " << strings[temp.statement.promptString + stringPackages[formSets[i].usingStringPackage].structureOffset];
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -439,7 +456,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Setting: " << strings[temp.question.statement.promptString] << ", Variable: 0x" << hex << uppercase << temp.question.varOffset;
+				fout << "Setting: " << strings[temp.question.statement.promptString + stringPackages[formSets[i].usingStringPackage].structureOffset] << ", Variable: 0x" << hex << uppercase << temp.question.varOffset;
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -479,7 +496,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Checkbox: " << strings[temp.question.statement.promptString] << ", Variable: 0x" << hex << uppercase << temp.question.varOffset;
+				fout << "Checkbox: " << strings[temp.question.statement.promptString + stringPackages[formSets[i].usingStringPackage].structureOffset] << ", Variable: 0x" << hex << uppercase << temp.question.varOffset;
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -540,7 +557,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Numeric: " << strings[temp.question.statement.promptString] << dec << " (" << temp.data.minimumValue << '-' << temp.data.maximumValue << ") , Variable: 0x" << hex << uppercase << temp.question.varOffset;
+				fout << "Numeric: " << strings[temp.question.statement.promptString + stringPackages[formSets[i].usingStringPackage].structureOffset] << dec << " (" << temp.data.minimumValue << '-' << temp.data.maximumValue << ") , Variable: 0x" << hex << uppercase << temp.question.varOffset;
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -581,7 +598,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Password: " << strings[temp.question.statement.promptString] << ", Variable: 0x" << hex << uppercase << temp.question.varOffset;
+				fout << "Password: " << strings[temp.question.statement.promptString + stringPackages[formSets[i].usingStringPackage].structureOffset] << ", Variable: 0x" << hex << uppercase << temp.question.varOffset;
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -626,7 +643,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Option: " << strings[temp.optionString] << ", Value: ";
+				fout << "Option: " << strings[temp.optionString + stringPackages[formSets[i].usingStringPackage].structureOffset] << ", Value: ";
 
 				if(temp.type >= 0x00 && temp.type <= 0x03)
 					fout << "0x" << hex << uppercase << temp.value;
@@ -756,7 +773,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Action: " << strings[temp.question.statement.promptString] << ", Variable: 0x" << hex << uppercase << temp.question.varOffset;
+				fout << "Action: " << strings[temp.question.statement.promptString + stringPackages[formSets[i].usingStringPackage].structureOffset] << ", Variable: 0x" << hex << uppercase << temp.question.varOffset;
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -792,7 +809,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Reset: " << strings[temp.statement.promptString];
+				fout << "Reset: " << strings[temp.statement.promptString + stringPackages[formSets[i].usingStringPackage].structureOffset];
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -936,7 +953,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Form Set: " << strings[temp.titleString];
+				fout << "Form Set: " << strings[temp.titleString + stringPackages[formSets[i].usingStringPackage].structureOffset];
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -976,7 +993,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Ref: " << strings[temp.question.statement.promptString] << ", Variable: 0x" << hex << uppercase << temp.question.varOffset;
+				fout << "Ref: " << strings[temp.question.statement.promptString + stringPackages[formSets[i].usingStringPackage].structureOffset] << ", Variable: 0x" << hex << uppercase << temp.question.varOffset;
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -1366,7 +1383,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Date: " << strings[temp.question.statement.promptString] << ", Variable: 0x" << hex << uppercase << temp.question.varOffset;
+				fout << "Date: " << strings[temp.question.statement.promptString + stringPackages[formSets[i].usingStringPackage].structureOffset] << ", Variable: 0x" << hex << uppercase << temp.question.varOffset;
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -1406,7 +1423,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Time: " << strings[temp.question.statement.promptString] << ", Variable: 0x" << hex << uppercase << temp.question.varOffset;
+				fout << "Time: " << strings[temp.question.statement.promptString + stringPackages[formSets[i].usingStringPackage].structureOffset] << ", Variable: 0x" << hex << uppercase << temp.question.varOffset;
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -1448,7 +1465,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "String: " << strings[temp.question.statement.promptString] << ", Variable: 0x" << hex << uppercase << temp.question.varOffset;
+				fout << "String: " << strings[temp.question.statement.promptString + stringPackages[formSets[i].usingStringPackage].structureOffset] << ", Variable: 0x" << hex << uppercase << temp.question.varOffset;
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -1689,7 +1706,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Ordered List: " << strings[temp.question.statement.promptString] << ", Variable: 0x" << hex << uppercase << temp.question.varOffset;
+				fout << "Ordered List: " << strings[temp.question.statement.promptString + stringPackages[formSets[i].usingStringPackage].structureOffset] << ", Variable: 0x" << hex << uppercase << temp.question.varOffset;
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -3308,7 +3325,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "String Ref: " << strings[temp.stringId];
+				fout << "String Ref: " << strings[temp.stringId + stringPackages[formSets[i].usingStringPackage].structureOffset];
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -3811,7 +3828,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Default Store: " << strings[temp.defaultNameString] << " 0x" << hex << uppercase << temp.defaultId;
+				fout << "Default Store: " << strings[temp.defaultNameString + stringPackages[formSets[i].usingStringPackage].structureOffset] << " 0x" << hex << uppercase << temp.defaultId;
 
 				// Check if scope
 				if(temp.header.scope) {

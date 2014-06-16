@@ -110,7 +110,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 
 	// Create window
 	hwnd = CreateWindow(appName,
-		TEXT("Universal IFR Extractor v0.5"),
+		TEXT("Universal IFR Extractor v0.6"),
 		WS_SYSMENU | WS_MINIMIZEBOX,
 		0, 0,
 		354, 135,
@@ -305,7 +305,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) 
 						getEFIStrings(stringPackages, strings, buffer);
 
 						// Get EFI form sets
-						getEFIFormSets(formSets, buffer, strings);
+						getEFIFormSets(formSets, buffer, stringPackages, strings);
 
 						// Generate EFI IFR dump
 						generateEFIIFRDump(outputFile, stringPackages, formSets, buffer, strings);
@@ -325,7 +325,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) 
 						getUEFIStrings(stringPackages, strings, buffer);
 
 						// Get UEFI form sets
-						getUEFIFormSets(formSets, buffer, strings);
+						getUEFIFormSets(formSets, buffer, stringPackages, strings);
 
 						// Generate UEFI IFR dump
 						generateUEFIIFRDump(outputFile, stringPackages, formSets, buffer, strings);

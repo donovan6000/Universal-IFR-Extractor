@@ -59,43 +59,43 @@ void displayEFIStringPackages(const vector<EFI_IFR_STRING_PACK> &stringPackages)
 	cout << endl;
 }
 
-void getEFIStrings(const vector<EFI_IFR_STRING_PACK> &stringPackages, vector<string> &strings, const string &buffer) {
+void getEFIStrings(vector<EFI_IFR_STRING_PACK> &stringPackages, vector<string> &strings, const string &buffer) {
 
 	// Initialize variables
-	int selection = 0, index;
+	int index;
 	string temp;
 
-	// Go through strin packages
-	for(unsigned int i = 0; i < stringPackages.size(); i++)
+	// Go through string packages
+	for(unsigned int i = 0; i < stringPackages.size(); i++) {
 
-		// Check if language is english
-		if(stringPackages[i].language == "eng") {
+		// Check if language isn't english
+		if(stringPackages[i].language != "eng")
 
-			// Set selection
-			selection = i;
+			// Continue
+			continue;
+		
+		// Set structure offset
+		stringPackages[i].structureOffset = strings.size();
 
-			// Break
-			break;
+		// Set index
+		index = stringPackages[i].header.offset + 22;
+
+		// Go through strings
+		for(uint32_t j = 0; j < stringPackages[i].numberOfStrings; j++) {
+
+			// Fill string
+			for(uint32_t k = stringPackages[i].header.offset + static_cast<uint32_t>(static_cast<unsigned char>(buffer[index]) + (static_cast<unsigned char>(buffer[index + 1]) << 8) + (static_cast<unsigned char>(buffer[index + 2]) << 16) + (static_cast<unsigned char>(buffer[index + 3]) << 24)); buffer[k] != '\x00'; k += 2)
+				temp.push_back(buffer[k]);
+
+			// Add string to list
+			strings.push_back(temp);
+
+			// Clear temp
+			temp.clear();
+
+			// Increment index
+			index += 4;
 		}
-
-	// Set index
-	index = stringPackages[selection].header.offset + 22;
-
-	// Go through strings
-	for(uint32_t i = 0; i < stringPackages[selection].numberOfStrings; i++) {
-
-		// Fill string
-		for(uint32_t j = stringPackages[selection].header.offset + static_cast<uint32_t>(static_cast<unsigned char>(buffer[index]) + (static_cast<unsigned char>(buffer[index + 1]) << 8) + (static_cast<unsigned char>(buffer[index + 2]) << 16) + (static_cast<unsigned char>(buffer[index + 3]) << 24)); buffer[j] != '\x00'; j += 2)
-			temp.push_back(buffer[j]);
-
-		// Add string to list
-		strings.push_back(temp);
-
-		// Clear temp
-		temp.clear();
-
-		// Increment index
-		index += 4;
 	}
 
 	// Go through strings
@@ -131,23 +131,45 @@ void displayEFIStrings(const vector<string> &strings) {
 	cout << endl;
 }
 
-void getEFIFormSets(vector<EFI_IFR_FORM_SET_PACK> &formSets, const string &buffer, const vector<string> &strings) {
+void getEFIFormSets(vector<EFI_IFR_FORM_SET_PACK> &formSets, const string &buffer, const vector<EFI_IFR_STRING_PACK> &stringPackages, const vector<string> &strings) {
 
 	// Initialize variables
 	EFI_IFR_FORM_SET_PACK tempFormSet;
+	vector<uint32_t> stringCandidates;
+	uint32_t chosenCandidate;
+	
+	// Go through string packages
+	for(unsigned int i = 0; i < stringPackages.size(); i++) {
+
+		// Check if language isn't english
+		if(stringPackages[i].language != "eng")
+
+			// Continue
+			continue;
+		
+		// Get string candidate
+		stringCandidates.push_back(i);
+	}
 
 	// Go through buffer
 	for(uint32_t i = 0; i < buffer.size() - 5; i++)
 
 		// Check if form set was found
 		if((buffer[i] != '\x00' || buffer[i + 1] != '\x00' || buffer[i + 2] != '\x00' || buffer[i + 3] != '\x00') && buffer[i + 4] == '\x03' && buffer[i + 5] == '\x00' && i + static_cast<unsigned char>(buffer[i]) + (static_cast<unsigned char>(buffer[i + 1]) << 8) + (static_cast<unsigned char>(buffer[i + 2]) << 16) + (static_cast<unsigned char>(buffer[i + 3]) << 24) < buffer.size() && buffer[i + static_cast<unsigned char>(buffer[i]) + (static_cast<unsigned char>(buffer[i + 1]) << 8) + (static_cast<unsigned char>(buffer[i + 2]) << 16) + (static_cast<unsigned char>(buffer[i + 3]) << 24) - 1] == '\x02' && buffer[i + static_cast<unsigned char>(buffer[i]) + (static_cast<unsigned char>(buffer[i + 1]) << 8) + (static_cast<unsigned char>(buffer[i + 2]) << 16) + (static_cast<unsigned char>(buffer[i + 3]) << 24) - 2] == '\x0D') {
+		
+			// Get chosen candidate for form set's string package
+			chosenCandidate = stringCandidates[0];
+			for(unsigned int j = 1; j < stringCandidates.size(); j++)
+				if(abs(static_cast<signed>(stringPackages[j].header.offset - i)) < abs(static_cast<signed>(stringPackages[chosenCandidate].header.offset - i)))
+					chosenCandidate = j;
 
 			// Set temp form set
 			tempFormSet.header.offset = i;
 			tempFormSet.header.length = static_cast<uint32_t>(static_cast<unsigned char>(buffer[i]) + (static_cast<unsigned char>(buffer[i + 1]) << 8) + (static_cast<unsigned char>(buffer[i + 2]) << 16) + (static_cast<unsigned char>(buffer[i + 3]) << 24));
 			tempFormSet.header.type = static_cast<uint16_t>(static_cast<unsigned char>(buffer[i + 4]) + (static_cast<unsigned char>(buffer[i + 5]) << 8));
 			tempFormSet.titleString = static_cast<uint16_t>(static_cast<unsigned char>(buffer[i + 24]) + (static_cast<unsigned char>(buffer[i + 25]) << 8));
-			tempFormSet.title = strings[tempFormSet.titleString];
+			tempFormSet.usingStringPackage = stringCandidates[chosenCandidate];
+			tempFormSet.title = strings[tempFormSet.titleString + stringPackages[tempFormSet.usingStringPackage].structureOffset];
 
 			// Add temp form set to list
 			formSets.push_back(tempFormSet);
@@ -202,7 +224,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 	fout << endl;
 	for(uint8_t i = 0; i < stringPackages.size(); i++) {
 		fout << "0x" << hex << uppercase << stringPackages[i].header.offset;
-		fout << "\t\t" << stringPackages[i].language << endl;
+		fout << "\t\t" << stringPackages[i].language << " (0x" << hex << uppercase << static_cast<unsigned int>(i) << ')' << endl;
 	}
 	fout << endl << endl;
 
@@ -219,7 +241,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 	fout << endl;
 	for(uint8_t i = 0; i < formSets.size(); i++) {
 		fout << "0x" << hex << uppercase << formSets[i].header.offset;
-		fout << "\t\t" << formSets[i].title << " (0x" << hex << uppercase << formSets[i].titleString << ')' << endl;
+		fout << "\t\t" << formSets[i].title << " (0x" << hex << uppercase << formSets[i].titleString << " from string package 0x" << formSets[i].usingStringPackage << ')' << endl;
 	}
 	fout << endl << endl;
 
@@ -262,7 +284,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 					fout << '\t';
 
 				// Display temp
-				fout << "Form: " << strings[temp.titleString] << ", Form ID: 0x" << hex << uppercase << temp.formId;
+				fout << "Form: " << strings[temp.titleString + stringPackages[formSets[i].usingStringPackage].structureOffset] << ", Form ID: 0x" << hex << uppercase << temp.formId;
 
 				// Increment number of tabs
 				numberOfTabs++;
@@ -288,7 +310,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 					fout << '\t';
 
 				// Display temp
-				fout << "Subtitle: " << strings[temp.subtitleString];
+				fout << "Subtitle: " << strings[temp.subtitleString + stringPackages[formSets[i].usingStringPackage].structureOffset];
 			}
 
 			// Otherwise check if opcode is EFI_IFR_TEXT_OP 0x03
@@ -315,7 +337,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 					fout << '\t';
 
 				// Display temp
-				fout << "Text: " << strings[temp.primaryTextString];
+				fout << "Text: " << strings[temp.primaryTextString + stringPackages[formSets[i].usingStringPackage].structureOffset];
 			}
 
 			// Otherwise chec if opcode is EFI_IFR_GRAPHIC_OP 0x04
@@ -355,7 +377,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 					fout << '\t';
 
 				// Display temp
-				fout << "Setting: " << strings[temp.promptString] << ", Variable: 0x" << hex << uppercase << temp.questionId << '[' << dec << static_cast<unsigned int>(temp.width) << ']';
+				fout << "Setting: " << strings[temp.promptString + stringPackages[formSets[i].usingStringPackage].structureOffset] << ", Variable: 0x" << hex << uppercase << temp.questionId << '[' << dec << static_cast<unsigned int>(temp.width) << ']';
 
 				// Increment number of tabs
 				numberOfTabs++;
@@ -386,7 +408,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 					fout << '\t';
 
 				// Display temp
-				fout << "Checkbox: " << strings[temp.promptString] << ", Variable: 0x" << hex << uppercase << temp.questionId << '[' << dec << static_cast<unsigned int>(temp.width) << ']';
+				fout << "Checkbox: " << strings[temp.promptString + stringPackages[formSets[i].usingStringPackage].structureOffset] << ", Variable: 0x" << hex << uppercase << temp.questionId << '[' << dec << static_cast<unsigned int>(temp.width) << ']';
 			}
 
 			// Otherwise check if opcode is EFI_IFR_NUMERIC_OP 0x07
@@ -417,7 +439,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 					fout << '\t';
 
 				// Display temp
-				fout << "Numeric: " << strings[temp.promptString] << " (" << dec << temp.minimum << '-' << temp.maximum << "), Variable: 0x" << hex << uppercase << temp.questionId << '[' << dec << static_cast<unsigned int>(temp.width) << ']';
+				fout << "Numeric: " << strings[temp.promptString + stringPackages[formSets[i].usingStringPackage].structureOffset] << " (" << dec << temp.minimum << '-' << temp.maximum << "), Variable: 0x" << hex << uppercase << temp.questionId << '[' << dec << static_cast<unsigned int>(temp.width) << ']';
 			}
 
 			// Otherwise check if opcode is EFI_IFR_PASSWORD_OP 0x08
@@ -448,7 +470,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 					fout << '\t';
 
 				// Display temp
-				fout << "Password: " << strings[temp.promptString] << ", Variable: 0x" << hex << uppercase << temp.questionId << '[' << dec << static_cast<unsigned int>(temp.width) << ']';
+				fout << "Password: " << strings[temp.promptString + stringPackages[formSets[i].usingStringPackage].structureOffset] << ", Variable: 0x" << hex << uppercase << temp.questionId << '[' << dec << static_cast<unsigned int>(temp.width) << ']';
 			}
 
 			// Otherwise check if opcode is EFI_IFR_ONE_OF_OPTION_OP 0x09
@@ -474,7 +496,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 					fout << '\t';
 
 				// Display temp
-				fout << "Option: " << strings[temp.optionString] << ", Value: 0x" << hex << uppercase << temp.value;
+				fout << "Option: " << strings[temp.optionString + stringPackages[formSets[i].usingStringPackage].structureOffset] << ", Value: 0x" << hex << uppercase << temp.value;
 			}
 
 			// Otherwise check if opcode is EFI_IFR_SUPPRESS_IF_OP 0x0A
@@ -656,7 +678,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 					fout << '\t';
 
 				// Display temp
-				fout << "Form Set: " << strings[temp.titleString];
+				fout << "Form Set: " << strings[temp.titleString + stringPackages[formSets[i].usingStringPackage].structureOffset];
 
 				// Increment number of tabs
 				numberOfTabs++;
@@ -686,7 +708,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 					fout << '\t';
 
 				// Display temp
-				fout << "Selectable: " << strings[temp.promptString] << ", Form ID: 0x" << hex << uppercase << temp.formId;
+				fout << "Selectable: " << strings[temp.promptString + stringPackages[formSets[i].usingStringPackage].structureOffset] << ", Form ID: 0x" << hex << uppercase << temp.formId;
 			}
 
 			// Otherwise check if opcode is EFI_IFR_END_OP 0x10
@@ -1152,7 +1174,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 					fout << '\t';
 
 				// Display temp
-				fout << "String: " << strings[temp.promptString] << ", Variable: 0x" << hex << uppercase << temp.questionId << '[' << dec << static_cast<unsigned int>(temp.width) << ']';
+				fout << "String: " << strings[temp.promptString + stringPackages[formSets[i].usingStringPackage].structureOffset] << ", Variable: 0x" << hex << uppercase << temp.questionId << '[' << dec << static_cast<unsigned int>(temp.width) << ']';
 			}
 
 			// Otherwise check if opcode is EFI_IFR_LABEL_OP 0x1D
@@ -1202,7 +1224,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 					fout << '\t';
 
 				// Display temp
-				fout << "Save Defaults: " << strings[temp.promptString] << ", Form ID: 0x" << hex << uppercase << temp.formId;
+				fout << "Save Defaults: " << strings[temp.promptString + stringPackages[formSets[i].usingStringPackage].structureOffset] << ", Form ID: 0x" << hex << uppercase << temp.formId;
 			}
 
 			// Otherwise check if opcode is EFI_IFR_RESTORE_DEFAULTS_OP 0x1F
@@ -1229,7 +1251,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 					fout << '\t';
 
 				// Display temp
-				fout << "Restore Defaults: " << strings[temp.promptString] << ", Form ID: 0x" << hex << uppercase << temp.formId;
+				fout << "Restore Defaults: " << strings[temp.promptString + stringPackages[formSets[i].usingStringPackage].structureOffset] << ", Form ID: 0x" << hex << uppercase << temp.formId;
 			}
 
 			// Otherwise check if opcode is EFI_IFR_BANNER_OP 0x20
@@ -1254,7 +1276,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 					fout << '\t';
 
 				// Display temp
-				fout << "Banner: " << strings[temp.titleString];
+				fout << "Banner: " << strings[temp.titleString + stringPackages[formSets[i].usingStringPackage].structureOffset];
 			}
 
 			// Otherwise check if opcode is EFI_IFR_INVENTORY_OP 0x21
@@ -1279,7 +1301,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 					fout << '\t';
 
 				// Display temp
-				fout << "Inventory: " << strings[temp.primaryTextString];
+				fout << "Inventory: " << strings[temp.primaryTextString + stringPackages[formSets[i].usingStringPackage].structureOffset];
 			}
 
 			// Otherwise check if opcode is EFI_IFR_EQ_VAR_VAL_OP 0x22
@@ -1335,7 +1357,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 					fout << '\t';
 
 				// Display temp
-				fout << "Ordered List: " << strings[temp.promptString] << ", Variable: 0x" << hex << uppercase << temp.questionId;
+				fout << "Ordered List: " << strings[temp.promptString + stringPackages[formSets[i].usingStringPackage].structureOffset] << ", Variable: 0x" << hex << uppercase << temp.questionId;
 			}
 
 			// Otherwise check if opcode is EFI_IFR_VARSTORE_OP 0x24
