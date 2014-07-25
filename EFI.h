@@ -6,7 +6,12 @@
 // Header files
 #include <string>
 #include <vector>
-#include <cstdint>
+// Make work with MSVC++ 9.0 (Visual Studio 2008)
+#if (_MSC_VER < 1600)
+	#include "inttypes.h"
+#elif
+	#include <cstdint>
+#endif
 
 using namespace std;
 

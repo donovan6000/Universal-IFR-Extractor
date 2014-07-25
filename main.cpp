@@ -110,7 +110,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 
 	// Create window
 	hwnd = CreateWindow(appName,
-		TEXT("Universal IFR Extractor v0.6"),
+		TEXT("Universal IFR Extractor v0.6 - MOD"),
 		WS_SYSMENU | WS_MINIMIZEBOX,
 		0, 0,
 		354, 135,
@@ -554,8 +554,12 @@ void showDialog(HWND hwnd) {
 bool fileExists(const string &file) {
 
 	// Open file
+	#if (_MSC_VER < 1600)
+	ifstream fin(file.c_str());
+	#else
 	ifstream fin(file);
-
+	#endif
+	
 	// Return if first characetr doesn't equal EOF
 	return fin.peek() != EOF;
 }
@@ -563,7 +567,11 @@ bool fileExists(const string &file) {
 void readFile(const string &file, string &buffer) {
 
 	// Initialize variables
+	#if (_MSC_VER < 1600)
+	ifstream fin(file.c_str(), ios::binary);
+	#else
 	ifstream fin(file, ios::binary);
+	#endif
 
 	// Clear buffer
 	buffer.clear();
