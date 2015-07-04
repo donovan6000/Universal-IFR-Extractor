@@ -173,11 +173,7 @@ void getUEFIFormSets(vector<UEFI_IFR_FORM_SET_PACK> &formSets, const string &buf
 			tempFormSet.header.type = static_cast<unsigned char>(buffer[i + 3]);
 			tempFormSet.titleString = static_cast<uint16_t>(static_cast<unsigned char>(buffer[i + 22]) + (static_cast<unsigned char>(buffer[i + 23]) << 8));
 			tempFormSet.usingStringPackage = stringCandidates[chosenCandidate];
-
-			if (strings.size() > (tempFormSet.titleString + stringPackages[tempFormSet.usingStringPackage].structureOffset))
-				tempFormSet.title = strings[tempFormSet.titleString + stringPackages[tempFormSet.usingStringPackage].structureOffset];
-			else
-				tempFormSet.title = "Unknown!";
+			tempFormSet.title = strings[tempFormSet.titleString + stringPackages[tempFormSet.usingStringPackage].structureOffset];
 			
 			// Add temp form set to list
 			formSets.push_back(tempFormSet);
