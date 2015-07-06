@@ -1,10 +1,5 @@
 
-#CC=../tools/bin/i386-hydrax-gcc
-#AS=../tools/bin/i386-hydrax-as
-#LD=../tools/bin/i386-hydrax-ld
-
 CXXFLAGS=-std=c++11 -ggdb
-
 SOURCES=main-cli.o UEFI.o EFI.o
 
 all: uifr
