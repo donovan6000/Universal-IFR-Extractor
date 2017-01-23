@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include <iomanip>
+#include <map>
 #include "UEFI.h"
 
 
@@ -15,7 +16,7 @@ void getUEFIStringPackages(vector<UEFI_IFR_STRING_PACK> &stringPackages, const s
 	for(unsigned int i = 0; i < buffer.size() - 45; i++)
 
 		// Check if string pakage was found
-		if((buffer[i] != '\x00' || buffer[i + 1] != '\x00' || buffer[i + 2] != '\x00') && buffer[i + 3] == '\x04' && buffer[i + 4] == '\x34' && buffer[i + 44] == '\x01' && buffer[i + 45] == '\x00' && buffer[i + 48] == '\x2D' && i + static_cast<unsigned char>(buffer[i]) + (static_cast<unsigned char>(buffer[i + 1]) << 8) + (static_cast<unsigned char>(buffer[i + 2]) << 16) < buffer.size() && buffer[i + static_cast<unsigned char>(buffer[i]) + (static_cast<unsigned char>(buffer[i + 1]) << 8) + (static_cast<unsigned char>(buffer[i + 2]) << 16) - 1] == '\x00' && buffer[i + static_cast<unsigned char>(buffer[i]) + (static_cast<unsigned char>(buffer[i + 1]) << 8) + (static_cast<unsigned char>(buffer[i + 2]) << 16) - 2] == '\x00') {
+		if((buffer[i] != '\x00' || buffer[i + 1] != '\x00' || buffer[i + 2] != '\x00') && buffer[i + 3] == '\x04' && buffer[i + 4] == '\x34' && (buffer[i + 44] == '\x01' || buffer[i + 44] == '\x02') && buffer[i + 45] == '\x00' && buffer[i + 48] == '\x2D' && i + static_cast<unsigned char>(buffer[i]) + (static_cast<unsigned char>(buffer[i + 1]) << 8) + (static_cast<unsigned char>(buffer[i + 2]) << 16) < buffer.size() && buffer[i + static_cast<unsigned char>(buffer[i]) + (static_cast<unsigned char>(buffer[i + 1]) << 8) + (static_cast<unsigned char>(buffer[i + 2]) << 16) - 1] == '\x00' && buffer[i + static_cast<unsigned char>(buffer[i]) + (static_cast<unsigned char>(buffer[i + 1]) << 8) + (static_cast<unsigned char>(buffer[i + 2]) << 16) - 2] == '\x00') {
 
 			// Set temp string package
 			tempStringPackage.header.offset = i;
@@ -99,10 +100,19 @@ void getUEFIStrings(vector<UEFI_IFR_STRING_PACK> &stringPackages, vector<string>
 			// Skip % padding
 			while(buffer[index + 1] == '\x25')
 				index += 2;
+			
+			// Add empty string
+			if (buffer[index + 2] == '\x21')
+            {
+				for(char k = 0; k < buffer[index + 3]; k++)
+				strings.push_back("");
+				index += 3;
+			}
 		}
 	}
 
 	// Go through strings
+	strings[0]="";
 	for(unsigned int i = 0; i < strings.size(); i++) {
 
 		// Change carriage return characters to spaces
@@ -135,10 +145,9 @@ void displayUEFIStrings(const vector<string> &strings) {
 	cout << endl;
 }
 
-void getUEFIFormSets(vector<UEFI_IFR_FORM_SET_PACK> &formSets, const string &buffer, const vector<UEFI_IFR_STRING_PACK> &stringPackages, const vector<string> &strings) {
+void getUEFIFormSets(vector<UEFI_IFR_FORM_SET_PACK> &formSets, const string &buffer, const vector<UEFI_IFR_STRING_PACK> &stringPackages, vector<string> &strings) {
 
 	// Initialize variables
-	UEFI_IFR_FORM_SET_PACK tempFormSet;
 	vector<uint32_t> stringCandidates;
 	uint32_t chosenCandidate;
 	
@@ -155,6 +164,8 @@ void getUEFIFormSets(vector<UEFI_IFR_FORM_SET_PACK> &formSets, const string &buf
 		stringCandidates.push_back(i);
 	}
 
+    formSets.reserve(stringCandidates.size());
+
 	// Go through buffer
 	for(uint32_t i = 0; i < buffer.size() - 4; i++)
 
@@ -168,6 +179,7 @@ void getUEFIFormSets(vector<UEFI_IFR_FORM_SET_PACK> &formSets, const string &buf
 					chosenCandidate = j;
 			
 			// Set temp form set
+            UEFI_IFR_FORM_SET_PACK tempFormSet;
 			tempFormSet.header.offset = i;
 			tempFormSet.header.length = static_cast<uint32_t>(static_cast<unsigned char>(buffer[i]) + (static_cast<unsigned char>(buffer[i + 1]) << 8) + (static_cast<unsigned char>(buffer[i + 2]) << 16));
 			tempFormSet.header.type = static_cast<unsigned char>(buffer[i + 3]);
@@ -202,6 +214,7 @@ void displayUEFIFormSets(const vector<UEFI_IFR_FORM_SET_PACK> &formSets) {
 void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_PACK> &stringPackages, const vector<UEFI_IFR_FORM_SET_PACK> &formSets, const string &buffer, const vector<string> &strings) {
 
 	// Initialize variables
+	std::map<uint16_t, UEFI_IFR_QUESTION_HEADER> questions;
 	uint8_t numberOfTabs = 0;
 	unsigned char highNibble, lowNibble;
 	vector<uint8_t> conditionalStack;
@@ -424,7 +437,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 				temp.question.questionId = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 6]) + (static_cast<unsigned char>(buffer[j + 7]) << 8));
 				temp.question.varStoreId = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 8]) + (static_cast<unsigned char>(buffer[j + 9]) << 8));
 				temp.question.varOffset = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 10]) + (static_cast<unsigned char>(buffer[j + 11]) << 8));
-				temp.question.flags = static_cast<unsigned char>(buffer[j + 12]);
+				questions[temp.question.questionId] = temp.question; temp.question.flags = static_cast<unsigned char>(buffer[j + 12]);
 				temp.flags = static_cast<unsigned char>(buffer[j + 13]);
 
 				if(temp.flags == 0x00) {
@@ -438,9 +451,9 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					temp.data.step = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 18]) + (static_cast<unsigned char>(buffer[j + 19]) << 8));
 				}
 				else if(temp.flags == 0x02) {
-					temp.data.minimumValue = static_cast<uint32_t>(static_cast<unsigned char>(buffer[i + 14]) + (static_cast<unsigned char>(buffer[i + 15]) << 8) + (static_cast<unsigned char>(buffer[i + 16]) << 16) + (static_cast<unsigned char>(buffer[i + 17]) << 24));
-					temp.data.maximumValue = static_cast<uint32_t>(static_cast<unsigned char>(buffer[i + 18]) + (static_cast<unsigned char>(buffer[i + 19]) << 8) + (static_cast<unsigned char>(buffer[i + 20]) << 16) + (static_cast<unsigned char>(buffer[i + 21]) << 24));
-					temp.data.step = static_cast<uint32_t>(static_cast<unsigned char>(buffer[i + 22]) + (static_cast<unsigned char>(buffer[i + 23]) << 8) + (static_cast<unsigned char>(buffer[i + 24]) << 16) + (static_cast<unsigned char>(buffer[i + 25]) << 24));
+					temp.data.minimumValue = static_cast<uint32_t>(static_cast<unsigned char>(buffer[j + 14]) + (static_cast<unsigned char>(buffer[j + 15]) << 8) + (static_cast<unsigned char>(buffer[j + 16]) << 16) + (static_cast<unsigned char>(buffer[j + 17]) << 24));
+					temp.data.maximumValue = static_cast<uint32_t>(static_cast<unsigned char>(buffer[j + 18]) + (static_cast<unsigned char>(buffer[j + 19]) << 8) + (static_cast<unsigned char>(buffer[j + 20]) << 16) + (static_cast<unsigned char>(buffer[j + 21]) << 24));
+					temp.data.step = static_cast<uint32_t>(static_cast<unsigned char>(buffer[j + 22]) + (static_cast<unsigned char>(buffer[j + 23]) << 8) + (static_cast<unsigned char>(buffer[j + 24]) << 16) + (static_cast<unsigned char>(buffer[j + 25]) << 24));
 				}
 				else if(temp.flags == 0x03) {
 					temp.data.minimumValue = static_cast<uint64_t>(static_cast<unsigned char>(buffer[j + 14]) + (static_cast<unsigned char>(buffer[j + 15]) << 8) + (static_cast<unsigned char>(buffer[j + 16]) << 16) + (static_cast<unsigned char>(buffer[j + 17]) << 24) + (static_cast<uint64_t>(static_cast<unsigned char>(buffer[j + 18])) << 32) + (static_cast<uint64_t>(static_cast<unsigned char>(buffer[j + 19])) << 40) + (static_cast<uint64_t>(static_cast<unsigned char>(buffer[j + 20])) << 48) + (static_cast<uint64_t>(static_cast<unsigned char>(buffer[j + 21])) << 56));
@@ -485,7 +498,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 				temp.question.questionId = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 6]) + (static_cast<unsigned char>(buffer[j + 7]) << 8));
 				temp.question.varStoreId = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 8]) + (static_cast<unsigned char>(buffer[j + 9]) << 8));
 				temp.question.varOffset = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 10]) + (static_cast<unsigned char>(buffer[j + 11]) << 8));
-				temp.question.flags = static_cast<unsigned char>(buffer[j + 12]);
+				questions[temp.question.questionId] = temp.question; temp.question.flags = static_cast<unsigned char>(buffer[j + 12]);
 				temp.flags = static_cast<unsigned char>(buffer[j + 13]);
 
 				// Display offset
@@ -525,7 +538,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 				temp.question.questionId = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 6]) + (static_cast<unsigned char>(buffer[j + 7]) << 8));
 				temp.question.varStoreId = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 8]) + (static_cast<unsigned char>(buffer[j + 9]) << 8));
 				temp.question.varOffset = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 10]) + (static_cast<unsigned char>(buffer[j + 11]) << 8));
-				temp.question.flags = static_cast<unsigned char>(buffer[j + 12]);
+				questions[temp.question.questionId] = temp.question; temp.question.flags = static_cast<unsigned char>(buffer[j + 12]);
 				temp.flags = static_cast<unsigned char>(buffer[j + 13]);
 
 				if(temp.flags == 0x00) {
@@ -539,9 +552,9 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					temp.data.step = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 18]) + (static_cast<unsigned char>(buffer[j + 19]) << 8));
 				}
 				else if(temp.flags == 0x02) {
-					temp.data.minimumValue = static_cast<uint32_t>(static_cast<unsigned char>(buffer[i + 14]) + (static_cast<unsigned char>(buffer[i + 15]) << 8) + (static_cast<unsigned char>(buffer[i + 16]) << 16) + (static_cast<unsigned char>(buffer[i + 17]) << 24));
-					temp.data.maximumValue = static_cast<uint32_t>(static_cast<unsigned char>(buffer[i + 18]) + (static_cast<unsigned char>(buffer[i + 19]) << 8) + (static_cast<unsigned char>(buffer[i + 20]) << 16) + (static_cast<unsigned char>(buffer[i + 21]) << 24));
-					temp.data.step = static_cast<uint32_t>(static_cast<unsigned char>(buffer[i + 22]) + (static_cast<unsigned char>(buffer[i + 23]) << 8) + (static_cast<unsigned char>(buffer[i + 24]) << 16) + (static_cast<unsigned char>(buffer[i + 25]) << 24));
+					temp.data.minimumValue = static_cast<uint32_t>(static_cast<unsigned char>(buffer[j + 14]) + (static_cast<unsigned char>(buffer[j + 15]) << 8) + (static_cast<unsigned char>(buffer[j + 16]) << 16) + (static_cast<unsigned char>(buffer[j + 17]) << 24));
+					temp.data.maximumValue = static_cast<uint32_t>(static_cast<unsigned char>(buffer[j + 18]) + (static_cast<unsigned char>(buffer[j + 19]) << 8) + (static_cast<unsigned char>(buffer[j + 20]) << 16) + (static_cast<unsigned char>(buffer[j + 21]) << 24));
+					temp.data.step = static_cast<uint32_t>(static_cast<unsigned char>(buffer[j + 22]) + (static_cast<unsigned char>(buffer[j + 23]) << 8) + (static_cast<unsigned char>(buffer[j + 24]) << 16) + (static_cast<unsigned char>(buffer[j + 25]) << 24));
 				}
 				else if(temp.flags == 0x03) {
 					temp.data.minimumValue = static_cast<uint64_t>(static_cast<unsigned char>(buffer[j + 14]) + (static_cast<unsigned char>(buffer[j + 15]) << 8) + (static_cast<unsigned char>(buffer[j + 16]) << 16) + (static_cast<unsigned char>(buffer[j + 17]) << 24) + (static_cast<uint64_t>(static_cast<unsigned char>(buffer[j + 18])) << 32) + (static_cast<uint64_t>(static_cast<unsigned char>(buffer[j + 19])) << 40) + (static_cast<uint64_t>(static_cast<unsigned char>(buffer[j + 20])) << 48) + (static_cast<uint64_t>(static_cast<unsigned char>(buffer[j + 21])) << 56));
@@ -586,7 +599,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 				temp.question.questionId = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 6]) + (static_cast<unsigned char>(buffer[j + 7]) << 8));
 				temp.question.varStoreId = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 8]) + (static_cast<unsigned char>(buffer[j + 9]) << 8));
 				temp.question.varOffset = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 10]) + (static_cast<unsigned char>(buffer[j + 11]) << 8));
-				temp.question.flags = static_cast<unsigned char>(buffer[j + 12]);
+				questions[temp.question.questionId] = temp.question; temp.question.flags = static_cast<unsigned char>(buffer[j + 12]);
 				temp.minimumSize = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 13]) + (static_cast<unsigned char>(buffer[j + 14]) << 8));
 				temp.maximumSize = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 15]) + (static_cast<unsigned char>(buffer[j + 16]) << 8));
 
@@ -631,7 +644,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 				else if(temp.type == 0x01)
 					temp.value = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 6]) + (static_cast<unsigned char>(buffer[j + 7]) << 8));
 				else if(temp.type == 0x02)
-					temp.value = static_cast<uint32_t>(static_cast<unsigned char>(buffer[i + 6]) + (static_cast<unsigned char>(buffer[i + 7]) << 8) + (static_cast<unsigned char>(buffer[i + 8]) << 16) + (static_cast<unsigned char>(buffer[i + 9]) << 24));
+					temp.value = static_cast<uint32_t>(static_cast<unsigned char>(buffer[j + 6]) + (static_cast<unsigned char>(buffer[j + 7]) << 8) + (static_cast<unsigned char>(buffer[j + 8]) << 16) + (static_cast<unsigned char>(buffer[j + 9]) << 24));
 				else if(temp.type == 0x03)
 					temp.value = static_cast<uint64_t>(static_cast<unsigned char>(buffer[j + 6]) + (static_cast<unsigned char>(buffer[j + 7]) << 8) + (static_cast<unsigned char>(buffer[j + 8]) << 16) + (static_cast<unsigned char>(buffer[j + 9]) << 24) + (static_cast<uint64_t>(static_cast<unsigned char>(buffer[j + 10])) << 32) + (static_cast<uint64_t>(static_cast<unsigned char>(buffer[j + 11])) << 40) + (static_cast<uint64_t>(static_cast<unsigned char>(buffer[j + 12])) << 48) + (static_cast<uint64_t>(static_cast<unsigned char>(buffer[j + 13])) << 56));
 
@@ -762,7 +775,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 				temp.question.questionId = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 6]) + (static_cast<unsigned char>(buffer[j + 7]) << 8));
 				temp.question.varStoreId = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 8]) + (static_cast<unsigned char>(buffer[j + 9]) << 8));
 				temp.question.varOffset = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 10]) + (static_cast<unsigned char>(buffer[j + 11]) << 8));
-				temp.question.flags = static_cast<unsigned char>(buffer[j + 12]);
+				questions[temp.question.questionId] = temp.question; temp.question.flags = static_cast<unsigned char>(buffer[j + 12]);
 				temp.questionConfigString = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 13]) + (static_cast<unsigned char>(buffer[j + 14]) << 8));
 
 				// Display offset
@@ -982,7 +995,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 				temp.question.questionId = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 6]) + (static_cast<unsigned char>(buffer[j + 7]) << 8));
 				temp.question.varStoreId = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 8]) + (static_cast<unsigned char>(buffer[j + 9]) << 8));
 				temp.question.varOffset = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 10]) + (static_cast<unsigned char>(buffer[j + 11]) << 8));
-				temp.question.flags = static_cast<unsigned char>(buffer[j + 12]);
+				questions[temp.question.questionId] = temp.question; temp.question.flags = static_cast<unsigned char>(buffer[j + 12]);
 				temp.formId = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 13]) + (static_cast<unsigned char>(buffer[j + 14]) << 8));
 
 				// Display offset
@@ -993,7 +1006,8 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Ref: " << strings[temp.question.statement.promptString + stringPackages[formSets[i].usingStringPackage].structureOffset] << ", Variable: 0x" << hex << uppercase << temp.question.varOffset;
+                if (formSets[i].usingStringPackage < stringPackages.size() && temp.question.statement.promptString + stringPackages[formSets[i].usingStringPackage].structureOffset < strings.size())
+				    fout << "Ref: " << strings.at(temp.question.statement.promptString + stringPackages[formSets[i].usingStringPackage].structureOffset) << ", Form ID: 0x" << hex << uppercase << temp.formId << ", Variable: 0x" << hex << uppercase << temp.question.varOffset;
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -1372,7 +1386,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 				temp.question.questionId = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 6]) + (static_cast<unsigned char>(buffer[j + 7]) << 8));
 				temp.question.varStoreId = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 8]) + (static_cast<unsigned char>(buffer[j + 9]) << 8));
 				temp.question.varOffset = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 10]) + (static_cast<unsigned char>(buffer[j + 11]) << 8));
-				temp.question.flags = static_cast<unsigned char>(buffer[j + 12]);
+				questions[temp.question.questionId] = temp.question; temp.question.flags = static_cast<unsigned char>(buffer[j + 12]);
 				temp.flags = static_cast<unsigned char>(buffer[j + 13]);
 
 				// Display offset
@@ -1412,7 +1426,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 				temp.question.questionId = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 6]) + (static_cast<unsigned char>(buffer[j + 7]) << 8));
 				temp.question.varStoreId = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 8]) + (static_cast<unsigned char>(buffer[j + 9]) << 8));
 				temp.question.varOffset = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 10]) + (static_cast<unsigned char>(buffer[j + 11]) << 8));
-				temp.question.flags = static_cast<unsigned char>(buffer[j + 12]);
+				questions[temp.question.questionId] = temp.question; temp.question.flags = static_cast<unsigned char>(buffer[j + 12]);
 				temp.flags = static_cast<unsigned char>(buffer[j + 13]);
 
 				// Display offset
@@ -1452,7 +1466,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 				temp.question.questionId = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 6]) + (static_cast<unsigned char>(buffer[j + 7]) << 8));
 				temp.question.varStoreId = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 8]) + (static_cast<unsigned char>(buffer[j + 9]) << 8));
 				temp.question.varOffset = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 10]) + (static_cast<unsigned char>(buffer[j + 11]) << 8));
-				temp.question.flags = static_cast<unsigned char>(buffer[j + 12]);
+				questions[temp.question.questionId] = temp.question; temp.question.flags = static_cast<unsigned char>(buffer[j + 12]);
 				temp.minimumSize = static_cast<unsigned char>(buffer[j + 13]);
 				temp.maximumSize = static_cast<unsigned char>(buffer[j + 14]);
 				temp.flags = static_cast<unsigned char>(buffer[j + 15]);
@@ -1694,7 +1708,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 				temp.question.questionId = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 6]) + (static_cast<unsigned char>(buffer[j + 7]) << 8));
 				temp.question.varStoreId = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 8]) + (static_cast<unsigned char>(buffer[j + 9]) << 8));
 				temp.question.varOffset = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 10]) + (static_cast<unsigned char>(buffer[j + 11]) << 8));
-				temp.question.flags = static_cast<unsigned char>(buffer[j + 12]);
+				questions[temp.question.questionId] = temp.question; temp.question.flags = static_cast<unsigned char>(buffer[j + 12]);
 				temp.minimumContainers = static_cast<unsigned char>(buffer[j + 13]);
 				temp.flags = static_cast<unsigned char>(buffer[j + 14]);
 
@@ -1964,7 +1978,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					temp.guid.push_back(highNibble);
 					temp.guid.push_back(lowNibble);
 				}
-				temp.attributes = static_cast<uint32_t>(static_cast<unsigned char>(buffer[i + 20]) + (static_cast<unsigned char>(buffer[i + 21]) << 8) + (static_cast<unsigned char>(buffer[i + 22]) << 16) + (static_cast<unsigned char>(buffer[i + 23]) << 24));
+				temp.attributes = static_cast<uint32_t>(static_cast<unsigned char>(buffer[j + 20]) + (static_cast<unsigned char>(buffer[j + 21]) << 8) + (static_cast<unsigned char>(buffer[j + 22]) << 16) + (static_cast<unsigned char>(buffer[j + 23]) << 24));
 
 				// Display offset
 				fout << "0x" << hex << uppercase << temp.header.offset << ' ';
@@ -2846,7 +2860,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 				temp.header.opcode = buffer[j];
 				temp.header.length = static_cast<unsigned char>(buffer[j + 1]) & 0x7F;
 				temp.header.scope = static_cast<unsigned char>(buffer[j + 1]) & 0x80;
-				temp.questionId = static_cast<uint16_t>(static_cast<unsigned char>(buffer[i + 2]) + (static_cast<unsigned char>(buffer[i + 3]) << 8));
+				temp.questionId = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 2]) + (static_cast<unsigned char>(buffer[j + 3]) << 8));
 
 				// Display offset
 				fout << "0x" << hex << uppercase << temp.header.offset << ' ';
@@ -2856,7 +2870,8 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "Question Ref: 0x" << hex << uppercase << temp.questionId;
+                if (temp.questionId < questions.size() && formSets[i].usingStringPackage < stringPackages.size() && questions[temp.questionId].statement.promptString + stringPackages[formSets[i].usingStringPackage].structureOffset < strings.size())
+				    fout << "Question Ref: 0x" << hex << uppercase << temp.questionId << " (" << strings.at(questions[temp.questionId].statement.promptString + stringPackages[formSets[i].usingStringPackage].structureOffset) << ", Variable: 0x" << hex << uppercase << questions.at(temp.questionId).varOffset << ")";
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -2947,7 +2962,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 				temp.header.opcode = buffer[j];
 				temp.header.length = static_cast<unsigned char>(buffer[j + 1]) & 0x7F;
 				temp.header.scope = static_cast<unsigned char>(buffer[j + 1]) & 0x80;
-				temp.value = static_cast<uint16_t>(static_cast<unsigned char>(buffer[i + 2]) + (static_cast<unsigned char>(buffer[i + 3]) << 8));
+				temp.value = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 2]) + (static_cast<unsigned char>(buffer[j + 3]) << 8));
 
 				// Display offset
 				fout << "0x" << hex << uppercase << temp.header.offset << ' ';
@@ -2981,7 +2996,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 				temp.header.opcode = buffer[j];
 				temp.header.length = static_cast<unsigned char>(buffer[j + 1]) & 0x7F;
 				temp.header.scope = static_cast<unsigned char>(buffer[j + 1]) & 0x80;
-				temp.value = static_cast<uint32_t>(static_cast<unsigned char>(buffer[i + 2]) + (static_cast<unsigned char>(buffer[i + 3]) << 8) + (static_cast<unsigned char>(buffer[i + 4]) << 16) + (static_cast<unsigned char>(buffer[i + 5]) << 24));
+				temp.value = static_cast<uint32_t>(static_cast<unsigned char>(buffer[j + 2]) + (static_cast<unsigned char>(buffer[j + 3]) << 8) + (static_cast<unsigned char>(buffer[j + 4]) << 16) + (static_cast<unsigned char>(buffer[j + 5]) << 24));
 
 				// Display offset
 				fout << "0x" << hex << uppercase << temp.header.offset << ' ';
@@ -3325,7 +3340,8 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 					fout << '\t';
 
 				// Display temp
-				fout << "String Ref: " << strings[temp.stringId + stringPackages[formSets[i].usingStringPackage].structureOffset];
+                if (formSets[i].usingStringPackage < stringPackages.size() && temp.stringId + stringPackages[formSets[i].usingStringPackage].structureOffset < strings.size())
+				    fout << "String Ref: " << strings.at(temp.stringId + stringPackages[formSets[i].usingStringPackage].structureOffset);
 
 				// Check if scope
 				if(temp.header.scope) {
@@ -3754,7 +3770,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 				else if(temp.type == 0x01)
 					temp.value = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 5]) + (static_cast<unsigned char>(buffer[j + 6]) << 8));
 				else if(temp.type == 0x02)
-					temp.value = static_cast<uint32_t>(static_cast<unsigned char>(buffer[i + 5]) + (static_cast<unsigned char>(buffer[i + 6]) << 8) + (static_cast<unsigned char>(buffer[i + 7]) << 16) + (static_cast<unsigned char>(buffer[i + 8]) << 24));
+					temp.value = static_cast<uint32_t>(static_cast<unsigned char>(buffer[j + 5]) + (static_cast<unsigned char>(buffer[j + 6]) << 8) + (static_cast<unsigned char>(buffer[j + 7]) << 16) + (static_cast<unsigned char>(buffer[j + 8]) << 24));
 				else if(temp.type == 0x03)
 					temp.value = static_cast<uint64_t>(static_cast<unsigned char>(buffer[j + 5]) + (static_cast<unsigned char>(buffer[j + 6]) << 8) + (static_cast<unsigned char>(buffer[j + 7]) << 16) + (static_cast<unsigned char>(buffer[j + 8]) << 24) + (static_cast<uint64_t>(static_cast<unsigned char>(buffer[j + 9])) << 32) + (static_cast<uint64_t>(static_cast<unsigned char>(buffer[j + 10])) << 40) + (static_cast<uint64_t>(static_cast<unsigned char>(buffer[j + 11])) << 48) + (static_cast<uint64_t>(static_cast<unsigned char>(buffer[j + 12])) << 56));
 

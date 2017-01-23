@@ -98,7 +98,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 	wndclass.cbClsExtra = 0;
 	wndclass.cbWndExtra = 0;
 	wndclass.hInstance = hInstance;
-	wndclass.hIcon = HICON(LoadImage(GetModuleHandle(NULL), "MY_ICON", IMAGE_ICON, 256, 256, 0));
+	wndclass.hIcon = HICON(LoadImage(GetModuleHandle(NULL), TEXT("IDI_ICON1"), IMAGE_ICON, 16, 16, 0));
 	wndclass.hIconSm = NULL;
 	wndclass.hCursor = LoadCursor(NULL, IDC_ARROW);
 	wndclass.hbrBackground = HBRUSH((COLOR_WINDOW + 1));
@@ -110,10 +110,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 
 	// Create window
 	hwnd = CreateWindow(appName,
-		TEXT("Universal IFR Extractor v0.6"),
+		TEXT("IFRExtractor LS v0.1"),
 		WS_SYSMENU | WS_MINIMIZEBOX,
 		0, 0,
-		354, 135,
+		350, 120,
 		NULL,
 		NULL,
 		hInstance,
@@ -187,19 +187,6 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) 
 				WS_CHILD | WS_VISIBLE,
 				55, 50,
 				100, 25,
-				hwnd,
-				HMENU(NO_ACTION),
-				NULL,
-				NULL);
-
-			// Create copyright text
-			HWND copyrightText;
-			copyrightText = CreateWindowEx(WS_EX_TRANSPARENT,
-				TEXT("static"),
-				TEXT("© 2014 donovan6000"),
-				WS_CHILD | WS_VISIBLE,
-				198, 81,
-				200, 25,
 				hwnd,
 				HMENU(NO_ACTION),
 				NULL,
@@ -485,6 +472,7 @@ bool saveFile(HWND hwnd) {
 	// Initialize variables
 	OPENFILENAME browserInfo;
 	string fileName = fileLocation.substr(0, fileLocation.find_last_of('.')) + " IFR";
+	fileName.reserve(MAX_PATH);
 
 	// Set dialog options
 	ZeroMemory(&browserInfo, sizeof(browserInfo));
@@ -554,8 +542,12 @@ void showDialog(HWND hwnd) {
 bool fileExists(const string &file) {
 
 	// Open file
+	#if (_MSC_VER < 1600)
+	ifstream fin(file.c_str());
+	#else
 	ifstream fin(file);
-
+	#endif
+	
 	// Return if first characetr doesn't equal EOF
 	return fin.peek() != EOF;
 }
@@ -563,7 +555,11 @@ bool fileExists(const string &file) {
 void readFile(const string &file, string &buffer) {
 
 	// Initialize variables
+	#if (_MSC_VER < 1600)
+	ifstream fin(file.c_str(), ios::binary);
+	#else
 	ifstream fin(file, ios::binary);
+	#endif
 
 	// Clear buffer
 	buffer.clear();
@@ -581,14 +577,14 @@ type getType(const string &buffer) {
 	// Go through buffer
 	for(unsigned int i = 0; i < buffer.size() - 9; i++)
 	
-		// Check if an EFI string pakage was found
+		// Check if an EFI string package was found
 		if((buffer[i] != '\x00' || buffer[i + 1] != '\x00' || buffer[i + 2] != '\x00' || buffer[i + 3] != '\x00') && buffer[i + 4] == '\x02' && buffer[i + 5] == '\x00' && (buffer[i + 6] != '\x00' || buffer[i + 7] != '\x00' || buffer[i + 8] != '\x00' || buffer[i + 9] != '\x00') && i + static_cast<unsigned char>(buffer[i + 6]) + (static_cast<unsigned char>(buffer[i + 7]) << 8) + (static_cast<unsigned char>(buffer[i + 8]) << 16) + (static_cast<unsigned char>(buffer[i + 9]) << 24) < buffer.size() && buffer[i + static_cast<unsigned char>(buffer[i + 6]) + (static_cast<unsigned char>(buffer[i + 7]) << 8) + (static_cast<unsigned char>(buffer[i + 8]) << 16) + (static_cast<unsigned char>(buffer[i + 9]) << 24) + 4] >= 'a' && buffer[i + static_cast<unsigned char>(buffer[i + 6]) + (static_cast<unsigned char>(buffer[i + 7]) << 8) + (static_cast<unsigned char>(buffer[i + 8]) << 16) + (static_cast<unsigned char>(buffer[i + 9]) << 24) + 4] <= 'z' && i + static_cast<unsigned char>(buffer[i]) + (static_cast<unsigned char>(buffer[i + 1]) << 8) + (static_cast<unsigned char>(buffer[i + 2]) << 16) + (static_cast<unsigned char>(buffer[i + 3]) << 24) < buffer.size() && buffer[i + static_cast<unsigned char>(buffer[i]) + (static_cast<unsigned char>(buffer[i + 1]) << 8) + (static_cast<unsigned char>(buffer[i + 2]) << 16) + (static_cast<unsigned char>(buffer[i + 3]) << 24) + 4] == '\x02' && buffer[i + static_cast<unsigned char>(buffer[i]) + (static_cast<unsigned char>(buffer[i + 1]) << 8) + (static_cast<unsigned char>(buffer[i + 2]) << 16) + (static_cast<unsigned char>(buffer[i + 3]) << 24) + 5] == '\x00')
 		
 			// Return EFI
 			return EFI;
 	
-		// Otherwise check if a UEFI string pakage was found
-		else if((buffer[i] != '\x00' || buffer[i + 1] != '\x00' || buffer[i + 2] != '\x00') && buffer[i + 3] == '\x04' && buffer[i + 4] == '\x34' && buffer[i + 44] == '\x01' && buffer[i + 45] == '\x00' && buffer[i + 48] == '\x2D' && i + static_cast<unsigned char>(buffer[i]) + (static_cast<unsigned char>(buffer[i + 1]) << 8) + (static_cast<unsigned char>(buffer[i + 2]) << 16) < buffer.size() && buffer[i + static_cast<unsigned char>(buffer[i]) + (static_cast<unsigned char>(buffer[i + 1]) << 8) + (static_cast<unsigned char>(buffer[i + 2]) << 16) - 1] == '\x00' && buffer[i + static_cast<unsigned char>(buffer[i]) + (static_cast<unsigned char>(buffer[i + 1]) << 8) + (static_cast<unsigned char>(buffer[i + 2]) << 16) - 2] == '\x00')
+		// Otherwise check if a UEFI string package was found
+		else if((buffer[i] != '\x00' || buffer[i + 1] != '\x00' || buffer[i + 2] != '\x00') && buffer[i + 3] == '\x04' && buffer[i + 4] == '\x34' && (buffer[i + 44] == '\x01' || buffer[i + 44] == '\x02') && buffer[i + 45] == '\x00' && buffer[i + 48] == '\x2D' && i + static_cast<unsigned char>(buffer[i]) + (static_cast<unsigned char>(buffer[i + 1]) << 8) + (static_cast<unsigned char>(buffer[i + 2]) << 16) < buffer.size() && buffer[i + static_cast<unsigned char>(buffer[i]) + (static_cast<unsigned char>(buffer[i + 1]) << 8) + (static_cast<unsigned char>(buffer[i + 2]) << 16) - 1] == '\x00' && buffer[i + static_cast<unsigned char>(buffer[i]) + (static_cast<unsigned char>(buffer[i + 1]) << 8) + (static_cast<unsigned char>(buffer[i + 2]) << 16) - 2] == '\x00')
 	
 			// Return UEFI
 			return UEFI;

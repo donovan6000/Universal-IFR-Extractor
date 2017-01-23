@@ -6,10 +6,10 @@
 // Header files
 #include <string>
 #include <vector>
+// Make work with MSVC++ 9.0 (Visual Studio 2008)
 #include <cstdint>
 
 using namespace std;
-
 
 // Gobal definitions
 #define EFI_IFR_FORM_OP '\x01'
@@ -335,6 +335,8 @@ struct EFI_IFR_VARSTORE {
 	string guid;
 	uint16_t varId;
 	uint16_t size;
+	// 255 (max size allowed by EFI_IFR_OP_HEADER:Length - 2 - 16 - 2 - 2 = 233 bytes max name (?)
+	uint8_t name[233];
 };
 
 struct EFI_IFR_VARSTORE_SELECT {

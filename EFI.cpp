@@ -14,7 +14,7 @@ void getEFIStringPackages(vector<EFI_IFR_STRING_PACK> &stringPackages, const str
 	// Go through buffer
 	for(unsigned int i = 0; i < buffer.size() - 9; i++)
 	
-		// Check if string pakage was found
+		// Check if string package was found
 		if((buffer[i] != '\x00' || buffer[i + 1] != '\x00' || buffer[i + 2] != '\x00' || buffer[i + 3] != '\x00') && buffer[i + 4] == '\x02' && buffer[i + 5] == '\x00' && (buffer[i + 6] != '\x00' || buffer[i + 7] != '\x00' || buffer[i + 8] != '\x00' || buffer[i + 9] != '\x00') && i + static_cast<unsigned char>(buffer[i + 6]) + (static_cast<unsigned char>(buffer[i + 7]) << 8) + (static_cast<unsigned char>(buffer[i + 8]) << 16) + (static_cast<unsigned char>(buffer[i + 9]) << 24) < buffer.size() && buffer[i + static_cast<unsigned char>(buffer[i + 6]) + (static_cast<unsigned char>(buffer[i + 7]) << 8) + (static_cast<unsigned char>(buffer[i + 8]) << 16) + (static_cast<unsigned char>(buffer[i + 9]) << 24) + 4] >= 'a' && buffer[i + static_cast<unsigned char>(buffer[i + 6]) + (static_cast<unsigned char>(buffer[i + 7]) << 8) + (static_cast<unsigned char>(buffer[i + 8]) << 16) + (static_cast<unsigned char>(buffer[i + 9]) << 24) + 4] <= 'z' && i + static_cast<unsigned char>(buffer[i]) + (static_cast<unsigned char>(buffer[i + 1]) << 8) + (static_cast<unsigned char>(buffer[i + 2]) << 16) + (static_cast<unsigned char>(buffer[i + 3]) << 24) < buffer.size() && buffer[i + static_cast<unsigned char>(buffer[i]) + (static_cast<unsigned char>(buffer[i + 1]) << 8) + (static_cast<unsigned char>(buffer[i + 2]) << 16) + (static_cast<unsigned char>(buffer[i + 3]) << 24) + 4] == '\x02' && buffer[i + static_cast<unsigned char>(buffer[i]) + (static_cast<unsigned char>(buffer[i + 1]) << 8) + (static_cast<unsigned char>(buffer[i + 2]) << 16) + (static_cast<unsigned char>(buffer[i + 3]) << 24) + 5] == '\x00') {
 	
 			// Set temp string package
@@ -1426,6 +1426,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 				}
 				temp.varId = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 18]) + (static_cast<unsigned char>(buffer[j + 19]) << 8));
 				temp.size = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 20]) + (static_cast<unsigned char>(buffer[j + 21]) << 8));
+				strcpy_s((char *)temp.name, 233, (char *)&buffer[j+22]); // Name can start at 22, and will be header_length - 22 long.
 
 				// Display offset
 				fout << "0x" << hex << uppercase << temp.header.offset << ' ';
@@ -1435,7 +1436,13 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 					fout << '\t';
 
 				// Display temp
-				fout << "Variable Store: 0x" << hex << uppercase << temp.varId;
+				//fout << "Variable Store: 0x" << hex << uppercase << temp.varId;
+				fout << "Var Store: ";
+				//Display additional information: GUID:Name[]
+				fout << "[0x" << hex << uppercase << setw(4) << setfill('0') << temp.varId << "]";
+				fout << "[" << temp.guid << "]";
+				fout << "[" << dec << setw(3) << temp.size << "]";
+				fout << "[" << temp.name << "]";
 			}
 
 			// Otherwise check if opcode is EFI_IFR_VARSTORE_SELECT_OP 0x25

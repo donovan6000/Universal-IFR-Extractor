@@ -2,14 +2,12 @@
 #ifndef UEFI_H
 #define UEFI_H
 
-
 // Header files
 #include <string>
 #include <vector>
 #include <cstdint>
 
 using namespace std;
-
 
 // Gobal definitions
 enum { FORM_SET, FORM, CONDITION, OPTION, OTHER };
@@ -666,7 +664,7 @@ void displayUEFIStrings(const vector<string> &strings);
 Name: getUEFIFormSets
 Purpose: Gets UEFI form sets
 */
-void getUEFIFormSets(vector<UEFI_IFR_FORM_SET_PACK> &formSets, const string &buffer, const vector<UEFI_IFR_STRING_PACK> &stringPackages, const vector<string> &strings);
+void getUEFIFormSets(vector<UEFI_IFR_FORM_SET_PACK> &formSets, const string &buffer, const vector<UEFI_IFR_STRING_PACK> &stringPackages, vector<string> &strings);
 
 /*
 Name: displayUEFIFormSets
