@@ -24,19 +24,16 @@ string buffer;
 type protocol;
 vector<string> strings;
 
-std::ostream& operator<<(std::ostream& out, const type value){
-#define ENUM_ELEMENT(e) { e, #e }
-    static map<type, string> strs =
-    {
-    	ENUM_ELEMENT(EFI),
-	ENUM_ELEMENT(UEFI),
-	ENUM_ELEMENT(UNKNOWN)
-    };
-#undef ENUM_ELEMENT
+std::ostream& operator<<(std::ostream& out, const type value)
+{
+    map<type, string> strs;
+
+    strs[EFI] = "EFI";
+    strs[UEFI] = "UEFI";
+    strs[UNKNOWN] = "UNKNOWN";
 
     return out << strs[value];
 }
-
 
 bool fileExists(const string &file) {
 

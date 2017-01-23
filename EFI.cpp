@@ -1426,7 +1426,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 				}
 				temp.varId = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 18]) + (static_cast<unsigned char>(buffer[j + 19]) << 8));
 				temp.size = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 20]) + (static_cast<unsigned char>(buffer[j + 21]) << 8));
-				strcpy_s((char *)temp.name, 233, (char *)&buffer[j+22]); // Name can start at 22, and will be header_length - 22 long.
+				strncpy((char *)temp.name, (char *)&buffer[j+22], 233); // Name can start at 22, and will be header_length - 22 long.
 
 				// Display offset
 				fout << "0x" << hex << uppercase << temp.header.offset << ' ';
