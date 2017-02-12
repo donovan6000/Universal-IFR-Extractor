@@ -38,16 +38,16 @@ std::ostream& operator<<(std::ostream& out, const type value)
 bool fileExists(const string &file) {
 
 	// Open file
-	ifstream fin(file);
+	ifstream fin(file.c_str());
 
-	// Return if first characetr doesn't equal EOF
+	// Return if first character doesn't equal EOF
 	return fin.peek() != EOF;
 }
 
 void readFile(const string &file, string &buffer) {
 
 	// Initialize variables
-	ifstream fin(file, ios::binary);
+	ifstream fin(file.c_str(), ios::binary);
 
 	// Clear buffer
 	buffer.clear();

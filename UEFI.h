@@ -1,15 +1,16 @@
-// Header gaurd
+// Header guard
 #ifndef UEFI_H
 #define UEFI_H
 
 // Header files
-#include <string>
+#include <string.h>
 #include <vector>
-#include <cstdint>
+#include <stdint.h>
+#include <stdlib.h>
 
 using namespace std;
 
-// Gobal definitions
+// Global definitions
 enum { FORM_SET, FORM, CONDITION, OPTION, OTHER };
 
 #define UEFI_IFR_FORM_OP '\x01'

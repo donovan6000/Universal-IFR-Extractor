@@ -1,17 +1,16 @@
-// Header gaurd
+// Header guard
 #ifndef EFI_H
 #define EFI_H
 
-
 // Header files
-#include <string>
+#include <string.h>
 #include <vector>
-// Make work with MSVC++ 9.0 (Visual Studio 2008)
-#include <cstdint>
+#include <stdint.h>
+#include <stdlib.h>
 
 using namespace std;
 
-// Gobal definitions
+// Global definitions
 #define EFI_IFR_FORM_OP '\x01'
 #define EFI_IFR_SUBTITLE_OP '\x02'
 #define EFI_IFR_TEXT_OP '\x03'
