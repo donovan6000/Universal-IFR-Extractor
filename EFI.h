@@ -335,6 +335,8 @@ struct EFI_IFR_VARSTORE {
 	string guid;
 	uint16_t varId;
 	uint16_t size;
+	// 255 (max size allowed by EFI_IFR_OP_HEADER:Length - 2 - 16 - 2 - 2 = 233 bytes max name (?)
+	uint8_t name[233];
 };
 
 struct EFI_IFR_VARSTORE_SELECT {

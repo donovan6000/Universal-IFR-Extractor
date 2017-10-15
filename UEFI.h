@@ -1,7 +1,4 @@
-// Header gaurd
-#ifndef UEFI_H
-#define UEFI_H
-
+#pragma once
 
 // Header files
 #include <string>
@@ -9,7 +6,6 @@
 #include <cstdint>
 
 using namespace std;
-
 
 // Gobal definitions
 enum { FORM_SET, FORM, CONDITION, OPTION, OTHER };
@@ -155,7 +151,7 @@ struct UEFI_IFR_QUESTION_HEADER {
 	uint8_t flags;
 };
 
-union MINMAXSTEP_DATA {
+struct MINMAXSTEP_DATA {
 	uint64_t minimumValue;
 	uint64_t maximumValue;
 	uint64_t step;
@@ -679,6 +675,3 @@ Name: generateUEFIIFRDump
 Purpose: Generates UEFI IFR dump
 */
 void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_PACK> &stringPackages, const vector<UEFI_IFR_FORM_SET_PACK> &formSets, const string &buffer, const vector<string> &strings);
-
-
-#endif

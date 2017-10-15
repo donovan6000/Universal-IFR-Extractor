@@ -110,7 +110,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 
 	// Create window
 	hwnd = CreateWindow(appName,
-		TEXT("Universal IFR Extractor v0.6"),
+		TEXT("Universal IFR Extractor v0.7"),
 		WS_SYSMENU | WS_MINIMIZEBOX,
 		0, 0,
 		354, 135,
@@ -477,7 +477,7 @@ void fileBrowser(HWND hwnd) {
 	if(GetOpenFileName(&browserInfo))
 
 		// Update file location edit
-		SetWindowText(fileLocationEdit, TEXT(browserInfo.lpstrFile));
+	SetWindowText(fileLocationEdit, TEXT(browserInfo.lpstrFile));
 }
 
 bool saveFile(HWND hwnd) {

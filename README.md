@@ -3,11 +3,20 @@ Universal IFR Extractor
 
 Utility that can extract the internal forms representation from both EFI and UEFI modules and convert it into a human readable format.
 
+Use VS2017 to build.
+
 You can download an executable <a href="http://bios-mods.com/pub/donovan6000/Software/Universal%20IFR%20Extractor/Universal%20IFR%20Extractor.exe">here.</a>
 
 © 2014 donovan6000
 <br /><br /><br />
 Changelog:
+
+v0.6.1 7/25/2014
+* Print out the full fields of the Variable Store declaration, ie GUID and Name. Ex:
+* 0x3B996 	Variable Store: 0xF015 {24 20 67 DE D0 3D D7 02 29 41 91 4A 9F 37 7C C3 4B 0D 15 F0 90 00 49 44 45 53 65 63 44 65 76 00}
+* becomes
+* 0x3B996 	Var Store: [0xF015][3DD0DE67-02D7-4129-914A-9F377CC34B0D][144][IDESecDev] {24 20 67 DE D0 3D D7 02 29 41 91 4A 9F 37 7C C3 4B 0D 15 F0 90 00 49 44 45 53 65 63 44 65 76 00}
+* This allows trivial correlation in nvram with dmpstore (via EFI Shell).
 
 v0.6 6/16/2014
 * Added support for multiple string packages being used by one form.
