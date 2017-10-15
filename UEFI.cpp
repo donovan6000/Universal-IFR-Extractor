@@ -348,9 +348,9 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 				EFI_IFR_SUBTITLE *temp = (EFI_IFR_SUBTITLE*)&buffer[j];
 
 				// Display temp
-				fout << "Subtitle: Statement.Prompt - " << strings[temp->Statement.Prompt + strPackageOffset];
-				//fout << ", Statement.Help - " << strings[temp->Statement.Help + strPackageOffset];
-				fout << ", Flags - 0x" << hex << uppercase << (uint16_t)temp->Flags;
+				fout << "Subtitle: Statement.Prompt: " << strings[temp->Statement.Prompt + strPackageOffset];
+				//fout << ", Statement.Help: " << strings[temp->Statement.Help + strPackageOffset];
+				fout << ", Flags: 0x" << hex << uppercase << (uint16_t)temp->Flags;
 
 				// Check if scope
 				if (temp->Header.Scope)
@@ -364,9 +364,9 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 				EFI_IFR_TEXT *temp = (EFI_IFR_TEXT*)&buffer[j];
 
 				// Display temp
-				fout << "Text: Statement.Prompt - " << strings[temp->Statement.Prompt + strPackageOffset];
-				//fout << ", Statement.Help - " << strings[temp->Statement.Help + strPackageOffset];
-				fout << ", TextTwo - " << strings[temp->TextTwo + strPackageOffset];
+				fout << "Text: Statement.Prompt: " << strings[temp->Statement.Prompt + strPackageOffset];
+				//fout << ", Statement.Help: " << strings[temp->Statement.Help + strPackageOffset];
+				fout << ", TextTwo: " << strings[temp->TextTwo + strPackageOffset];
 
 				// Check if scope
 				if (temp->Header.Scope)
@@ -432,26 +432,13 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 			else if (buffer[j] == UEFI_IFR_CHECKBOX_OP) {
 
 				// Create temp
-				UEFI_IFR_CHECKBOX temp;
-
-				// Fill temp
-				temp.header.offset = j;
-				temp.header.opcode = buffer[j];
-				temp.header.length = static_cast<unsigned char>(buffer[j + 1]) & 0x7F;
-				temp.header.scope = static_cast<unsigned char>(buffer[j + 1]) & 0x80;
-				temp.question.statement.promptString = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 2]) + (static_cast<unsigned char>(buffer[j + 3]) << 8));
-				temp.question.statement.helpString = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 4]) + (static_cast<unsigned char>(buffer[j + 5]) << 8));
-				temp.question.questionId = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 6]) + (static_cast<unsigned char>(buffer[j + 7]) << 8));
-				temp.question.varStoreId = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 8]) + (static_cast<unsigned char>(buffer[j + 9]) << 8));
-				temp.question.varOffset = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 10]) + (static_cast<unsigned char>(buffer[j + 11]) << 8));
-				temp.question.flags = static_cast<unsigned char>(buffer[j + 12]);
-				temp.flags = static_cast<unsigned char>(buffer[j + 13]);
+				EFI_IFR_CHECKBOX *temp = (EFI_IFR_CHECKBOX*)&buffer[j];
 
 				// Display temp
-				fout << "Checkbox: " << strings[temp.question.statement.promptString + strPackageOffset] << ", Variable: 0x" << hex << uppercase << temp.question.varOffset << ", VarStore: 0x" << temp.question.varStoreId << ", QuestionId: 0x" << temp.question.questionId;
+				fout << "Checkbox: " << strings[temp->Question.Header.Prompt + strPackageOffset] << ", VarStoreInfo (VarOffset/VarName): 0x" << hex << uppercase << temp->Question.VarStoreInfo.VarOffset << ", VarStore: 0x" << temp->Question.VarStoreId << ", QuestionId: 0x" << temp->Question.QuestionId;
 
 				// Check if scope
-				if (temp.header.scope)
+				if (temp->Header.Scope)
 					IndentText(OTHER);
 			}
 
@@ -498,27 +485,15 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 			else if (buffer[j] == UEFI_IFR_PASSWORD_OP) {
 
 				// Create temp
-				UEFI_IFR_PASSWORD temp;
-
-				// Fill temp
-				temp.header.offset = j;
-				temp.header.opcode = buffer[j];
-				temp.header.length = static_cast<unsigned char>(buffer[j + 1]) & 0x7F;
-				temp.header.scope = static_cast<unsigned char>(buffer[j + 1]) & 0x80;
-				temp.question.statement.promptString = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 2]) + (static_cast<unsigned char>(buffer[j + 3]) << 8));
-				temp.question.statement.helpString = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 4]) + (static_cast<unsigned char>(buffer[j + 5]) << 8));
-				temp.question.questionId = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 6]) + (static_cast<unsigned char>(buffer[j + 7]) << 8));
-				temp.question.varStoreId = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 8]) + (static_cast<unsigned char>(buffer[j + 9]) << 8));
-				temp.question.varOffset = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 10]) + (static_cast<unsigned char>(buffer[j + 11]) << 8));
-				temp.question.flags = static_cast<unsigned char>(buffer[j + 12]);
-				temp.minimumSize = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 13]) + (static_cast<unsigned char>(buffer[j + 14]) << 8));
-				temp.maximumSize = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 15]) + (static_cast<unsigned char>(buffer[j + 16]) << 8));
+				EFI_IFR_PASSWORD *temp = (EFI_IFR_PASSWORD*)&buffer[j];
 
 				// Display temp
-				fout << "Password: " << strings[temp.question.statement.promptString + strPackageOffset] << ", Variable: 0x" << hex << uppercase << temp.question.varOffset << ", VarStore: 0x" << temp.question.varStoreId << ", QuestionId: 0x" << temp.question.questionId;
+				fout << "Password: " << strings[temp->Question.Header.Prompt + strPackageOffset] << ", VarStoreInfo (VarOffset/VarName): 0x" << hex << uppercase << temp->Question.VarStoreInfo.VarOffset << ", VarStore: 0x" << temp->Question.VarStoreId << ", QuestionId: 0x" << temp->Question.QuestionId;
+				fout << ", Min: 0x" << temp->MinSize;
+				fout << ", Max 0x" << temp->MaxSize;
 
 				// Check if scope
-				if (temp.header.scope)
+				if (temp->Header.Scope)
 					IndentText(OTHER);
 			}
 
