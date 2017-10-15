@@ -51,7 +51,6 @@ typedef struct _EFI_HII_STRING_PACKAGE_HDR {
 	CHAR16 LanguageWindow[16];
 	EFI_STRING_ID LanguageName;
 	CHAR8 Language[1];
-	//CHAR8 *Language;
 } EFI_HII_STRING_PACKAGE_HDR;
 
 typedef struct {
@@ -79,7 +78,6 @@ typedef struct {
 #pragma pack(push, 1)
 typedef struct _EFI_HII_SIBT_STRING_UCS2_BLOCK {
 	EFI_HII_STRING_BLOCK Header;
-	//CHAR16 StringText[0];
 	CHAR16 StringText[1];
 } EFI_HII_SIBT_STRING_UCS2_BLOCK;
 #pragma pack(pop)
@@ -157,6 +155,7 @@ typedef struct _EFI_IFR_ACTION {
 	EFI_IFR_QUESTION_HEADER Question;
 	EFI_STRING_ID QuestionConfig;
 } EFI_IFR_ACTION;
+
 typedef struct _EFI_IFR_ACTION_1 {
 	EFI_IFR_OP_HEADER Header;
 	EFI_IFR_QUESTION_HEADER Question;
@@ -225,6 +224,7 @@ typedef struct _EFI_IFR_DEFAULT {
 	UINT8 Type;
 	EFI_IFR_TYPE_VALUE Value;
 } EFI_IFR_DEFAULT;
+
 typedef struct _EFI_IFR_DEFAULT_2 {
 	EFI_IFR_OP_HEADER Header;
 	UINT16 DefaultId;
@@ -541,10 +541,12 @@ typedef struct _EFI_IFR_QUESTION_REF2 {
 typedef struct _EFI_IFR_QUESTION_REF3 {
 	EFI_IFR_OP_HEADER Header;
 } EFI_IFR_QUESTION_REF3;
+
 typedef struct _EFI_IFR_QUESTION_REF3_2 {
 	EFI_IFR_OP_HEADER Header;
 	EFI_STRING_ID DevicePath;
 } EFI_IFR_QUESTION_REF3_2;
+
 typedef struct _EFI_IFR_QUESTION_REF3_3 {
 	EFI_IFR_OP_HEADER Header;
 	EFI_STRING_ID DevicePath;
@@ -560,12 +562,14 @@ typedef struct _EFI_IFR_REF {
 	EFI_IFR_QUESTION_HEADER Question;
 	EFI_FORM_ID FormId;
 } EFI_IFR_REF;
+
 typedef struct _EFI_IFR_REF2 {
 	EFI_IFR_OP_HEADER Header;
 	EFI_IFR_QUESTION_HEADER Question;
 	EFI_FORM_ID FormId;
 	EFI_QUESTION_ID QuestionId;
 } EFI_IFR_REF2;
+
 typedef struct _EFI_IFR_REF3 {
 	EFI_IFR_OP_HEADER Header;
 	EFI_IFR_QUESTION_HEADER Question;
@@ -573,6 +577,7 @@ typedef struct _EFI_IFR_REF3 {
 	EFI_QUESTION_ID QuestionId;
 	EFI_GUID FormSetId;
 } EFI_IFR_REF3;
+
 typedef struct _EFI_IFR_REF4 {
 	EFI_IFR_OP_HEADER Header;
 	EFI_IFR_QUESTION_HEADER Question;
@@ -581,6 +586,7 @@ typedef struct _EFI_IFR_REF4 {
 	EFI_GUID FormSetId;
 	EFI_STRING_ID DevicePath;
 } EFI_IFR_REF4;
+
 typedef struct _EFI_IFR_REF5 {
 	EFI_IFR_OP_HEADER Header;
 	EFI_IFR_QUESTION_HEADER Question;
