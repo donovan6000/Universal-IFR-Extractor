@@ -304,14 +304,16 @@ typedef struct _EFI_IFR_FORM_MAP {
 	//EFI_IFR_FORM_MAP_METHOD Methods[];
 } EFI_IFR_FORM_MAP;
 
+#pragma pack(push, 1)
 typedef struct _EFI_IFR_FORM_SET {
 	EFI_IFR_OP_HEADER Header;
 	EFI_GUID Guid;
 	EFI_STRING_ID FormSetTitle;
 	EFI_STRING_ID Help;
 	UINT8 Flags;
-	//EFI_GUID ClassGuid[…];
+	EFI_GUID ClassGuid[1];
 } EFI_IFR_FORM_SET;
+#pragma pack(pop)
 
 typedef struct _EFI_IFR_GET {
 	EFI_IFR_OP_HEADER Header;
@@ -755,13 +757,15 @@ typedef struct _EFI_IFR_VALUE {
 	EFI_IFR_OP_HEADER Header;
 } EFI_IFR_VALUE;
 
+#pragma pack(push, 1)
 typedef struct {
 	EFI_IFR_OP_HEADER Header;
 	EFI_GUID Guid;
 	EFI_VARSTORE_ID VarStoreId;
 	UINT16 Size;
-	//UINT8 Name[];
+	UINT8 Name[1];
 } EFI_IFR_VARSTORE;
+#pragma pack(pop)
 
 typedef struct _EFI_IFR_VARSTORE_NAME_VALUE {
 	EFI_IFR_OP_HEADER Header;
@@ -775,7 +779,7 @@ typedef struct _EFI_IFR_VARSTORE_EFI {
 	EFI_GUID Guid;
 	UINT32 Attributes;
 	UINT16 Size;
-	//UINT8 Name[];
+	UINT8 Name[1];
 } EFI_IFR_VARSTORE_EFI;
 
 typedef struct _EFI_IFR_VARSTORE_DEVICE {
