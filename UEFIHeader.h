@@ -485,6 +485,7 @@ typedef struct _EFI_IFR_ONE_OF {
 } EFI_IFR_ONE_OF;
 #pragma pack(pop)
 
+#pragma pack(push, 1)
 typedef struct _EFI_IFR_ONE_OF_OPTION {
 	EFI_IFR_OP_HEADER Header;
 	EFI_STRING_ID Option;
@@ -492,6 +493,7 @@ typedef struct _EFI_IFR_ONE_OF_OPTION {
 	UINT8 Type;
 	EFI_IFR_TYPE_VALUE Value;
 } EFI_IFR_ONE_OF_OPTION;
+#pragma pack(pop)
 
 #define EFI_IFR_TYPE_NUM_SIZE_8 0x00
 #define EFI_IFR_TYPE_NUM_SIZE_16 0x01
@@ -559,11 +561,13 @@ typedef struct _EFI_IFR_READ {
 	EFI_IFR_OP_HEADER Header;
 } EFI_IFR_READ;
 
+#pragma pack(push, 1)
 typedef struct _EFI_IFR_REF {
 	EFI_IFR_OP_HEADER Header;
 	EFI_IFR_QUESTION_HEADER Question;
 	EFI_FORM_ID FormId;
 } EFI_IFR_REF;
+#pragma pack(pop)
 
 typedef struct _EFI_IFR_REF2 {
 	EFI_IFR_OP_HEADER Header;
