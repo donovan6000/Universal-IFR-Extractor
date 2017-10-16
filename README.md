@@ -5,7 +5,7 @@ Utility that can extract the internal forms representation from both EFI and UEF
 
 Use VS2017 to build.
 
-You can download an executable <a href="http://bios-mods.com/pub/donovan6000/Software/Universal%20IFR%20Extractor/Universal%20IFR%20Extractor.exe">here.</a>
+You can download an executable <a href="https://github.com/tomrus88/Universal-IFR-Extractor/releases">here.</a>
 
 © 2014 donovan6000
 <br /><br /><br />
