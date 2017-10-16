@@ -17,6 +17,10 @@ typedef UINT16 EFI_VARSTORE_ID;
 typedef UINT16 EFI_ANIMATION_ID;
 typedef UINT16 EFI_DEFAULT_ID;
 
+typedef UINT32 EFI_HII_FONT_STYLE;
+
+#pragma pack(push, 1)
+
 typedef struct {
 	UINT32 Data1;
 	UINT16 Data2;
@@ -24,12 +28,26 @@ typedef struct {
 	UINT8 Data4[8];
 } EFI_GUID;
 
+///
+/// The header found at the start of each package list.
+///
 typedef struct {
-	UINT32 Length : 24;
-	UINT32 Type : 8;
-	//UINT8 Data[0];
+	EFI_GUID               PackageListGuid;
+	UINT32                 PackageLength;
+} EFI_HII_PACKAGE_LIST_HEADER;
+
+///
+/// The header found at the start of each package.
+///
+typedef struct {
+	UINT32  Length : 24;
+	UINT32  Type : 8;
+	// UINT8  Data[...];
 } EFI_HII_PACKAGE_HEADER;
 
+//
+// Value of HII package type
+//
 #define EFI_HII_PACKAGE_TYPE_ALL 0x00
 #define EFI_HII_PACKAGE_TYPE_GUID 0x01
 #define EFI_HII_PACKAGE_FORMS 0x02
@@ -44,6 +62,10 @@ typedef struct {
 #define EFI_HII_PACKAGE_TYPE_SYSTEM_BEGIN 0xE0
 #define EFI_HII_PACKAGE_TYPE_SYSTEM_END 0xFF
 
+///
+/// The fixed header consists of a standard record header and then the string identifiers
+/// contained in this section and the offsets of the string and language information.
+///
 typedef struct _EFI_HII_STRING_PACKAGE_HDR {
 	EFI_HII_PACKAGE_HEADER Header;
 	UINT32 HdrSize;
@@ -55,9 +77,11 @@ typedef struct _EFI_HII_STRING_PACKAGE_HDR {
 
 typedef struct {
 	UINT8 BlockType;
-	//UINT8 BlockBody[0];
 } EFI_HII_STRING_BLOCK;
 
+//
+// Value of different string information block types
+//
 #define EFI_HII_SIBT_END 0x00 // The end of the string information.
 #define EFI_HII_SIBT_STRING_SCSU 0x10 // Single string using default font information.
 #define EFI_HII_SIBT_STRING_SCSU_FONT 0x11 // Single string with font information.
@@ -75,24 +99,111 @@ typedef struct {
 #define EFI_HII_SIBT_EXT4 0x32 // For future expansion(four byte length field)
 #define EFI_HII_SIBT_FONT 0x40 // Font information.
 
-#pragma pack(push, 1)
-typedef struct _EFI_HII_SIBT_STRING_UCS2_BLOCK {
-	EFI_HII_STRING_BLOCK Header;
-	CHAR16 StringText[1];
-} EFI_HII_SIBT_STRING_UCS2_BLOCK;
-#pragma pack(pop)
+//
+// Definition of different string information block types
+//
 
+typedef struct _EFI_HII_SIBT_DUPLICATE_BLOCK {
+	EFI_HII_STRING_BLOCK    Header;
+	EFI_STRING_ID           StringId;
+} EFI_HII_SIBT_DUPLICATE_BLOCK;
+
+typedef struct _EFI_HII_SIBT_END_BLOCK {
+	EFI_HII_STRING_BLOCK    Header;
+} EFI_HII_SIBT_END_BLOCK;
+
+typedef struct _EFI_HII_SIBT_EXT1_BLOCK {
+	EFI_HII_STRING_BLOCK    Header;
+	UINT8                   BlockType2;
+	UINT8                   Length;
+} EFI_HII_SIBT_EXT1_BLOCK;
+
+typedef struct _EFI_HII_SIBT_EXT2_BLOCK {
+	EFI_HII_STRING_BLOCK    Header;
+	UINT8                   BlockType2;
+	UINT16                  Length;
+} EFI_HII_SIBT_EXT2_BLOCK;
+
+typedef struct _EFI_HII_SIBT_EXT4_BLOCK {
+	EFI_HII_STRING_BLOCK    Header;
+	UINT8                   BlockType2;
+	UINT32                  Length;
+} EFI_HII_SIBT_EXT4_BLOCK;
+
+typedef struct _EFI_HII_SIBT_FONT_BLOCK {
+	EFI_HII_SIBT_EXT2_BLOCK Header;
+	UINT8                   FontId;
+	UINT16                  FontSize;
+	EFI_HII_FONT_STYLE      FontStyle;
+	CHAR16                  FontName[1];
+} EFI_HII_SIBT_FONT_BLOCK;
+
+typedef struct _EFI_HII_SIBT_SKIP1_BLOCK {
+	EFI_HII_STRING_BLOCK    Header;
+	UINT8                   SkipCount;
+} EFI_HII_SIBT_SKIP1_BLOCK;
+
+typedef struct _EFI_HII_SIBT_SKIP2_BLOCK {
+	EFI_HII_STRING_BLOCK    Header;
+	UINT16                  SkipCount;
+} EFI_HII_SIBT_SKIP2_BLOCK;
+
+typedef struct _EFI_HII_SIBT_STRING_SCSU_BLOCK {
+	EFI_HII_STRING_BLOCK    Header;
+	UINT8                   StringText[1];
+} EFI_HII_SIBT_STRING_SCSU_BLOCK;
+
+typedef struct _EFI_HII_SIBT_STRING_SCSU_FONT_BLOCK {
+	EFI_HII_STRING_BLOCK    Header;
+	UINT8                   FontIdentifier;
+	UINT8                   StringText[1];
+} EFI_HII_SIBT_STRING_SCSU_FONT_BLOCK;
+
+typedef struct _EFI_HII_SIBT_STRINGS_SCSU_BLOCK {
+	EFI_HII_STRING_BLOCK    Header;
+	UINT16                  StringCount;
+	UINT8                   StringText[1];
+} EFI_HII_SIBT_STRINGS_SCSU_BLOCK;
+
+typedef struct _EFI_HII_SIBT_STRINGS_SCSU_FONT_BLOCK {
+	EFI_HII_STRING_BLOCK    Header;
+	UINT8                   FontIdentifier;
+	UINT16                  StringCount;
+	UINT8                   StringText[1];
+} EFI_HII_SIBT_STRINGS_SCSU_FONT_BLOCK;
+
+typedef struct _EFI_HII_SIBT_STRING_UCS2_BLOCK {
+	EFI_HII_STRING_BLOCK    Header;
+	CHAR16                  StringText[1];
+} EFI_HII_SIBT_STRING_UCS2_BLOCK;
+
+typedef struct _EFI_HII_SIBT_STRING_UCS2_FONT_BLOCK {
+	EFI_HII_STRING_BLOCK    Header;
+	UINT8                   FontIdentifier;
+	CHAR16                  StringText[1];
+} EFI_HII_SIBT_STRING_UCS2_FONT_BLOCK;
+
+typedef struct _EFI_HII_SIBT_STRINGS_UCS2_BLOCK {
+	EFI_HII_STRING_BLOCK    Header;
+	UINT16                  StringCount;
+	CHAR16                  StringText[1];
+} EFI_HII_SIBT_STRINGS_UCS2_BLOCK;
+
+typedef struct _EFI_HII_SIBT_STRINGS_UCS2_FONT_BLOCK {
+	EFI_HII_STRING_BLOCK    Header;
+	UINT8                   FontIdentifier;
+	UINT16                  StringCount;
+	CHAR16                  StringText[1];
+} EFI_HII_SIBT_STRINGS_UCS2_FONT_BLOCK;
+
+///
+/// The Form package is used to carry form-based encoding data.
+///
 typedef struct _EFI_HII_FORM_PACKAGE_HDR {
 	EFI_HII_PACKAGE_HEADER Header;
 	//EFI_IFR_OP_HEADER OpCodeHeader;
 	//More op-codes follow
 } EFI_HII_FORM_PACKAGE_HDR;
-
-typedef struct _EFI_IFR_OP_HEADER {
-	UINT8 OpCode;
-	UINT8 Length : 7;
-	UINT8 Scope : 1;
-} EFI_IFR_OP_HEADER;
 
 typedef struct {
 	UINT8 Hour;
@@ -126,12 +237,22 @@ typedef union {
 	// UINT8 buffer[]; // EFI_IFR_TYPE_BUFFER
 } EFI_IFR_TYPE_VALUE;
 
+//
+// Definitions of IFR Standard Headers
+// Section 27.3.8.2
+//
+
+typedef struct _EFI_IFR_OP_HEADER {
+	UINT8 OpCode;
+	UINT8 Length : 7;
+	UINT8 Scope : 1;
+} EFI_IFR_OP_HEADER;
+
 typedef struct _EFI_IFR_STATEMENT_HEADER {
 	EFI_STRING_ID Prompt;
 	EFI_STRING_ID Help;
 } EFI_IFR_STATEMENT_HEADER;
 
-#pragma pack(push, 1)
 typedef struct _EFI_IFR_QUESTION_HEADER {
 	EFI_IFR_STATEMENT_HEADER Header;
 	EFI_QUESTION_ID QuestionId;
@@ -142,13 +263,20 @@ typedef struct _EFI_IFR_QUESTION_HEADER {
 	} VarStoreInfo;
 	UINT8 Flags;
 } EFI_IFR_QUESTION_HEADER;
-#pragma pack(pop)
 
+//
+// Flag values of EFI_IFR_QUESTION_HEADER
+//
 #define EFI_IFR_FLAG_READ_ONLY 0x01
 #define EFI_IFR_FLAG_CALLBACK 0x04
 #define EFI_IFR_FLAG_RESET_REQUIRED 0x10
 #define EFI_IFR_FLAG_RECONNECT_REQUIRED 0x40
 #define EFI_IFR_FLAG_OPTIONS_ONLY 0x80
+
+//
+// Definition for Opcode Reference
+// Section 27.3.8.3
+//
 
 typedef struct _EFI_IFR_ACTION {
 	EFI_IFR_OP_HEADER Header;
@@ -218,14 +346,12 @@ typedef struct _EFI_IFR_DATE {
 #define QF_DATE_STORAGE_TIME 0x10
 #define QF_DATE_STORAGE_WAKEUP 0x20
 
-#pragma pack(push, 1)
 typedef struct _EFI_IFR_DEFAULT {
 	EFI_IFR_OP_HEADER Header;
 	UINT16 DefaultId;
 	UINT8 Type;
 	EFI_IFR_TYPE_VALUE Value;
 } EFI_IFR_DEFAULT;
-#pragma pack(pop)
 
 typedef struct _EFI_IFR_DEFAULT_2 {
 	EFI_IFR_OP_HEADER Header;
@@ -300,13 +426,13 @@ typedef struct _EFI_IFR_FORM_MAP_METHOD {
 	EFI_STRING_ID MethodTitle;
 	EFI_GUID MethodIdentifier;
 } EFI_IFR_FORM_MAP_METHOD;
+
 typedef struct _EFI_IFR_FORM_MAP {
 	EFI_IFR_OP_HEADER Header;
 	EFI_FORM_ID FormId;
 	//EFI_IFR_FORM_MAP_METHOD Methods[];
 } EFI_IFR_FORM_MAP;
 
-#pragma pack(push, 1)
 typedef struct _EFI_IFR_FORM_SET {
 	EFI_IFR_OP_HEADER Header;
 	EFI_GUID Guid;
@@ -315,7 +441,6 @@ typedef struct _EFI_IFR_FORM_SET {
 	UINT8 Flags;
 	EFI_GUID ClassGuid[1];
 } EFI_IFR_FORM_SET;
-#pragma pack(pop)
 
 typedef struct _EFI_IFR_GET {
 	EFI_IFR_OP_HEADER Header;
@@ -408,7 +533,6 @@ typedef struct _EFI_IFR_NO_SUBMIT_IF {
 	EFI_STRING_ID Error;
 } EFI_IFR_NO_SUBMIT_IF;
 
-#pragma pack(push, 1)
 typedef struct _EFI_IFR_NUMERIC {
 	EFI_IFR_OP_HEADER Header;
 	EFI_IFR_QUESTION_HEADER Question;
@@ -437,7 +561,6 @@ typedef struct _EFI_IFR_NUMERIC {
 		} u64;
 	} data;
 } EFI_IFR_NUMERIC;
-#pragma pack(pop)
 
 #define EFI_IFR_NUMERIC_SIZE 0x03
 #define EFI_IFR_NUMERIC_SIZE_1 0x00
@@ -457,7 +580,6 @@ typedef struct _EFI_IFR_ONES {
 	EFI_IFR_OP_HEADER Header;
 } EFI_IFR_ONES;
 
-#pragma pack(push, 1)
 typedef struct _EFI_IFR_ONE_OF {
 	EFI_IFR_OP_HEADER Header;
 	EFI_IFR_QUESTION_HEADER Question;
@@ -485,9 +607,7 @@ typedef struct _EFI_IFR_ONE_OF {
 		} u64;
 	} data;
 } EFI_IFR_ONE_OF;
-#pragma pack(pop)
 
-#pragma pack(push, 1)
 typedef struct _EFI_IFR_ONE_OF_OPTION {
 	EFI_IFR_OP_HEADER Header;
 	EFI_STRING_ID Option;
@@ -495,7 +615,6 @@ typedef struct _EFI_IFR_ONE_OF_OPTION {
 	UINT8 Type;
 	EFI_IFR_TYPE_VALUE Value;
 } EFI_IFR_ONE_OF_OPTION;
-#pragma pack(pop)
 
 #define EFI_IFR_TYPE_NUM_SIZE_8 0x00
 #define EFI_IFR_TYPE_NUM_SIZE_16 0x01
@@ -563,13 +682,11 @@ typedef struct _EFI_IFR_READ {
 	EFI_IFR_OP_HEADER Header;
 } EFI_IFR_READ;
 
-#pragma pack(push, 1)
 typedef struct _EFI_IFR_REF {
 	EFI_IFR_OP_HEADER Header;
 	EFI_IFR_QUESTION_HEADER Question;
 	EFI_FORM_ID FormId;
 } EFI_IFR_REF;
-#pragma pack(pop)
 
 typedef struct _EFI_IFR_REF2 {
 	EFI_IFR_OP_HEADER Header;
@@ -763,7 +880,6 @@ typedef struct _EFI_IFR_VALUE {
 	EFI_IFR_OP_HEADER Header;
 } EFI_IFR_VALUE;
 
-#pragma pack(push, 1)
 typedef struct {
 	EFI_IFR_OP_HEADER Header;
 	EFI_GUID Guid;
@@ -771,7 +887,6 @@ typedef struct {
 	UINT16 Size;
 	UINT8 Name[1];
 } EFI_IFR_VARSTORE;
-#pragma pack(pop)
 
 typedef struct _EFI_IFR_VARSTORE_NAME_VALUE {
 	EFI_IFR_OP_HEADER Header;
@@ -779,7 +894,6 @@ typedef struct _EFI_IFR_VARSTORE_NAME_VALUE {
 	EFI_GUID Guid;
 } EFI_IFR_VARSTORE_NAME_VALUE;
 
-#pragma pack(push, 1)
 typedef struct _EFI_IFR_VARSTORE_EFI {
 	EFI_IFR_OP_HEADER Header;
 	EFI_VARSTORE_ID VarStoreId;
@@ -788,7 +902,6 @@ typedef struct _EFI_IFR_VARSTORE_EFI {
 	UINT16 Size;
 	UINT8 Name[1];
 } EFI_IFR_VARSTORE_EFI;
-#pragma pack(pop)
 
 typedef struct _EFI_IFR_VARSTORE_DEVICE {
 	EFI_IFR_OP_HEADER Header;
@@ -817,6 +930,8 @@ typedef struct _EFI_IFR_MATCH2 {
 	EFI_IFR_OP_HEADER Header;
 	EFI_GUID SyntaxType;
 } EFI_IFR_MATCH2;
+
+#pragma pack(pop)
 
 #define EFI_IFR_FORM_OP 0x01 // Form
 #define EFI_IFR_SUBTITLE_OP 0x02 // Subtitle statement
@@ -860,7 +975,6 @@ typedef struct _EFI_IFR_MATCH2 {
 #define EFI_IFR_VERSION_OP 0x28 // Push the revision level of the UEFI Specification to which this Forms Processor is compliant.
 #define EFI_IFR_END_OP 0x29 // Marks end of scope.
 #define EFI_IFR_MATCH_OP 0x2A // Push TRUE if string matches a pattern.
-#define EFI_IFR_MATCH2_OP 0x64 // Push TRUE if string matches a Regular Expression pattern.
 #define EFI_IFR_GET_OP 0x2B // Return a stored value.
 #define EFI_IFR_SET_OP 0x2C // Change a stored value.
 #define EFI_IFR_READ_OP 0x2D // Provides a value for the current question or default.
@@ -918,3 +1032,4 @@ typedef struct _EFI_IFR_MATCH2 {
 #define EFI_IFR_MODAL_TAG_OP 0x61 // Specify current form is modal
 #define EFI_IFR_REFRESH_ID_OP 0x62 // Establish an event group for refreshing a forms - based element.
 #define EFI_IFR_WARNING_IF_OP 0x63 // Warning conditional
+#define EFI_IFR_MATCH2_OP 0x64 // Push TRUE if string matches a Regular Expression pattern.

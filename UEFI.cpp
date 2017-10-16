@@ -1203,6 +1203,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 
 				// Display temp
 				fout << "Form Map: 0x" << hex << uppercase << temp->FormId;
+				// Methods?
 			}
 			else if (buffer[j] == EFI_IFR_CATENATE_OP) {
 
@@ -1252,6 +1253,14 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 
 				// Display temp
 				fout << "Warning If: " << strings[temp->Warning + strPackageOffset] << ", TimeOut: 0x" << hex << uppercase << temp->TimeOut;
+			}
+			else if (buffer[j] == EFI_IFR_MATCH2_OP) {
+
+				// Create temp
+				EFI_IFR_MATCH2 *temp = (EFI_IFR_MATCH2*)&buffer[j];
+
+				// Display temp
+				fout << "Match2: SyntaxType: [" << GuidToString(temp->SyntaxType) << "]";
 			}
 			else {
 
