@@ -779,6 +779,7 @@ typedef struct _EFI_IFR_VARSTORE_NAME_VALUE {
 	EFI_GUID Guid;
 } EFI_IFR_VARSTORE_NAME_VALUE;
 
+#pragma pack(push, 1)
 typedef struct _EFI_IFR_VARSTORE_EFI {
 	EFI_IFR_OP_HEADER Header;
 	EFI_VARSTORE_ID VarStoreId;
@@ -787,6 +788,7 @@ typedef struct _EFI_IFR_VARSTORE_EFI {
 	UINT16 Size;
 	UINT8 Name[1];
 } EFI_IFR_VARSTORE_EFI;
+#pragma pack(pop)
 
 typedef struct _EFI_IFR_VARSTORE_DEVICE {
 	EFI_IFR_OP_HEADER Header;
