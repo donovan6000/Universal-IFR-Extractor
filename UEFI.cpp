@@ -130,9 +130,9 @@ void getUEFIStrings(vector<UEFI_IFR_STRING_PACK> &stringPackages, vector<string>
 			// Clear temp
 			temp.clear();
 
-			// Skip % padding
-			while (buffer[index + 1] == '\x25')
-				index += 2;
+			//// Skip % padding
+			//while (buffer[index + 1] == '\x25')
+			//	index += 2;
 		}
 	}
 
@@ -278,7 +278,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 	fout << setfill('-') << setw(80) << "" << endl;
 	for (uint8_t i = 0; i < stringPackages.size(); i++) {
 		fout << "0x" << hex << uppercase << stringPackages[i].header.offset;
-		fout << "\t\t" << stringPackages[i].language << " (0x" << hex << uppercase << static_cast<unsigned int>(i) << ')' << endl;
+		fout << "\t\t" << stringPackages[i].language << " (0x" << hex << uppercase << (uint16_t)i << ')' << endl;
 	}
 	fout << endl << endl;
 
