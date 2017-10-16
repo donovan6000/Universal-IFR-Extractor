@@ -218,12 +218,14 @@ typedef struct _EFI_IFR_DATE {
 #define QF_DATE_STORAGE_TIME 0x10
 #define QF_DATE_STORAGE_WAKEUP 0x20
 
+#pragma pack(push, 1)
 typedef struct _EFI_IFR_DEFAULT {
 	EFI_IFR_OP_HEADER Header;
 	UINT16 DefaultId;
 	UINT8 Type;
 	EFI_IFR_TYPE_VALUE Value;
 } EFI_IFR_DEFAULT;
+#pragma pack(pop)
 
 typedef struct _EFI_IFR_DEFAULT_2 {
 	EFI_IFR_OP_HEADER Header;
