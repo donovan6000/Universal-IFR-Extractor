@@ -555,7 +555,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 				EFI_IFR_EQ_ID_VAL *temp = (EFI_IFR_EQ_ID_VAL*)&buffer[j];
 
 				// Display temp
-				fout << "QuestionId 0x" << hex << uppercase << temp->QuestionId << " equals value 0x" << hex << uppercase << temp->Value;
+				fout << "QuestionId: 0x" << hex << uppercase << temp->QuestionId << " equals value 0x" << hex << uppercase << temp->Value;
 			}
 			else if (buffer[j] == EFI_IFR_EQ_ID_ID_OP) {
 
@@ -563,7 +563,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 				EFI_IFR_EQ_ID_ID *temp = (EFI_IFR_EQ_ID_ID*)&buffer[j];
 
 				// Display temp
-				fout << "QuestionId 0x" << hex << uppercase << temp->QuestionId1 << " equals QuestionId 0x" << hex << uppercase << temp->QuestionId2;
+				fout << "QuestionId: 0x" << hex << uppercase << temp->QuestionId1 << " equals QuestionId 0x" << hex << uppercase << temp->QuestionId2;
 			}
 			else if (buffer[j] == EFI_IFR_EQ_ID_VAL_LIST_OP) {
 
@@ -571,7 +571,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 				EFI_IFR_EQ_ID_VAL_LIST *temp = (EFI_IFR_EQ_ID_VAL_LIST*)&buffer[j];
 
 				// Display temp
-				fout << "QuestionId 0x" << hex << uppercase << temp->QuestionId << " equals value in list (";
+				fout << "QuestionId: 0x" << hex << uppercase << temp->QuestionId << " equals value in list (";
 				for (uint8_t k = 0; k < temp->ListLength; k++) {
 					fout << "0x" << hex << uppercase << temp->ValueList[k];
 					if (k != temp->ListLength - 1)
@@ -1194,7 +1194,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 				EFI_IFR_DEFAULTSTORE *temp = (EFI_IFR_DEFAULTSTORE*)&buffer[j];
 
 				// Display temp
-				fout << "Default Store: " << strings[temp->DefaultName + strPackageOffset] << ", Id: 0x" << hex << uppercase << temp->DefaultId;
+				fout << "Default Store: " << strings[temp->DefaultName + strPackageOffset] << ", DefaultId: 0x" << hex << uppercase << temp->DefaultId;
 			}
 			else if (buffer[j] == EFI_IFR_FORM_MAP_OP) {
 
@@ -1202,7 +1202,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 				EFI_IFR_FORM_MAP *temp = (EFI_IFR_FORM_MAP*)&buffer[j];
 
 				// Display temp
-				fout << "Form Map: 0x" << hex << uppercase << temp->FormId;
+				fout << "Form Map: FormId: 0x" << hex << uppercase << temp->FormId;
 				// Methods?
 			}
 			else if (buffer[j] == EFI_IFR_CATENATE_OP) {
