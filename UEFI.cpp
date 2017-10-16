@@ -190,7 +190,7 @@ void getUEFIFormSets(vector<UEFI_IFR_FORM_SET_PACK> &formSets, const string &buf
 	}
 
 	// Go through buffer
-	for (uint32_t i = 0; i < buffer.size() - 4; i++)
+	for (uint32_t i = 0; i < buffer.size() - 4; i++) {
 
 		// Check if form set was found
 		if ((buffer[i] != '\x00' || buffer[i + 1] != '\x00' || buffer[i + 2] != '\x00') && buffer[i + 3] == '\x02' && buffer[i + 4] == '\x0E' && i + static_cast<unsigned char>(buffer[i]) + (static_cast<unsigned char>(buffer[i + 1]) << 8) + (static_cast<unsigned char>(buffer[i + 2]) << 16) < buffer.size() && buffer[i + static_cast<unsigned char>(buffer[i]) + (static_cast<unsigned char>(buffer[i + 1]) << 8) + (static_cast<unsigned char>(buffer[i + 2]) << 16) - 1] == '\x02' && buffer[i + static_cast<unsigned char>(buffer[i]) + (static_cast<unsigned char>(buffer[i + 1]) << 8) + (static_cast<unsigned char>(buffer[i + 2]) << 16) - 2] == '\x29') {
@@ -212,6 +212,7 @@ void getUEFIFormSets(vector<UEFI_IFR_FORM_SET_PACK> &formSets, const string &buf
 			// Add temp form set to list
 			formSets.push_back(tempFormSet);
 		}
+	}
 }
 
 void displayUEFIFormSets(const vector<UEFI_IFR_FORM_SET_PACK> &formSets) {
@@ -245,14 +246,14 @@ void IndentText(uint8_t reason)
 	conditionalStack.push_back(reason);
 }
 
-const std::string & GetTextById(EFI_STRING_ID stringId, const std::vector<std::string> &strings, const uint32_t strPackageOffset)
-{
-	return strings[stringId + strPackageOffset];
-}
+//const std::string & GetTextById(EFI_STRING_ID stringId, const std::vector<std::string> &strings, const uint32_t strPackageOffset)
+//{
+//	return strings[stringId + strPackageOffset];
+//}
 
 std::string GuidToString(EFI_GUID &guid)
 {
-	char guid_cstr[39];
+	char guid_cstr[37];
 	snprintf(guid_cstr, sizeof(guid_cstr), "%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X",
 		guid.Data1, guid.Data2, guid.Data3,
 		guid.Data4[0], guid.Data4[1], guid.Data4[2], guid.Data4[3],
@@ -266,24 +267,15 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 	ofstream fout(outputFile.c_str());
 
 	// Display protocol
-	for (uint8_t i = 0; i < 32; i++)
-		fout << ' ';
-	fout << "UEFI Protocol Detected" << endl;
-	for (uint8_t i = 0; i < 80; i++)
-		fout << '-';
-	fout << endl << endl << endl;
+	fout << setfill(' ') << setw(32) << "" << "UEFI Protocol Detected" << endl;
+	fout << setfill('-') << setw(80) << "" << endl;
+	fout << endl << endl;
 
 	// Display string packages info
-	for (uint8_t i = 0; i < 32; i++)
-		fout << ' ';
-	fout << "String Packages" << endl;
-	for (uint8_t i = 0; i < 80; i++)
-		fout << '-';
-	fout << endl;
+	fout << setfill(' ') << setw(32) << "" << "String Packages" << endl;
+	fout << setfill('-') << setw(80) << "" << endl;
 	fout << "Offset:\t\tLanguage:" << endl;
-	for (uint8_t i = 0; i < 80; i++)
-		fout << '-';
-	fout << endl;
+	fout << setfill('-') << setw(80) << "" << endl;
 	for (uint8_t i = 0; i < stringPackages.size(); i++) {
 		fout << "0x" << hex << uppercase << stringPackages[i].header.offset;
 		fout << "\t\t" << stringPackages[i].language << " (0x" << hex << uppercase << static_cast<unsigned int>(i) << ')' << endl;
@@ -291,16 +283,10 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 	fout << endl << endl;
 
 	// Display form sets info
-	for (uint8_t i = 0; i < 35; i++)
-		fout << ' ';
-	fout << "Form Sets" << endl;
-	for (uint8_t i = 0; i < 80; i++)
-		fout << '-';
-	fout << endl;
+	fout << setfill(' ') << setw(35) << "" << "Form Sets" << endl;
+	fout << setfill('-') << setw(80) << "" << endl;
 	fout << "Offset:\t\tTitle:" << endl;
-	for (uint8_t i = 0; i < 80; i++)
-		fout << '-';
-	fout << endl;
+	fout << setfill('-') << setw(80) << "" << endl;
 	for (uint8_t i = 0; i < formSets.size(); i++) {
 		fout << "0x" << hex << uppercase << formSets[i].header.offset;
 		fout << "\t\t" << formSets[i].title << " (0x" << hex << uppercase << formSets[i].titleString << " from string package 0x" << formSets[i].usingStringPackage << ')' << endl;
@@ -308,16 +294,10 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 	fout << endl << endl;
 
 	// Display IFR
-	for (uint8_t i = 0; i < 25; i++)
-		fout << ' ';
-	fout << "Internal Forms Representation" << endl;
-	for (uint8_t i = 0; i < 80; i++)
-		fout << '-';
-	fout << endl;
+	fout << setfill(' ') << setw(25) << "" << "Internal Forms Representation" << endl;
+	fout << setfill('-') << setw(80) << "" << endl;
 	fout << "Offset:\t\tInstruction:" << endl;
-	for (uint8_t i = 0; i < 80; i++)
-		fout << '-';
-	fout << endl;
+	fout << setfill('-') << setw(80) << "" << endl;
 
 	// Go through form sets
 	for (uint32_t i = 0; i < formSets.size(); i++) {
@@ -330,11 +310,14 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 			// Display offset
 			fout << "0x" << hex << uppercase << j << ' ';
 
-			if (buffer[j] != EFI_IFR_END_OP) {
-				// Display tabs
-				for (uint8_t k = 0; k < numberOfTabs; k++)
-					fout << '\t';
+			if (buffer[j] == EFI_IFR_END_OP) {
+				// Decrement number of tabs
+				numberOfTabs--;
 			}
+
+			// Display tabs
+			for (uint8_t k = 0; k < numberOfTabs; k++)
+				fout << '\t';
 
 			// Check opcodes
 			if (buffer[j] == EFI_IFR_FORM_OP) {
@@ -640,82 +623,34 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 			else if (buffer[j] == EFI_IFR_DATE_OP) {
 
 				// Create temp
-				UEFI_IFR_DATE temp;
-
-				// Fill temp
-				temp.header.offset = j;
-				temp.header.opcode = buffer[j];
-				temp.header.length = static_cast<unsigned char>(buffer[j + 1]) & 0x7F;
-				temp.header.scope = static_cast<unsigned char>(buffer[j + 1]) & 0x80;
-				temp.question.statement.promptString = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 2]) + (static_cast<unsigned char>(buffer[j + 3]) << 8));
-				temp.question.statement.helpString = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 4]) + (static_cast<unsigned char>(buffer[j + 5]) << 8));
-				temp.question.questionId = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 6]) + (static_cast<unsigned char>(buffer[j + 7]) << 8));
-				temp.question.varStoreId = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 8]) + (static_cast<unsigned char>(buffer[j + 9]) << 8));
-				temp.question.varOffset = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 10]) + (static_cast<unsigned char>(buffer[j + 11]) << 8));
-				temp.question.flags = static_cast<unsigned char>(buffer[j + 12]);
-				temp.flags = static_cast<unsigned char>(buffer[j + 13]);
+				EFI_IFR_DATE *temp = (EFI_IFR_DATE*)&buffer[j];
 
 				// Display temp
-				fout << "Date: " << strings[temp.question.statement.promptString + strPackageOffset] << ", Variable: 0x" << hex << uppercase << temp.question.varOffset << ", VarStore: 0x" << temp.question.varStoreId << ", QuestionId: 0x" << temp.question.questionId;
+				fout << "Date: " << strings[temp->Question.Header.Prompt + strPackageOffset] << ", VarStoreInfo (VarOffset/VarName): 0x" << hex << uppercase << temp->Question.VarStoreInfo.VarOffset << ", VarStore: 0x" << temp->Question.VarStoreId << ", QuestionId: 0x" << temp->Question.QuestionId;
 			}
 			else if (buffer[j] == EFI_IFR_TIME_OP) {
 
 				// Create temp
-				UEFI_IFR_TIME temp;
-
-				// Fill temp
-				temp.header.offset = j;
-				temp.header.opcode = buffer[j];
-				temp.header.length = static_cast<unsigned char>(buffer[j + 1]) & 0x7F;
-				temp.header.scope = static_cast<unsigned char>(buffer[j + 1]) & 0x80;
-				temp.question.statement.promptString = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 2]) + (static_cast<unsigned char>(buffer[j + 3]) << 8));
-				temp.question.statement.helpString = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 4]) + (static_cast<unsigned char>(buffer[j + 5]) << 8));
-				temp.question.questionId = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 6]) + (static_cast<unsigned char>(buffer[j + 7]) << 8));
-				temp.question.varStoreId = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 8]) + (static_cast<unsigned char>(buffer[j + 9]) << 8));
-				temp.question.varOffset = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 10]) + (static_cast<unsigned char>(buffer[j + 11]) << 8));
-				temp.question.flags = static_cast<unsigned char>(buffer[j + 12]);
-				temp.flags = static_cast<unsigned char>(buffer[j + 13]);
+				EFI_IFR_TIME *temp = (EFI_IFR_TIME*)&buffer[j];
 
 				// Display temp
-				fout << "Time: " << strings[temp.question.statement.promptString + strPackageOffset] << ", Variable: 0x" << hex << uppercase << temp.question.varOffset << ", VarStore: 0x" << temp.question.varStoreId << ", QuestionId: 0x" << temp.question.questionId;
+				fout << "Time: " << strings[temp->Question.Header.Prompt + strPackageOffset] << ", VarStoreInfo (VarOffset/VarName): 0x" << hex << uppercase << temp->Question.VarStoreInfo.VarOffset << ", VarStore: 0x" << temp->Question.VarStoreId << ", QuestionId: 0x" << temp->Question.QuestionId;
 			}
 			else if (buffer[j] == EFI_IFR_STRING_OP) {
 
 				// Create temp
-				UEFI_IFR_STRING temp;
-
-				// Fill temp
-				temp.header.offset = j;
-				temp.header.opcode = buffer[j];
-				temp.header.length = static_cast<unsigned char>(buffer[j + 1]) & 0x7F;
-				temp.header.scope = static_cast<unsigned char>(buffer[j + 1]) & 0x80;
-				temp.question.statement.promptString = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 2]) + (static_cast<unsigned char>(buffer[j + 3]) << 8));
-				temp.question.statement.helpString = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 4]) + (static_cast<unsigned char>(buffer[j + 5]) << 8));
-				temp.question.questionId = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 6]) + (static_cast<unsigned char>(buffer[j + 7]) << 8));
-				temp.question.varStoreId = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 8]) + (static_cast<unsigned char>(buffer[j + 9]) << 8));
-				temp.question.varOffset = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 10]) + (static_cast<unsigned char>(buffer[j + 11]) << 8));
-				temp.question.flags = static_cast<unsigned char>(buffer[j + 12]);
-				temp.minimumSize = static_cast<unsigned char>(buffer[j + 13]);
-				temp.maximumSize = static_cast<unsigned char>(buffer[j + 14]);
-				temp.flags = static_cast<unsigned char>(buffer[j + 15]);
+				EFI_IFR_STRING *temp = (EFI_IFR_STRING*)&buffer[j];
 
 				// Display temp
-				fout << "String: " << strings[temp.question.statement.promptString + strPackageOffset] << ", Variable: 0x" << hex << uppercase << temp.question.varOffset << ", VarStore: 0x" << temp.question.varStoreId << ", QuestionId: 0x" << temp.question.questionId;
+				fout << "String: " << strings[temp->Question.Header.Prompt + strPackageOffset] << ", VarStoreInfo (VarOffset/VarName): 0x" << hex << uppercase << temp->Question.VarStoreInfo.VarOffset << ", VarStore: 0x" << temp->Question.VarStoreId << ", QuestionId: 0x" << temp->Question.QuestionId << ", MinSize: 0x" << temp->MinSize << ", MaxSize: 0x" << temp->MaxSize;
 			}
 			else if (buffer[j] == EFI_IFR_REFRESH_OP) {
 
 				// Create temp
-				UEFI_IFR_REFRESH temp;
-
-				// Fill temp
-				temp.header.offset = j;
-				temp.header.opcode = buffer[j];
-				temp.header.length = static_cast<unsigned char>(buffer[j + 1]) & 0x7F;
-				temp.header.scope = static_cast<unsigned char>(buffer[j + 1]) & 0x80;
-				temp.refreshInterval = static_cast<unsigned char>(buffer[j + 2]);
+				EFI_IFR_REFRESH *temp = (EFI_IFR_REFRESH*)&buffer[j];
 
 				// Display temp
-				fout << "Refresh: Interval: 0x" << hex << uppercase << temp.refreshInterval;
+				fout << "Refresh: RefreshInterval: 0x" << hex << uppercase << (uint16_t)temp->RefreshInterval;
 			}
 			else if (buffer[j] == EFI_IFR_DISABLE_IF_OP) {
 
@@ -728,28 +663,15 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 			else if (buffer[j] == EFI_IFR_ANIMATION_OP) {
 
 				// Create temp
-				UEFI_IFR_ANIMATION temp;
-
-				// Fill temp
-				temp.header.offset = j;
-				temp.header.opcode = buffer[j];
-				temp.header.length = static_cast<unsigned char>(buffer[j + 1]) & 0x7F;
-				temp.header.scope = static_cast<unsigned char>(buffer[j + 1]) & 0x80;
-				temp.animationId = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 2]) + (static_cast<unsigned char>(buffer[j + 3]) << 8));
+				EFI_IFR_ANIMATION *temp = (EFI_IFR_ANIMATION*)&buffer[j];
 
 				// Display temp
-				fout << "Animation";
+				fout << "Animation: Id: 0x" << hex << uppercase << temp->Id;
 			}
 			else if (buffer[j] == EFI_IFR_TO_LOWER_OP) {
 
 				// Create temp
-				UEFI_IFR_TO_LOWER temp;
-
-				// Fill temp
-				temp.header.offset = j;
-				temp.header.opcode = buffer[j];
-				temp.header.length = static_cast<unsigned char>(buffer[j + 1]) & 0x7F;
-				temp.header.scope = static_cast<unsigned char>(buffer[j + 1]) & 0x80;
+				EFI_IFR_TO_LOWER *temp = (EFI_IFR_TO_LOWER*)&buffer[j];
 
 				// Display temp
 				fout << "Convert to Lower";
@@ -757,13 +679,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 			else if (buffer[j] == EFI_IFR_TO_UPPER_OP) {
 
 				// Create temp
-				UEFI_IFR_TO_UPPER temp;
-
-				// Fill temp
-				temp.header.offset = j;
-				temp.header.opcode = buffer[j];
-				temp.header.length = static_cast<unsigned char>(buffer[j + 1]) & 0x7F;
-				temp.header.scope = static_cast<unsigned char>(buffer[j + 1]) & 0x80;
+				EFI_IFR_TO_UPPER *temp = (EFI_IFR_TO_UPPER*)&buffer[j];
 
 				// Display temp
 				fout << "Convert to Upper";
@@ -771,13 +687,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 			else if (buffer[j] == EFI_IFR_MAP_OP) {
 
 				// Create temp
-				UEFI_IFR_MAP temp;
-
-				// Fill temp
-				temp.header.offset = j;
-				temp.header.opcode = buffer[j];
-				temp.header.length = static_cast<unsigned char>(buffer[j + 1]) & 0x7F;
-				temp.header.scope = static_cast<unsigned char>(buffer[j + 1]) & 0x80;
+				EFI_IFR_MAP *temp = (EFI_IFR_MAP*)&buffer[j];
 
 				// Display temp
 				fout << "Map";
@@ -785,24 +695,10 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 			else if (buffer[j] == EFI_IFR_ORDERED_LIST_OP) {
 
 				// Create temp
-				UEFI_IFR_ORDERED_LIST temp;
-
-				// Fill temp
-				temp.header.offset = j;
-				temp.header.opcode = buffer[j];
-				temp.header.length = static_cast<unsigned char>(buffer[j + 1]) & 0x7F;
-				temp.header.scope = static_cast<unsigned char>(buffer[j + 1]) & 0x80;
-				temp.question.statement.promptString = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 2]) + (static_cast<unsigned char>(buffer[j + 3]) << 8));
-				temp.question.statement.helpString = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 4]) + (static_cast<unsigned char>(buffer[j + 5]) << 8));
-				temp.question.questionId = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 6]) + (static_cast<unsigned char>(buffer[j + 7]) << 8));
-				temp.question.varStoreId = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 8]) + (static_cast<unsigned char>(buffer[j + 9]) << 8));
-				temp.question.varOffset = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 10]) + (static_cast<unsigned char>(buffer[j + 11]) << 8));
-				temp.question.flags = static_cast<unsigned char>(buffer[j + 12]);
-				temp.minimumContainers = static_cast<unsigned char>(buffer[j + 13]);
-				temp.flags = static_cast<unsigned char>(buffer[j + 14]);
+				EFI_IFR_ORDERED_LIST *temp = (EFI_IFR_ORDERED_LIST*)&buffer[j];
 
 				// Display temp
-				fout << "Ordered List: " << strings[temp.question.statement.promptString + strPackageOffset] << ", Variable: 0x" << hex << uppercase << temp.question.varOffset << ", VarStore: 0x" << temp.question.varStoreId << ", QuestionId: 0x" << temp.question.questionId;
+				fout << "Ordered List: " << strings[temp->Question.Header.Prompt + strPackageOffset] << ", VarStoreInfo (VarOffset/VarName): 0x" << hex << uppercase << temp->Question.VarStoreInfo.VarOffset << ", VarStore: 0x" << temp->Question.VarStoreId << ", QuestionId: 0x" << temp->Question.QuestionId << ", MaxContainers: 0x" << (uint16_t)temp->MaxContainers << ", Flags: 0x" << (uint16_t)temp->Flags;
 			}
 			else if (buffer[j] == EFI_IFR_VARSTORE_OP) {
 
@@ -839,13 +735,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 			else if (buffer[j] == EFI_IFR_VERSION_OP) {
 
 				// Create temp
-				UEFI_IFR_VERSION temp;
-
-				// Fill temp
-				temp.header.offset = j;
-				temp.header.opcode = buffer[j];
-				temp.header.length = static_cast<unsigned char>(buffer[j + 1]) & 0x7F;
-				temp.header.scope = static_cast<unsigned char>(buffer[j + 1]) & 0x80;
+				EFI_IFR_VERSION *temp = (EFI_IFR_VERSION*)&buffer[j];
 
 				// Display temp
 				fout << "Version";
@@ -853,46 +743,29 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 			else if (buffer[j] == EFI_IFR_END_OP) {
 
 				// Create temp
-				UEFI_IFR_END temp;
+				EFI_IFR_END *temp = (EFI_IFR_END*)&buffer[j];
 
-				// Fill temp
-				temp.header.offset = j;
-				temp.header.opcode = buffer[j];
-				temp.header.length = static_cast<unsigned char>(buffer[j + 1]) & 0x7F;
-				temp.header.scope = static_cast<unsigned char>(buffer[j + 1]) & 0x80;
-				temp.condition = conditionalStack.back();
-
-				// Decrement number of tabs
-				numberOfTabs--;
-
-				// Display tabs
-				for (uint8_t k = 0; k < numberOfTabs; k++)
-					fout << '\t';
+				// Get condition
+				uint8_t condition = conditionalStack.back();
 
 				// Decrement conditional stack
 				conditionalStack.pop_back();
 
 				// Display temp
 				fout << "End";
-				if (temp.condition == FORM_SET)
+				if (condition == FORM_SET)
 					fout << " Form Set";
-				else if (temp.condition == FORM)
+				else if (condition == FORM)
 					fout << " Form";
-				else if (temp.condition == CONDITION)
+				else if (condition == CONDITION)
 					fout << " If";
-				else if (temp.condition == OPTION)
-					fout << " of Options";
+				else if (condition == OPTION)
+					fout << " One Of";
 			}
 			else if (buffer[j] == EFI_IFR_MATCH_OP) {
 
 				// Create temp
-				UEFI_IFR_MATCH temp;
-
-				// Fill temp
-				temp.header.offset = j;
-				temp.header.opcode = buffer[j];
-				temp.header.length = static_cast<unsigned char>(buffer[j + 1]) & 0x7F;
-				temp.header.scope = static_cast<unsigned char>(buffer[j + 1]) & 0x80;
+				EFI_IFR_MATCH *temp = (EFI_IFR_MATCH*)&buffer[j];
 
 				// Display temp
 				fout << "Match";
@@ -900,47 +773,22 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 			else if (buffer[j] == EFI_IFR_GET_OP) {
 
 				// Create temp
-				UEFI_IFR_GET temp;
+				EFI_IFR_GET *temp = (EFI_IFR_GET*)&buffer[j];
 
-				// Fill temp
-				temp.header.offset = j;
-				temp.header.opcode = buffer[j];
-				temp.header.length = static_cast<unsigned char>(buffer[j + 1]) & 0x7F;
-				temp.header.scope = static_cast<unsigned char>(buffer[j + 1]) & 0x80;
-				temp.varStoreId = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 2]) + (static_cast<unsigned char>(buffer[j + 3]) << 8));
-				temp.varOffset = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 4]) + (static_cast<unsigned char>(buffer[j + 5]) << 8));
-				temp.varStoreType = static_cast<unsigned char>(buffer[j + 6]);
-
-				// Display temp
-				fout << "Get: 0x" << hex << uppercase << temp.varOffset;
+				fout << "Get: VarStoreId: 0x" << hex << uppercase << temp->VarStoreId << ", VarStoreInfo (VarOffset/VarName): 0x" << hex << uppercase << temp->VarStoreInfo.VarOffset << ", VarStoreType: 0x" << (uint16_t)temp->VarStoreType;
 			}
 			else if (buffer[j] == EFI_IFR_SET_OP) {
 
 				// Create temp
-				UEFI_IFR_SET temp;
-
-				// Fill temp
-				temp.header.offset = j;
-				temp.header.opcode = buffer[j];
-				temp.header.length = static_cast<unsigned char>(buffer[j + 1]) & 0x7F;
-				temp.header.scope = static_cast<unsigned char>(buffer[j + 1]) & 0x80;
-				temp.varStoreId = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 2]) + (static_cast<unsigned char>(buffer[j + 3]) << 8));
-				temp.varOffset = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 4]) + (static_cast<unsigned char>(buffer[j + 5]) << 8));
-				temp.varStoreType = static_cast<unsigned char>(buffer[j + 6]);
+				EFI_IFR_SET *temp = (EFI_IFR_SET*)&buffer[j];
 
 				// Display temp
-				fout << "Set: 0x" << hex << uppercase << temp.varOffset;
+				fout << "Set: VarStoreId: 0x" << hex << uppercase << temp->VarStoreId << ", VarStoreInfo (VarOffset/VarName): 0x" << hex << uppercase << temp->VarStoreInfo.VarOffset << ", VarStoreType: 0x" << (uint16_t)temp->VarStoreType;
 			}
 			else if (buffer[j] == EFI_IFR_READ_OP) {
 
 				// Create temp
-				UEFI_IFR_READ temp;
-
-				// Fill temp
-				temp.header.offset = j;
-				temp.header.opcode = buffer[j];
-				temp.header.length = static_cast<unsigned char>(buffer[j + 1]) & 0x7F;
-				temp.header.scope = static_cast<unsigned char>(buffer[j + 1]) & 0x80;
+				EFI_IFR_READ *temp = (EFI_IFR_READ*)&buffer[j];
 
 				// Display temp
 				fout << "Read";
@@ -948,13 +796,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 			else if (buffer[j] == EFI_IFR_WRITE_OP) {
 
 				// Create temp
-				UEFI_IFR_WRITE temp;
-
-				// Fill temp
-				temp.header.offset = j;
-				temp.header.opcode = buffer[j];
-				temp.header.length = static_cast<unsigned char>(buffer[j + 1]) & 0x7F;
-				temp.header.scope = static_cast<unsigned char>(buffer[j + 1]) & 0x80;
+				EFI_IFR_WRITE *temp = (EFI_IFR_WRITE*)&buffer[j];
 
 				// Display temp
 				fout << "Write";
@@ -962,13 +804,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 			else if (buffer[j] == EFI_IFR_EQUAL_OP) {
 
 				// Create temp
-				UEFI_IFR_EQUAL temp;
-
-				// Fill temp
-				temp.header.offset = j;
-				temp.header.opcode = buffer[j];
-				temp.header.length = static_cast<unsigned char>(buffer[j + 1]) & 0x7F;
-				temp.header.scope = static_cast<unsigned char>(buffer[j + 1]) & 0x80;
+				EFI_IFR_EQUAL *temp = (EFI_IFR_EQUAL*)&buffer[j];
 
 				// Display temp
 				fout << "Equal";
@@ -976,13 +812,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 			else if (buffer[j] == EFI_IFR_NOT_EQUAL_OP) {
 
 				// Create temp
-				UEFI_IFR_NOT_EQUAL temp;
-
-				// Fill temp
-				temp.header.offset = j;
-				temp.header.opcode = buffer[j];
-				temp.header.length = static_cast<unsigned char>(buffer[j + 1]) & 0x7F;
-				temp.header.scope = static_cast<unsigned char>(buffer[j + 1]) & 0x80;
+				EFI_IFR_NOT_EQUAL *temp = (EFI_IFR_NOT_EQUAL*)&buffer[j];
 
 				// Display temp
 				fout << "Not Equal";
@@ -990,13 +820,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 			else if (buffer[j] == EFI_IFR_GREATER_THAN_OP) {
 
 				// Create temp
-				UEFI_IFR_GREATER_THAN temp;
-
-				// Fill temp
-				temp.header.offset = j;
-				temp.header.opcode = buffer[j];
-				temp.header.length = static_cast<unsigned char>(buffer[j + 1]) & 0x7F;
-				temp.header.scope = static_cast<unsigned char>(buffer[j + 1]) & 0x80;
+				EFI_IFR_GREATER_THAN *temp = (EFI_IFR_GREATER_THAN*)&buffer[j];
 
 				// Display temp
 				fout << "Greater Than";
@@ -1004,13 +828,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 			else if (buffer[j] == EFI_IFR_GREATER_EQUAL_OP) {
 
 				// Create temp
-				UEFI_IFR_GREATER_EQUAL temp;
-
-				// Fill temp
-				temp.header.offset = j;
-				temp.header.opcode = buffer[j];
-				temp.header.length = static_cast<unsigned char>(buffer[j + 1]) & 0x7F;
-				temp.header.scope = static_cast<unsigned char>(buffer[j + 1]) & 0x80;
+				EFI_IFR_GREATER_EQUAL *temp = (EFI_IFR_GREATER_EQUAL*)&buffer[j];
 
 				// Display temp
 				fout << "Greater Than or Equal";
@@ -1018,13 +836,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 			else if (buffer[j] == EFI_IFR_LESS_THAN_OP) {
 
 				// Create temp
-				UEFI_IFR_LESS_THAN temp;
-
-				// Fill temp
-				temp.header.offset = j;
-				temp.header.opcode = buffer[j];
-				temp.header.length = static_cast<unsigned char>(buffer[j + 1]) & 0x7F;
-				temp.header.scope = static_cast<unsigned char>(buffer[j + 1]) & 0x80;
+				EFI_IFR_LESS_THAN *temp = (EFI_IFR_LESS_THAN*)&buffer[j];
 
 				// Display temp
 				fout << "Less Than";
@@ -1032,13 +844,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 			else if (buffer[j] == EFI_IFR_LESS_EQUAL_OP) {
 
 				// Create temp
-				UEFI_IFR_LESS_EQUAL temp;
-
-				// Fill temp
-				temp.header.offset = j;
-				temp.header.opcode = buffer[j];
-				temp.header.length = static_cast<unsigned char>(buffer[j + 1]) & 0x7F;
-				temp.header.scope = static_cast<unsigned char>(buffer[j + 1]) & 0x80;
+				EFI_IFR_LESS_EQUAL *temp = (EFI_IFR_LESS_EQUAL*)&buffer[j];
 
 				// Display temp
 				fout << "Less Than or Equal";
@@ -1046,13 +852,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 			else if (buffer[j] == EFI_IFR_BITWISE_AND_OP) {
 
 				// Create temp
-				UEFI_IFR_BITWISE_AND temp;
-
-				// Fill temp
-				temp.header.offset = j;
-				temp.header.opcode = buffer[j];
-				temp.header.length = static_cast<unsigned char>(buffer[j + 1]) & 0x7F;
-				temp.header.scope = static_cast<unsigned char>(buffer[j + 1]) & 0x80;
+				EFI_IFR_BITWISE_AND *temp = (EFI_IFR_BITWISE_AND*)&buffer[j];
 
 				// Display temp
 				fout << "Bitwise And";
@@ -1060,13 +860,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 			else if (buffer[j] == EFI_IFR_BITWISE_OR_OP) {
 
 				// Create temp
-				UEFI_IFR_BITWISE_OR temp;
-
-				// Fill temp
-				temp.header.offset = j;
-				temp.header.opcode = buffer[j];
-				temp.header.length = static_cast<unsigned char>(buffer[j + 1]) & 0x7F;
-				temp.header.scope = static_cast<unsigned char>(buffer[j + 1]) & 0x80;
+				EFI_IFR_BITWISE_OR *temp = (EFI_IFR_BITWISE_OR*)&buffer[j];
 
 				// Display temp
 				fout << "Bitwise Or";
@@ -1074,13 +868,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 			else if (buffer[j] == EFI_IFR_BITWISE_NOT_OP) {
 
 				// Create temp
-				UEFI_IFR_BITWISE_NOT temp;
-
-				// Fill temp
-				temp.header.offset = j;
-				temp.header.opcode = buffer[j];
-				temp.header.length = static_cast<unsigned char>(buffer[j + 1]) & 0x7F;
-				temp.header.scope = static_cast<unsigned char>(buffer[j + 1]) & 0x80;
+				EFI_IFR_BITWISE_NOT *temp = (EFI_IFR_BITWISE_NOT*)&buffer[j];
 
 				// Display temp
 				fout << "Bitwise Not";
@@ -1088,13 +876,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 			else if (buffer[j] == EFI_IFR_SHIFT_LEFT_OP) {
 
 				// Create temp
-				UEFI_IFR_SHIFT_LEFT temp;
-
-				// Fill temp
-				temp.header.offset = j;
-				temp.header.opcode = buffer[j];
-				temp.header.length = static_cast<unsigned char>(buffer[j + 1]) & 0x7F;
-				temp.header.scope = static_cast<unsigned char>(buffer[j + 1]) & 0x80;
+				EFI_IFR_SHIFT_LEFT *temp = (EFI_IFR_SHIFT_LEFT*)&buffer[j];
 
 				// Display temp
 				fout << "Shift Left";
@@ -1102,13 +884,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 			else if (buffer[j] == EFI_IFR_SHIFT_RIGHT_OP) {
 
 				// Create temp
-				UEFI_IFR_SHIFT_RIGHT temp;
-
-				// Fill temp
-				temp.header.offset = j;
-				temp.header.opcode = buffer[j];
-				temp.header.length = static_cast<unsigned char>(buffer[j + 1]) & 0x7F;
-				temp.header.scope = static_cast<unsigned char>(buffer[j + 1]) & 0x80;
+				EFI_IFR_SHIFT_RIGHT *temp = (EFI_IFR_SHIFT_RIGHT*)&buffer[j];
 
 				// Display temp
 				fout << "Shift Right";
@@ -1116,13 +892,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 			else if (buffer[j] == EFI_IFR_ADD_OP) {
 
 				// Create temp
-				UEFI_IFR_ADD temp;
-
-				// Fill temp
-				temp.header.offset = j;
-				temp.header.opcode = buffer[j];
-				temp.header.length = static_cast<unsigned char>(buffer[j + 1]) & 0x7F;
-				temp.header.scope = static_cast<unsigned char>(buffer[j + 1]) & 0x80;
+				EFI_IFR_ADD *temp = (EFI_IFR_ADD*)&buffer[j];
 
 				// Display temp
 				fout << "Add";
@@ -1130,13 +900,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 			else if (buffer[j] == EFI_IFR_SUBTRACT_OP) {
 
 				// Create temp
-				UEFI_IFR_SUBTRACT temp;
-
-				// Fill temp
-				temp.header.offset = j;
-				temp.header.opcode = buffer[j];
-				temp.header.length = static_cast<unsigned char>(buffer[j + 1]) & 0x7F;
-				temp.header.scope = static_cast<unsigned char>(buffer[j + 1]) & 0x80;
+				EFI_IFR_SUBTRACT *temp = (EFI_IFR_SUBTRACT*)&buffer[j];
 
 				// Display temp
 				fout << "Subtract";
@@ -1144,13 +908,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 			else if (buffer[j] == EFI_IFR_MULTIPLY_OP) {
 
 				// Create temp
-				UEFI_IFR_MULTIPLY temp;
-
-				// Fill temp
-				temp.header.offset = j;
-				temp.header.opcode = buffer[j];
-				temp.header.length = static_cast<unsigned char>(buffer[j + 1]) & 0x7F;
-				temp.header.scope = static_cast<unsigned char>(buffer[j + 1]) & 0x80;
+				EFI_IFR_MULTIPLY *temp = (EFI_IFR_MULTIPLY*)&buffer[j];
 
 				// Display temp
 				fout << "Multiply";
@@ -1158,13 +916,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 			else if (buffer[j] == EFI_IFR_DIVIDE_OP) {
 
 				// Create temp
-				UEFI_IFR_DIVIDE temp;
-
-				// Fill temp
-				temp.header.offset = j;
-				temp.header.opcode = buffer[j];
-				temp.header.length = static_cast<unsigned char>(buffer[j + 1]) & 0x7F;
-				temp.header.scope = static_cast<unsigned char>(buffer[j + 1]) & 0x80;
+				EFI_IFR_DIVIDE *temp = (EFI_IFR_DIVIDE*)&buffer[j];
 
 				// Display temp
 				fout << "Divide";
@@ -1172,13 +924,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 			else if (buffer[j] == EFI_IFR_MODULO_OP) {
 
 				// Create temp
-				UEFI_IFR_MODULO temp;
-
-				// Fill temp
-				temp.header.offset = j;
-				temp.header.opcode = buffer[j];
-				temp.header.length = static_cast<unsigned char>(buffer[j + 1]) & 0x7F;
-				temp.header.scope = static_cast<unsigned char>(buffer[j + 1]) & 0x80;
+				EFI_IFR_MODULO *temp = (EFI_IFR_MODULO*)&buffer[j];
 
 				// Display temp
 				fout << "Modulo";
@@ -1186,32 +932,18 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 			else if (buffer[j] == EFI_IFR_RULE_REF_OP) {
 
 				// Create temp
-				UEFI_IFR_RULE_REF temp;
-
-				// Fill temp
-				temp.header.offset = j;
-				temp.header.opcode = buffer[j];
-				temp.header.length = static_cast<unsigned char>(buffer[j + 1]) & 0x7F;
-				temp.header.scope = static_cast<unsigned char>(buffer[j + 1]) & 0x80;
-				temp.ruleId = static_cast<unsigned char>(buffer[j + 2]);
+				EFI_IFR_RULE_REF *temp = (EFI_IFR_RULE_REF*)&buffer[j];
 
 				// Display temp
-				fout << "Rule Ref";
+				fout << "Rule Ref: RuleId: 0x" << hex << uppercase << (uint16_t)temp->RuleId;
 			}
 			else if (buffer[j] == EFI_IFR_QUESTION_REF1_OP) {
 
 				// Create temp
-				UEFI_IFR_QUESTION_REF1 temp;
-
-				// Fill temp
-				temp.header.offset = j;
-				temp.header.opcode = buffer[j];
-				temp.header.length = static_cast<unsigned char>(buffer[j + 1]) & 0x7F;
-				temp.header.scope = static_cast<unsigned char>(buffer[j + 1]) & 0x80;
-				temp.questionId = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 2]) + (static_cast<unsigned char>(buffer[j + 3]) << 8));
+				EFI_IFR_QUESTION_REF1 *temp = (EFI_IFR_QUESTION_REF1*)&buffer[j];
 
 				// Display temp
-				fout << "Question Ref1: 0x" << hex << uppercase << temp.questionId;
+				fout << "Question Ref1: QuestionId: 0x" << hex << uppercase << temp->QuestionId;
 			}
 			else if (buffer[j] == EFI_IFR_QUESTION_REF2_OP) {
 

@@ -393,7 +393,7 @@ typedef struct _EFI_IFR_MODULO {
 
 typedef struct _EFI_IFR_MULTIPLY {
 	EFI_IFR_OP_HEADER Header;
-} EFI_IFR_MULTPLY;
+} EFI_IFR_MULTIPLY;
 
 typedef struct _EFI_IFR_NOT {
 	EFI_IFR_OP_HEADER Header;
