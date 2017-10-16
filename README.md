@@ -11,6 +11,12 @@ You can download an executable <a href="http://bios-mods.com/pub/donovan6000/Sof
 <br /><br /><br />
 Changelog:
 
+v0.7.0 10/15/2017
+* Fixed numerous bugs
+* Added missing IFR opcodes up to UEFI Version 2.7 (Errata A, August 2017)
+* Improved output
+* Cleaned up code
+
 v0.6.1 7/25/2014
 * Print out the full fields of the Variable Store declaration, ie GUID and Name. Ex:
 * 0x3B996 	Variable Store: 0xF015 {24 20 67 DE D0 3D D7 02 29 41 91 4A 9F 37 7C C3 4B 0D 15 F0 90 00 49 44 45 53 65 63 44 65 76 00}
