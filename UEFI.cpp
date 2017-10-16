@@ -706,7 +706,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 				EFI_IFR_VARSTORE *temp = (EFI_IFR_VARSTORE*)&buffer[j];
 
 				// Display temp
-				fout << "VarStore: VarStoreId: 0x" << hex << uppercase << temp->VarStoreId << " [" << GuidToString(temp->Guid) << "]" << ", Size: " << hex << uppercase << temp->Size << ", Name: " << temp->Name;
+				fout << "VarStore: VarStoreId: 0x" << hex << uppercase << temp->VarStoreId << " [" << GuidToString(temp->Guid) << "]" << ", Size: 0x" << hex << uppercase << temp->Size << ", Name: " << temp->Name;
 			}
 			else if (buffer[j] == EFI_IFR_VARSTORE_NAME_VALUE_OP) {
 
