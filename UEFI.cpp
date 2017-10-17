@@ -17,7 +17,7 @@ void getUEFIStringPackages(vector<UEFI_IFR_STRING_PACK> &stringPackages, const s
 	for (unsigned int i = 0; i < buffer.size() - 48; i++)
 
 		// Check if string pakage was found
-		if ((buffer[i] != '\x00' || buffer[i + 1] != '\x00' || buffer[i + 2] != '\x00') && buffer[i + 3] == '\x04' && buffer[i + 4] == '\x34' && buffer[i + 44] == '\x01' && buffer[i + 45] == '\x00' && buffer[i + 48] == '\x2D' && i + static_cast<unsigned char>(buffer[i]) + (static_cast<unsigned char>(buffer[i + 1]) << 8) + (static_cast<unsigned char>(buffer[i + 2]) << 16) < buffer.size() && buffer[i + static_cast<unsigned char>(buffer[i]) + (static_cast<unsigned char>(buffer[i + 1]) << 8) + (static_cast<unsigned char>(buffer[i + 2]) << 16) - 1] == '\x00' && buffer[i + static_cast<unsigned char>(buffer[i]) + (static_cast<unsigned char>(buffer[i + 1]) << 8) + (static_cast<unsigned char>(buffer[i + 2]) << 16) - 2] == '\x00') {
+		if ((buffer[i] != '\x00' || buffer[i + 1] != '\x00' || buffer[i + 2] != '\x00') && buffer[i + 3] == '\x04' && buffer[i + 4] == '\x34' && (buffer[i + 44] == '\x01' || buffer[i + 44] == '\x02') && buffer[i + 45] == '\x00' && buffer[i + 48] == '\x2D' && i + static_cast<unsigned char>(buffer[i]) + (static_cast<unsigned char>(buffer[i + 1]) << 8) + (static_cast<unsigned char>(buffer[i + 2]) << 16) < buffer.size() && buffer[i + static_cast<unsigned char>(buffer[i]) + (static_cast<unsigned char>(buffer[i + 1]) << 8) + (static_cast<unsigned char>(buffer[i + 2]) << 16) - 1] == '\x00' && buffer[i + static_cast<unsigned char>(buffer[i]) + (static_cast<unsigned char>(buffer[i + 1]) << 8) + (static_cast<unsigned char>(buffer[i + 2]) << 16) - 2] == '\x00') {
 
 			//numPackages++;
 
@@ -98,15 +98,11 @@ void displayUEFIStringPackages(const vector<UEFI_IFR_STRING_PACK> &stringPackage
 
 void getUEFIStrings(vector<UEFI_IFR_STRING_PACK> &stringPackages, vector<string> &strings, const string &buffer) {
 
-	// Initialize variables
-	int index;
-	string temp;
-
 	// Go through string packages
 	for (unsigned int i = 0; i < stringPackages.size(); i++) {
 
 		// Check if language isn't english
-		if (stringPackages[i].language != "en-US")
+		if (_strcmpi(stringPackages[i].language.c_str(), "en-US") != 0)
 
 			// Continue
 			continue;
@@ -117,22 +113,34 @@ void getUEFIStrings(vector<UEFI_IFR_STRING_PACK> &stringPackages, vector<string>
 		// Add language string to list
 		strings.push_back(stringPackages[i].language);
 
-		// Loop while string exists
-		for (index = stringPackages[i].stringOffset; buffer[index] == '\x14'; index += 2) {
+		EFI_HII_STRING_PACKAGE_HDR* strPackage = (EFI_HII_STRING_PACKAGE_HDR*)(&buffer[stringPackages[i].header.offset]);
 
-			// Fill string
-			for (index++; buffer[index] != '\x00'; index += 2)
-				temp.push_back(buffer[index]);
+		EFI_HII_STRING_BLOCK* strBlock = (EFI_HII_STRING_BLOCK*)((char*)strPackage + strPackage->StringInfoOffset);
 
-			// Add string to list
-			strings.push_back(temp);
+		for (UINT32 offset = 0; offset < strPackage->Header.Length - strPackage->HdrSize; ) {
 
-			// Clear temp
-			temp.clear();
+			if ((strBlock + offset)->BlockType == EFI_HII_SIBT_STRING_UCS2) {
+				EFI_HII_SIBT_STRING_UCS2_BLOCK* str = (EFI_HII_SIBT_STRING_UCS2_BLOCK*)(strBlock + offset);
 
-			//// Skip % padding
-			//while (buffer[index + 1] == '\x25')
-			//	index += 2;
+				std::wstring ws = str->StringText;
+				strings.push_back(std::string(ws.begin(), ws.end()));
+
+				offset += (wcslen(str->StringText) + 1) * sizeof(CHAR16) + 1;
+			}
+			else if ((strBlock + offset)->BlockType == EFI_HII_SIBT_SKIP2) {
+				EFI_HII_SIBT_SKIP2_BLOCK* skipBlock = (EFI_HII_SIBT_SKIP2_BLOCK*)(strBlock + offset);
+
+				for (UINT16 skipCount = 0; skipCount < skipBlock->SkipCount; skipCount++)
+					strings.push_back("");
+
+				offset += sizeof(EFI_HII_SIBT_SKIP2_BLOCK);
+			}
+			else if ((strBlock + offset)->BlockType == EFI_HII_SIBT_END) {
+				offset += sizeof(EFI_HII_SIBT_END_BLOCK);
+			}
+			else {
+				// TODO: unhandled blocks...
+			}
 		}
 	}
 
@@ -180,7 +188,7 @@ void getUEFIFormSets(vector<UEFI_IFR_FORM_SET_PACK> &formSets, const string &buf
 	for (unsigned int i = 0; i < stringPackages.size(); i++) {
 
 		// Check if language isn't english
-		if (stringPackages[i].language != "en-US")
+		if (_strcmpi(stringPackages[i].language.c_str(), "en-US") != 0)
 
 			// Continue
 			continue;
