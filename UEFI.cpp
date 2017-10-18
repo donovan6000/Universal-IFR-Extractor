@@ -110,8 +110,9 @@ void getUEFIStrings(vector<UEFI_IFR_STRING_PACK> &stringPackages, vector<string>
 		// Set structure offset
 		stringPackages[i].structureOffset = strings.size();
 
-		// Add language string to list
-		strings.push_back(stringPackages[i].language);
+		//// Add language string to list
+		//strings.push_back(stringPackages[i].language);
+		strings.push_back("");
 
 		EFI_HII_STRING_PACKAGE_HDR* strPackage = (EFI_HII_STRING_PACKAGE_HDR*)(&buffer[stringPackages[i].header.offset]);
 
