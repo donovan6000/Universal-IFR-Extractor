@@ -12,11 +12,11 @@ void getEFIStringPackages(vector<EFI_IFR_STRING_PACK> &stringPackages, const str
 	EFI_IFR_STRING_PACK tempStringPackage;
 
 	// Go through buffer
-	for(unsigned int i = 0; i < buffer.size() - 9; i++)
-	
+	for (unsigned int i = 0; i < buffer.size() - 9; i++)
+
 		// Check if string pakage was found
-		if((buffer[i] != '\x00' || buffer[i + 1] != '\x00' || buffer[i + 2] != '\x00' || buffer[i + 3] != '\x00') && buffer[i + 4] == '\x02' && buffer[i + 5] == '\x00' && (buffer[i + 6] != '\x00' || buffer[i + 7] != '\x00' || buffer[i + 8] != '\x00' || buffer[i + 9] != '\x00') && i + static_cast<unsigned char>(buffer[i + 6]) + (static_cast<unsigned char>(buffer[i + 7]) << 8) + (static_cast<unsigned char>(buffer[i + 8]) << 16) + (static_cast<unsigned char>(buffer[i + 9]) << 24) < buffer.size() && buffer[i + static_cast<unsigned char>(buffer[i + 6]) + (static_cast<unsigned char>(buffer[i + 7]) << 8) + (static_cast<unsigned char>(buffer[i + 8]) << 16) + (static_cast<unsigned char>(buffer[i + 9]) << 24) + 4] >= 'a' && buffer[i + static_cast<unsigned char>(buffer[i + 6]) + (static_cast<unsigned char>(buffer[i + 7]) << 8) + (static_cast<unsigned char>(buffer[i + 8]) << 16) + (static_cast<unsigned char>(buffer[i + 9]) << 24) + 4] <= 'z' && i + static_cast<unsigned char>(buffer[i]) + (static_cast<unsigned char>(buffer[i + 1]) << 8) + (static_cast<unsigned char>(buffer[i + 2]) << 16) + (static_cast<unsigned char>(buffer[i + 3]) << 24) < buffer.size() && buffer[i + static_cast<unsigned char>(buffer[i]) + (static_cast<unsigned char>(buffer[i + 1]) << 8) + (static_cast<unsigned char>(buffer[i + 2]) << 16) + (static_cast<unsigned char>(buffer[i + 3]) << 24) + 4] == '\x02' && buffer[i + static_cast<unsigned char>(buffer[i]) + (static_cast<unsigned char>(buffer[i + 1]) << 8) + (static_cast<unsigned char>(buffer[i + 2]) << 16) + (static_cast<unsigned char>(buffer[i + 3]) << 24) + 5] == '\x00') {
-	
+		if ((buffer[i] != '\x00' || buffer[i + 1] != '\x00' || buffer[i + 2] != '\x00' || buffer[i + 3] != '\x00') && buffer[i + 4] == '\x02' && buffer[i + 5] == '\x00' && (buffer[i + 6] != '\x00' || buffer[i + 7] != '\x00' || buffer[i + 8] != '\x00' || buffer[i + 9] != '\x00') && i + static_cast<unsigned char>(buffer[i + 6]) + (static_cast<unsigned char>(buffer[i + 7]) << 8) + (static_cast<unsigned char>(buffer[i + 8]) << 16) + (static_cast<unsigned char>(buffer[i + 9]) << 24) < buffer.size() && buffer[i + static_cast<unsigned char>(buffer[i + 6]) + (static_cast<unsigned char>(buffer[i + 7]) << 8) + (static_cast<unsigned char>(buffer[i + 8]) << 16) + (static_cast<unsigned char>(buffer[i + 9]) << 24) + 4] >= 'a' && buffer[i + static_cast<unsigned char>(buffer[i + 6]) + (static_cast<unsigned char>(buffer[i + 7]) << 8) + (static_cast<unsigned char>(buffer[i + 8]) << 16) + (static_cast<unsigned char>(buffer[i + 9]) << 24) + 4] <= 'z' && i + static_cast<unsigned char>(buffer[i]) + (static_cast<unsigned char>(buffer[i + 1]) << 8) + (static_cast<unsigned char>(buffer[i + 2]) << 16) + (static_cast<unsigned char>(buffer[i + 3]) << 24) < buffer.size() && buffer[i + static_cast<unsigned char>(buffer[i]) + (static_cast<unsigned char>(buffer[i + 1]) << 8) + (static_cast<unsigned char>(buffer[i + 2]) << 16) + (static_cast<unsigned char>(buffer[i + 3]) << 24) + 4] == '\x02' && buffer[i + static_cast<unsigned char>(buffer[i]) + (static_cast<unsigned char>(buffer[i + 1]) << 8) + (static_cast<unsigned char>(buffer[i + 2]) << 16) + (static_cast<unsigned char>(buffer[i + 3]) << 24) + 5] == '\x00') {
+
 			// Set temp string package
 			tempStringPackage.header.offset = i;
 
@@ -24,7 +24,7 @@ void getEFIStringPackages(vector<EFI_IFR_STRING_PACK> &stringPackages, const str
 
 			tempStringPackage.header.type = static_cast<uint16_t>(static_cast<unsigned char>(buffer[i + 4]) + (static_cast<unsigned char>(buffer[i + 5]) << 8));
 
-			for(uint32_t j = i + static_cast<uint32_t>(static_cast<unsigned char>(buffer[i + 6]) + (static_cast<unsigned char>(buffer[i + 7]) << 8) + (static_cast<unsigned char>(buffer[i + 8]) << 16) + (static_cast<unsigned char>(buffer[i + 9]) << 24)); buffer[j] != '\x00'; j += 2)
+			for (uint32_t j = i + static_cast<uint32_t>(static_cast<unsigned char>(buffer[i + 6]) + (static_cast<unsigned char>(buffer[i + 7]) << 8) + (static_cast<unsigned char>(buffer[i + 8]) << 16) + (static_cast<unsigned char>(buffer[i + 9]) << 24)); buffer[j] != '\x00'; j += 2)
 				tempStringPackage.language.push_back(buffer[j]);
 
 			tempStringPackage.numberOfStrings = static_cast<uint32_t>(static_cast<unsigned char>(buffer[i + 14]) + (static_cast<unsigned char>(buffer[i + 15]) << 8) + (static_cast<unsigned char>(buffer[i + 16]) << 16) + (static_cast<unsigned char>(buffer[i + 17]) << 24));
@@ -45,7 +45,7 @@ void displayEFIStringPackages(const vector<EFI_IFR_STRING_PACK> &stringPackages)
 	cout << "String Packages Information:" << endl;
 
 	// Go through string packages
-	for(unsigned int i = 0; i < stringPackages.size(); i++) {
+	for (unsigned int i = 0; i < stringPackages.size(); i++) {
 
 		// Display string package info
 		cout << "\tString Package " << i << " Information:" << endl;
@@ -66,14 +66,14 @@ void getEFIStrings(vector<EFI_IFR_STRING_PACK> &stringPackages, vector<string> &
 	string temp;
 
 	// Go through string packages
-	for(unsigned int i = 0; i < stringPackages.size(); i++) {
+	for (unsigned int i = 0; i < stringPackages.size(); i++) {
 
 		// Check if language isn't english
-		if(stringPackages[i].language != "eng")
+		if (stringPackages[i].language != "eng")
 
 			// Continue
 			continue;
-		
+
 		// Set structure offset
 		stringPackages[i].structureOffset = strings.size();
 
@@ -81,10 +81,10 @@ void getEFIStrings(vector<EFI_IFR_STRING_PACK> &stringPackages, vector<string> &
 		index = stringPackages[i].header.offset + 22;
 
 		// Go through strings
-		for(uint32_t j = 0; j < stringPackages[i].numberOfStrings; j++) {
+		for (uint32_t j = 0; j < stringPackages[i].numberOfStrings; j++) {
 
 			// Fill string
-			for(uint32_t k = stringPackages[i].header.offset + static_cast<uint32_t>(static_cast<unsigned char>(buffer[index]) + (static_cast<unsigned char>(buffer[index + 1]) << 8) + (static_cast<unsigned char>(buffer[index + 2]) << 16) + (static_cast<unsigned char>(buffer[index + 3]) << 24)); buffer[k] != '\x00'; k += 2)
+			for (uint32_t k = stringPackages[i].header.offset + static_cast<uint32_t>(static_cast<unsigned char>(buffer[index]) + (static_cast<unsigned char>(buffer[index + 1]) << 8) + (static_cast<unsigned char>(buffer[index + 2]) << 16) + (static_cast<unsigned char>(buffer[index + 3]) << 24)); buffer[k] != '\x00'; k += 2)
 				temp.push_back(buffer[k]);
 
 			// Add string to list
@@ -99,20 +99,20 @@ void getEFIStrings(vector<EFI_IFR_STRING_PACK> &stringPackages, vector<string> &
 	}
 
 	// Go through strings
-	for(unsigned int i = 0; i < strings.size(); i++) {
+	for (unsigned int i = 0; i < strings.size(); i++) {
 
 		// Change carriage return characters to spaces
-		for(unsigned int j = 0; j < strings[i].size(); j++)
-			if(strings[i][j] == '\r')
+		for (unsigned int j = 0; j < strings[i].size(); j++)
+			if (strings[i][j] == '\r')
 				strings[i][j] = ' ';
 
 		// Remove leading spaces
-		while(strings[i].size() > 1 && strings[i][0] == ' ')
+		while (strings[i].size() > 1 && strings[i][0] == ' ')
 			strings[i].erase(0, 1);
 
 		// Change double spaces
-		for(unsigned int j = 0; strings[i].size() && j < strings[i].size() - 1; j++)
-			if(strings[i][j] == ' ' && strings[i][j + 1] == ' ')
+		for (unsigned int j = 0; strings[i].size() && j < strings[i].size() - 1; j++)
+			if (strings[i][j] == ' ' && strings[i][j + 1] == ' ')
 				strings[i].erase(j, 1);
 	}
 }
@@ -123,7 +123,7 @@ void displayEFIStrings(const vector<string> &strings) {
 	cout << "Strings:" << endl;
 
 	// Go through strings
-	for(uint32_t i = 0; i < strings.size(); i++)
+	for (uint32_t i = 0; i < strings.size(); i++)
 
 		// Print string
 		cout << '\t' << dec << i << " (0x" << hex << uppercase << i << ") " << strings[i] << endl;
@@ -137,30 +137,30 @@ void getEFIFormSets(vector<EFI_IFR_FORM_SET_PACK> &formSets, const string &buffe
 	EFI_IFR_FORM_SET_PACK tempFormSet;
 	vector<uint32_t> stringCandidates;
 	uint32_t chosenCandidate;
-	
+
 	// Go through string packages
-	for(unsigned int i = 0; i < stringPackages.size(); i++) {
+	for (unsigned int i = 0; i < stringPackages.size(); i++) {
 
 		// Check if language isn't english
-		if(stringPackages[i].language != "eng")
+		if (stringPackages[i].language != "eng")
 
 			// Continue
 			continue;
-		
+
 		// Get string candidate
 		stringCandidates.push_back(i);
 	}
 
 	// Go through buffer
-	for(uint32_t i = 0; i < buffer.size() - 5; i++)
+	for (uint32_t i = 0; i < buffer.size() - 5; i++)
 
 		// Check if form set was found
-		if((buffer[i] != '\x00' || buffer[i + 1] != '\x00' || buffer[i + 2] != '\x00' || buffer[i + 3] != '\x00') && buffer[i + 4] == '\x03' && buffer[i + 5] == '\x00' && i + static_cast<unsigned char>(buffer[i]) + (static_cast<unsigned char>(buffer[i + 1]) << 8) + (static_cast<unsigned char>(buffer[i + 2]) << 16) + (static_cast<unsigned char>(buffer[i + 3]) << 24) < buffer.size() && buffer[i + static_cast<unsigned char>(buffer[i]) + (static_cast<unsigned char>(buffer[i + 1]) << 8) + (static_cast<unsigned char>(buffer[i + 2]) << 16) + (static_cast<unsigned char>(buffer[i + 3]) << 24) - 1] == '\x02' && buffer[i + static_cast<unsigned char>(buffer[i]) + (static_cast<unsigned char>(buffer[i + 1]) << 8) + (static_cast<unsigned char>(buffer[i + 2]) << 16) + (static_cast<unsigned char>(buffer[i + 3]) << 24) - 2] == '\x0D') {
-		
+		if ((buffer[i] != '\x00' || buffer[i + 1] != '\x00' || buffer[i + 2] != '\x00' || buffer[i + 3] != '\x00') && buffer[i + 4] == '\x03' && buffer[i + 5] == '\x00' && i + static_cast<unsigned char>(buffer[i]) + (static_cast<unsigned char>(buffer[i + 1]) << 8) + (static_cast<unsigned char>(buffer[i + 2]) << 16) + (static_cast<unsigned char>(buffer[i + 3]) << 24) < buffer.size() && buffer[i + static_cast<unsigned char>(buffer[i]) + (static_cast<unsigned char>(buffer[i + 1]) << 8) + (static_cast<unsigned char>(buffer[i + 2]) << 16) + (static_cast<unsigned char>(buffer[i + 3]) << 24) - 1] == '\x02' && buffer[i + static_cast<unsigned char>(buffer[i]) + (static_cast<unsigned char>(buffer[i + 1]) << 8) + (static_cast<unsigned char>(buffer[i + 2]) << 16) + (static_cast<unsigned char>(buffer[i + 3]) << 24) - 2] == '\x0D') {
+
 			// Get chosen candidate for form set's string package
 			chosenCandidate = stringCandidates[0];
-			for(unsigned int j = 1; j < stringCandidates.size(); j++)
-				if(abs(static_cast<signed>(stringPackages[j].header.offset - i)) < abs(static_cast<signed>(stringPackages[chosenCandidate].header.offset - i)))
+			for (unsigned int j = 1; j < stringCandidates.size(); j++)
+				if (abs(static_cast<signed>(stringPackages[j].header.offset - i)) < abs(static_cast<signed>(stringPackages[chosenCandidate].header.offset - i)))
 					chosenCandidate = j;
 
 			// Set temp form set
@@ -182,7 +182,7 @@ void displayEFIFormSets(const vector<EFI_IFR_FORM_SET_PACK> &formSets) {
 	cout << "Form Sets Information:" << endl;
 
 	// Go through form sets
-	for(uint32_t i = 0; i < formSets.size(); i++) {
+	for (uint32_t i = 0; i < formSets.size(); i++) {
 
 		// Print form set information
 		cout << "\tForm Set " << i << " Information:" << endl;
@@ -204,67 +204,67 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 	ofstream fout(outputFile.c_str());
 
 	// Display protocol
-	for(uint8_t i = 0; i < 32; i++)
+	for (uint8_t i = 0; i < 32; i++)
 		fout << ' ';
 	fout << "EFI Protocol Detected" << endl;
-	for(uint8_t i = 0; i < 80; i++)
+	for (uint8_t i = 0; i < 80; i++)
 		fout << '-';
 	fout << endl << endl << endl;
 
 	// Display string packages info
-	for(uint8_t i = 0; i < 32; i++)
+	for (uint8_t i = 0; i < 32; i++)
 		fout << ' ';
 	fout << "String Packages" << endl;
-	for(uint8_t i = 0; i < 80; i++)
+	for (uint8_t i = 0; i < 80; i++)
 		fout << '-';
 	fout << endl;
 	fout << "Offset:\t\tLanguage:" << endl;
-	for(uint8_t i = 0; i < 80; i++)
+	for (uint8_t i = 0; i < 80; i++)
 		fout << '-';
 	fout << endl;
-	for(uint8_t i = 0; i < stringPackages.size(); i++) {
+	for (uint8_t i = 0; i < stringPackages.size(); i++) {
 		fout << "0x" << hex << uppercase << stringPackages[i].header.offset;
 		fout << "\t\t" << stringPackages[i].language << " (0x" << hex << uppercase << static_cast<unsigned int>(i) << ')' << endl;
 	}
 	fout << endl << endl;
 
 	// Display form sets info
-	for(uint8_t i = 0; i < 35; i++)
+	for (uint8_t i = 0; i < 35; i++)
 		fout << ' ';
 	fout << "Form Sets" << endl;
-	for(uint8_t i = 0; i < 80; i++)
+	for (uint8_t i = 0; i < 80; i++)
 		fout << '-';
 	fout << endl;
 	fout << "Offset:\t\tTitle:" << endl;
-	for(uint8_t i = 0; i < 80; i++)
+	for (uint8_t i = 0; i < 80; i++)
 		fout << '-';
 	fout << endl;
-	for(uint8_t i = 0; i < formSets.size(); i++) {
+	for (uint8_t i = 0; i < formSets.size(); i++) {
 		fout << "0x" << hex << uppercase << formSets[i].header.offset;
 		fout << "\t\t" << formSets[i].title << " (0x" << hex << uppercase << formSets[i].titleString << " from string package 0x" << formSets[i].usingStringPackage << ')' << endl;
 	}
 	fout << endl << endl;
 
 	// Display internal forms representation
-	for(uint8_t i = 0; i < 25; i++)
+	for (uint8_t i = 0; i < 25; i++)
 		fout << ' ';
 	fout << "Internal Forms Representation" << endl;
-	for(uint8_t i = 0; i < 80; i++)
+	for (uint8_t i = 0; i < 80; i++)
 		fout << '-';
 	fout << endl;
 	fout << "Offset:\t\tInstruction:" << endl;
-	for(uint8_t i = 0; i < 80; i++)
+	for (uint8_t i = 0; i < 80; i++)
 		fout << '-';
 	fout << endl;
 
 	// Go through form sets
-	for(uint32_t i = 0; i < formSets.size(); i++)
+	for (uint32_t i = 0; i < formSets.size(); i++)
 
 		// Go through all the form set's operations
-		for(uint32_t j = formSets[i].header.offset + 6; j < formSets[i].header.offset + formSets[i].header.length; j += static_cast<unsigned char>(buffer[j + 1])) {
+		for (uint32_t j = formSets[i].header.offset + 6; j < formSets[i].header.offset + formSets[i].header.length; j += static_cast<unsigned char>(buffer[j + 1])) {
 
 			// Check if opcode is EFI_IFR_FORM_OP 0x01
-			if(buffer[j] == EFI_IFR_FORM_OP) {
+			if (buffer[j] == EFI_IFR_FORM_OP) {
 
 				// Create temp
 				EFI_IFR_FORM temp;
@@ -280,7 +280,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 				fout << "0x" << hex << uppercase << temp.header.offset << ' ';
 
 				// Display tabs
-				for(uint8_t k = 0; k < numberOfTabs; k++)
+				for (uint8_t k = 0; k < numberOfTabs; k++)
 					fout << '\t';
 
 				// Display temp
@@ -291,7 +291,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 			}
 
 			// Otherwise check if opcode is EFI_IFR_SUBTITLE_OP 0x02
-			else if(buffer[j] == EFI_IFR_SUBTITLE_OP) {
+			else if (buffer[j] == EFI_IFR_SUBTITLE_OP) {
 
 				// Create temp
 				EFI_IFR_SUBTITLE temp;
@@ -306,7 +306,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 				fout << "0x" << hex << uppercase << temp.header.offset << ' ';
 
 				// Display tabs
-				for(uint8_t k = 0; k < numberOfTabs; k++)
+				for (uint8_t k = 0; k < numberOfTabs; k++)
 					fout << '\t';
 
 				// Display temp
@@ -314,7 +314,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 			}
 
 			// Otherwise check if opcode is EFI_IFR_TEXT_OP 0x03
-			else if(buffer[j] == EFI_IFR_TEXT_OP) {
+			else if (buffer[j] == EFI_IFR_TEXT_OP) {
 
 				// Create temp
 				EFI_IFR_TEXT temp;
@@ -333,7 +333,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 				fout << "0x" << hex << uppercase << temp.header.offset << ' ';
 
 				// Display tabs
-				for(uint8_t k = 0; k < numberOfTabs; k++)
+				for (uint8_t k = 0; k < numberOfTabs; k++)
 					fout << '\t';
 
 				// Display temp
@@ -341,13 +341,13 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 			}
 
 			// Otherwise chec if opcode is EFI_IFR_GRAPHIC_OP 0x04
-			else if(buffer[j] == EFI_IFR_GRAPHIC_OP) {
+			else if (buffer[j] == EFI_IFR_GRAPHIC_OP) {
 
 				// Display offset
 				fout << "0x" << hex << uppercase << j << ' ';
 
 				// Display tabs
-				for(uint8_t k = 0; k < numberOfTabs; k++)
+				for (uint8_t k = 0; k < numberOfTabs; k++)
 					fout << '\t';
 
 				// Display temp
@@ -355,7 +355,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 			}
 
 			// Otherwise check if opcode is EFI_IFR_ONE_OF_OP 0x05
-			else if(buffer[j] == EFI_IFR_ONE_OF_OP) {
+			else if (buffer[j] == EFI_IFR_ONE_OF_OP) {
 
 				// Create temp
 				EFI_IFR_ONE_OF temp;
@@ -373,7 +373,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 				fout << "0x" << hex << uppercase << temp.header.offset << ' ';
 
 				// Display tabs
-				for(uint8_t k = 0; k < numberOfTabs; k++)
+				for (uint8_t k = 0; k < numberOfTabs; k++)
 					fout << '\t';
 
 				// Display temp
@@ -384,7 +384,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 			}
 
 			// Otherwise check if opcode is EFI_IFR_CHECKBOX_OP 0x06
-			else if(buffer[j] == EFI_IFR_CHECKBOX_OP) {
+			else if (buffer[j] == EFI_IFR_CHECKBOX_OP) {
 
 				// Create temp
 				EFI_IFR_CHECKBOX temp;
@@ -404,7 +404,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 				fout << "0x" << hex << uppercase << temp.header.offset << ' ';
 
 				// Display tabs
-				for(uint8_t k = 0; k < numberOfTabs; k++)
+				for (uint8_t k = 0; k < numberOfTabs; k++)
 					fout << '\t';
 
 				// Display temp
@@ -412,7 +412,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 			}
 
 			// Otherwise check if opcode is EFI_IFR_NUMERIC_OP 0x07
-			else if(buffer[j] == EFI_IFR_NUMERIC_OP) {
+			else if (buffer[j] == EFI_IFR_NUMERIC_OP) {
 
 				// Create temp
 				EFI_IFR_NUMERIC temp;
@@ -435,7 +435,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 				fout << "0x" << hex << uppercase << temp.header.offset << ' ';
 
 				// Display tabs
-				for(uint8_t k = 0; k < numberOfTabs; k++)
+				for (uint8_t k = 0; k < numberOfTabs; k++)
 					fout << '\t';
 
 				// Display temp
@@ -443,7 +443,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 			}
 
 			// Otherwise check if opcode is EFI_IFR_PASSWORD_OP 0x08
-			else if(buffer[j] == EFI_IFR_PASSWORD_OP) {
+			else if (buffer[j] == EFI_IFR_PASSWORD_OP) {
 
 				// Create temp
 				EFI_IFR_PASSWORD temp;
@@ -466,7 +466,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 				fout << "0x" << hex << uppercase << temp.header.offset << ' ';
 
 				// Display tabs
-				for(uint8_t k = 0; k < numberOfTabs; k++)
+				for (uint8_t k = 0; k < numberOfTabs; k++)
 					fout << '\t';
 
 				// Display temp
@@ -474,7 +474,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 			}
 
 			// Otherwise check if opcode is EFI_IFR_ONE_OF_OPTION_OP 0x09
-			else if(buffer[j] == EFI_IFR_ONE_OF_OPTION_OP) {
+			else if (buffer[j] == EFI_IFR_ONE_OF_OPTION_OP) {
 
 				// Create temp
 				EFI_IFR_ONE_OF_OPTION temp;
@@ -492,7 +492,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 				fout << "0x" << hex << uppercase << temp.header.offset << ' ';
 
 				// Display tabs
-				for(uint8_t k = 0; k < numberOfTabs; k++)
+				for (uint8_t k = 0; k < numberOfTabs; k++)
 					fout << '\t';
 
 				// Display temp
@@ -500,7 +500,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 			}
 
 			// Otherwise check if opcode is EFI_IFR_SUPPRESS_IF_OP 0x0A
-			else if(buffer[j] == EFI_IFR_SUPPRESS_IF_OP) {
+			else if (buffer[j] == EFI_IFR_SUPPRESS_IF_OP) {
 
 				// Create temp
 				EFI_IFR_SUPPRESS temp;
@@ -515,7 +515,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 				fout << "0x" << hex << uppercase << temp.header.offset << ' ';
 
 				// Display tabs
-				for(uint8_t k = 0; k < numberOfTabs; k++)
+				for (uint8_t k = 0; k < numberOfTabs; k++)
 					fout << '\t';
 
 				// Display temp
@@ -526,7 +526,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 			}
 
 			// Otherwise check if opcode is EFI_IFR_END_FORM_OP 0x0B
-			else if(buffer[j] == EFI_IFR_END_FORM_OP) {
+			else if (buffer[j] == EFI_IFR_END_FORM_OP) {
 
 				// Create temp
 				EFI_IFR_END_FORM temp;
@@ -543,7 +543,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 				fout << "0x" << hex << uppercase << temp.header.offset << ' ';
 
 				// Display tabs
-				for(uint8_t k = 0; k < numberOfTabs; k++)
+				for (uint8_t k = 0; k < numberOfTabs; k++)
 					fout << '\t';
 
 				// Display temp
@@ -551,7 +551,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 			}
 
 			// Otherwise check if opcode is EFI_IFR_HIDDEN_OP 0x0C
-			else if(buffer[j] == EFI_IFR_HIDDEN_OP) {
+			else if (buffer[j] == EFI_IFR_HIDDEN_OP) {
 
 				// Create temp
 				EFI_IFR_HIDDEN temp;
@@ -567,7 +567,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 				fout << "0x" << hex << uppercase << temp.header.offset << ' ';
 
 				// Display tabs
-				for(uint8_t k = 0; k < numberOfTabs; k++)
+				for (uint8_t k = 0; k < numberOfTabs; k++)
 					fout << '\t';
 
 				// Display temp
@@ -575,7 +575,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 			}
 
 			// Otherwise check if opcode is EFI_IFR_END_FORM_SET_OP 0x0D
-			else if(buffer[j] == EFI_IFR_END_FORM_SET_OP) {
+			else if (buffer[j] == EFI_IFR_END_FORM_SET_OP) {
 
 				// Create temp
 				EFI_IFR_END_FORM_SET temp;
@@ -592,7 +592,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 				fout << "0x" << hex << uppercase << temp.header.offset << ' ';
 
 				// Display tabs
-				for(uint8_t k = 0; k < numberOfTabs; k++)
+				for (uint8_t k = 0; k < numberOfTabs; k++)
 					fout << '\t';
 
 				// Display temp
@@ -600,7 +600,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 			}
 
 			// Otherwise check if opcode is EFI_IFR_FORM_SET_OP 0x0E
-			else if(buffer[j] == EFI_IFR_FORM_SET_OP) {
+			else if (buffer[j] == EFI_IFR_FORM_SET_OP) {
 
 				// Create temp
 				EFI_IFR_FORM_SET temp;
@@ -609,56 +609,56 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 				temp.header.offset = j;
 				temp.header.opcode = buffer[j];
 				temp.header.length = static_cast<unsigned char>(buffer[j + 1]);
-				for(uint32_t k = j + 2; k < j + 6; k++) {
+				for (uint32_t k = j + 2; k < j + 6; k++) {
 					highNibble = ((buffer[k] >> 4) & 0x0F) + '0';
 					lowNibble = (buffer[k] & 0x0F) + '0';
-					if(highNibble > 0x39 && highNibble < 0x41)
+					if (highNibble > 0x39 && highNibble < 0x41)
 						highNibble += 0x07;
-					if(lowNibble > 0x39 && lowNibble < 0x41)
+					if (lowNibble > 0x39 && lowNibble < 0x41)
 						lowNibble += 0x07;
 					temp.guid.insert(0, 1, lowNibble);
 					temp.guid.insert(0, 1, highNibble);
 				}
 				temp.guid.push_back('-');
-				for(uint32_t k = j + 6; k < j + 8; k++) {
+				for (uint32_t k = j + 6; k < j + 8; k++) {
 					highNibble = ((buffer[k] >> 4) & 0x0F) + '0';
 					lowNibble = (buffer[k] & 0x0F) + '0';
-					if(highNibble > 0x39 && highNibble < 0x41)
+					if (highNibble > 0x39 && highNibble < 0x41)
 						highNibble += 0x07;
-					if(lowNibble > 0x39 && lowNibble < 0x41)
+					if (lowNibble > 0x39 && lowNibble < 0x41)
 						lowNibble += 0x07;
 					temp.guid.insert(9, 1, lowNibble);
 					temp.guid.insert(9, 1, highNibble);
 				}
 				temp.guid.push_back('-');
-				for(uint32_t k = j + 8; k < j + 10; k++) {
+				for (uint32_t k = j + 8; k < j + 10; k++) {
 					highNibble = ((buffer[k] >> 4) & 0x0F) + '0';
 					lowNibble = (buffer[k] & 0x0F) + '0';
-					if(highNibble > 0x39 && highNibble < 0x41)
+					if (highNibble > 0x39 && highNibble < 0x41)
 						highNibble += 0x07;
-					if(lowNibble > 0x39 && lowNibble < 0x41)
+					if (lowNibble > 0x39 && lowNibble < 0x41)
 						lowNibble += 0x07;
 					temp.guid.insert(14, 1, lowNibble);
 					temp.guid.insert(14, 1, highNibble);
 				}
 				temp.guid.push_back('-');
-				for(uint32_t k = j + 10; k < j + 12; k++) {
+				for (uint32_t k = j + 10; k < j + 12; k++) {
 					highNibble = ((buffer[k] >> 4) & 0x0F) + '0';
 					lowNibble = (buffer[k] & 0x0F) + '0';
-					if(highNibble > 0x39 && highNibble < 0x41)
+					if (highNibble > 0x39 && highNibble < 0x41)
 						highNibble += 0x07;
-					if(lowNibble > 0x39 && lowNibble < 0x41)
+					if (lowNibble > 0x39 && lowNibble < 0x41)
 						lowNibble += 0x07;
 					temp.guid.push_back(highNibble);
 					temp.guid.push_back(lowNibble);
 				}
 				temp.guid.push_back('-');
-				for(uint32_t k = j + 12; k < j + 18; k++) {
+				for (uint32_t k = j + 12; k < j + 18; k++) {
 					highNibble = ((buffer[k] >> 4) & 0x0F) + '0';
 					lowNibble = (buffer[k] & 0x0F) + '0';
-					if(highNibble > 0x39 && highNibble < 0x41)
+					if (highNibble > 0x39 && highNibble < 0x41)
 						highNibble += 0x07;
-					if(lowNibble > 0x39 && lowNibble < 0x41)
+					if (lowNibble > 0x39 && lowNibble < 0x41)
 						lowNibble += 0x07;
 					temp.guid.push_back(highNibble);
 					temp.guid.push_back(lowNibble);
@@ -674,7 +674,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 				fout << "0x" << hex << uppercase << temp.header.offset << ' ';
 
 				// Display tabs
-				for(uint8_t k = 0; k < numberOfTabs; k++)
+				for (uint8_t k = 0; k < numberOfTabs; k++)
 					fout << '\t';
 
 				// Display temp
@@ -685,7 +685,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 			}
 
 			// Otherwise check if opcode is EFI_IFR_REF_OP 0x0F
-			else if(buffer[j] == EFI_IFR_REF_OP) {
+			else if (buffer[j] == EFI_IFR_REF_OP) {
 
 				// Create temp
 				EFI_IFR_REF temp;
@@ -704,7 +704,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 				fout << "0x" << hex << uppercase << temp.header.offset << ' ';
 
 				// Display tabs
-				for(uint8_t k = 0; k < numberOfTabs; k++)
+				for (uint8_t k = 0; k < numberOfTabs; k++)
 					fout << '\t';
 
 				// Display temp
@@ -712,7 +712,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 			}
 
 			// Otherwise check if opcode is EFI_IFR_END_OP 0x10
-			else if(buffer[j] == EFI_IFR_END_ONE_OF_OP) {
+			else if (buffer[j] == EFI_IFR_END_ONE_OF_OP) {
 
 				// Create temp
 				EFI_IFR_END_ONE_OF temp;
@@ -729,7 +729,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 				fout << "0x" << hex << uppercase << temp.header.offset << ' ';
 
 				// Display tabs
-				for(uint8_t k = 0; k < numberOfTabs; k++)
+				for (uint8_t k = 0; k < numberOfTabs; k++)
 					fout << '\t';
 
 				// Display temp
@@ -737,7 +737,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 			}
 
 			// Otherwise check if opcode is EFI_IFR_INCONSISTENT_IF_OP 0x11
-			else if(buffer[j] == EFI_IFR_INCONSISTENT_IF_OP) {
+			else if (buffer[j] == EFI_IFR_INCONSISTENT_IF_OP) {
 
 				// Create temp
 				EFI_IFR_INCONSISTENT temp;
@@ -753,7 +753,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 				fout << "0x" << hex << uppercase << temp.header.offset << ' ';
 
 				// Display tabs
-				for(uint8_t k = 0; k < numberOfTabs; k++)
+				for (uint8_t k = 0; k < numberOfTabs; k++)
 					fout << '\t';
 
 				// Display inconsistent
@@ -764,7 +764,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 			}
 
 			// Otherwise check if opcode is EFI_IFR_EQ_ID_VAL_OP 0x12
-			else if(buffer[j] == EFI_IFR_EQ_ID_VAL_OP) {
+			else if (buffer[j] == EFI_IFR_EQ_ID_VAL_OP) {
 
 				// Create temp
 				EFI_IFR_EQ_ID_VAL temp;
@@ -781,21 +781,21 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 				fout << "0x" << hex << uppercase << temp.header.offset << ' ';
 
 				// Display tabs
-				for(uint8_t k = 0; k < numberOfTabs; k++)
+				for (uint8_t k = 0; k < numberOfTabs; k++)
 					fout << '\t';
 
 				// Display temp
 				fout << "Variable 0x" << hex << uppercase << temp.questionId << '[' << dec << static_cast<unsigned int>(temp.width) << ']' << " equals 0x" << hex << uppercase << temp.value;
 
 				// Check if there isn't a following conditional statement
-				if(endEFICondition(buffer, j))
+				if (endEFICondition(buffer, j))
 
 					// Increment number of tabs
 					numberOfTabs++;
 			}
 
 			// Otherwise check if opcode is EFI_IFR_EQ_ID_ID_OP 0x13
-			else if(buffer[j] == EFI_IFR_EQ_ID_ID_OP) {
+			else if (buffer[j] == EFI_IFR_EQ_ID_ID_OP) {
 
 				// Create temp
 				EFI_IFR_EQ_ID_ID temp;
@@ -812,21 +812,21 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 				fout << "0x" << hex << uppercase << temp.header.offset << ' ';
 
 				// Display tabs
-				for(uint8_t k = 0; k < numberOfTabs; k++)
+				for (uint8_t k = 0; k < numberOfTabs; k++)
 					fout << '\t';
 
 				// Display temp
 				fout << "Variable 0x" << hex << uppercase << temp.primaryQuestionId << '[' << dec << static_cast<unsigned int>(temp.width) << ']' << " equals variable 0x" << hex << uppercase << temp.secondaryQuestionId;
 
 				// Check if there isn't a following conditional statement
-				if(endEFICondition(buffer, j))
+				if (endEFICondition(buffer, j))
 
 					// Increment number of tabs
 					numberOfTabs++;
 			}
 
 			// Otherwise check if opcode is EFI_IFR_EQ_ID_LIST_OP 0x14
-			else if(buffer[j] == EFI_IFR_EQ_ID_LIST_OP) {
+			else if (buffer[j] == EFI_IFR_EQ_ID_LIST_OP) {
 
 				// Create temp
 				EFI_IFR_EQ_ID_LIST temp;
@@ -842,35 +842,35 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 				// Create list
 				uint32_t index = j + 7;
 
-				for(uint8_t k = 0; k < temp.listLength; k++, index += 2)
+				for (uint8_t k = 0; k < temp.listLength; k++, index += 2)
 					temp.valueList.push_back(static_cast<uint16_t>(static_cast<unsigned char>(buffer[index]) + (static_cast<unsigned char>(buffer[index + 1]) << 8)));
 
 				// Display offset
 				fout << "0x" << hex << uppercase << temp.header.offset << ' ';
 
 				// Display tabs
-				for(uint8_t k = 0; k < numberOfTabs; k++)
+				for (uint8_t k = 0; k < numberOfTabs; k++)
 					fout << '\t';
 
 				// Display temp
 				fout << "Variable 0x" << hex << uppercase << temp.questionId << '[' << dec << static_cast<unsigned int>(temp.width) << ']' << " equals value in list (";
-				for(uint8_t k = 0; k < temp.listLength; k++) {
+				for (uint8_t k = 0; k < temp.listLength; k++) {
 					fout << "0x" << hex << uppercase << temp.valueList[k];
-					if(k != temp.listLength - 1)
+					if (k != temp.listLength - 1)
 						fout << ", ";
 					else
 						fout << ')';
 				}
 
 				// Check if there isn't a following conditional statement
-				if(endEFICondition(buffer, j))
+				if (endEFICondition(buffer, j))
 
 					// Increment number of tabs
 					numberOfTabs++;
 			}
 
 			// Otherwise check if opcode is EFI_IFR_AND_OP 0x15
-			else if(buffer[j] == EFI_IFR_AND_OP) {
+			else if (buffer[j] == EFI_IFR_AND_OP) {
 
 				// Create temp
 				EFI_IFR_AND temp;
@@ -884,21 +884,21 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 				fout << "0x" << hex << uppercase << temp.header.offset << ' ';
 
 				// Display tabs
-				for(uint8_t k = 0; k < numberOfTabs; k++)
+				for (uint8_t k = 0; k < numberOfTabs; k++)
 					fout << '\t';
 
 				// Display temp
 				fout << "And";
 
 				// Check if there isn't a following conditional statement
-				if(endEFICondition(buffer, j))
+				if (endEFICondition(buffer, j))
 
 					// Increment number of tabs
 					numberOfTabs++;
 			}
 
 			// Otherwise check if opcode is EFI_IFR_OR_OP 0x16
-			else if(buffer[j] == EFI_IFR_OR_OP) {
+			else if (buffer[j] == EFI_IFR_OR_OP) {
 
 				// Create temp
 				EFI_IFR_OR temp;
@@ -912,21 +912,21 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 				fout << "0x" << hex << uppercase << temp.header.offset << ' ';
 
 				// Display tabs
-				for(uint8_t k = 0; k < numberOfTabs; k++)
+				for (uint8_t k = 0; k < numberOfTabs; k++)
 					fout << '\t';
 
 				// Display temp
 				fout << "Or";
 
 				// Check if there isn't a following conditional statement
-				if(endEFICondition(buffer, j))
+				if (endEFICondition(buffer, j))
 
 					// Increment number of tabs
 					numberOfTabs++;
 			}
 
 			// Otherwise check if opcode is EFI_IFR_NOT_OP 0x17
-			else if(buffer[j] == EFI_IFR_NOT_OP) {
+			else if (buffer[j] == EFI_IFR_NOT_OP) {
 
 				// Create temp
 				EFI_IFR_NOT temp;
@@ -940,21 +940,21 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 				fout << "0x" << hex << uppercase << temp.header.offset << ' ';
 
 				// Display tabs
-				for(uint8_t k = 0; k < numberOfTabs; k++)
+				for (uint8_t k = 0; k < numberOfTabs; k++)
 					fout << '\t';
 
 				// Display temp
 				fout << "Not";
 
 				// Check if there isn't a following conditional statement
-				if(endEFICondition(buffer, j))
+				if (endEFICondition(buffer, j))
 
 					// Increment number of tabs
 					numberOfTabs++;
 			}
 
 			// Otherwise check if opcode is EFI_IFR_END_IF_OP 0x18
-			else if(buffer[j] == EFI_IFR_END_IF_OP) {
+			else if (buffer[j] == EFI_IFR_END_IF_OP) {
 
 				// Create temp
 				EFI_IFR_END_IF temp;
@@ -965,7 +965,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 				temp.header.length = static_cast<unsigned char>(buffer[j + 1]);
 
 				// Go through ifs
-				for(uint8_t k = 0; k < numberOfIfs; k++) {
+				for (uint8_t k = 0; k < numberOfIfs; k++) {
 
 					// Decrement number of tabs
 					numberOfTabs--;
@@ -974,7 +974,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 					fout << "0x" << hex << uppercase << temp.header.offset << ' ';
 
 					// Display tabs
-					for(uint8_t l = 0; l < numberOfTabs; l++)
+					for (uint8_t l = 0; l < numberOfTabs; l++)
 						fout << '\t';
 
 					// Display temp
@@ -986,7 +986,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 			}
 
 			// Otherwise check if opcode is EFI_IFR_GRAYOUT_IF_OP 0x19
-			else if(buffer[j] == EFI_IFR_GRAYOUT_IF_OP) {
+			else if (buffer[j] == EFI_IFR_GRAYOUT_IF_OP) {
 
 				// Create temp
 				EFI_IFR_GRAYOUT temp;
@@ -1001,7 +1001,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 				fout << "0x" << hex << uppercase << temp.header.offset << ' ';
 
 				// Display tabs
-				for(uint8_t k = 0; k < numberOfTabs; k++)
+				for (uint8_t k = 0; k < numberOfTabs; k++)
 					fout << '\t';
 
 				// Display temp
@@ -1012,7 +1012,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 			}
 
 			// Otherwise check if opcode is EFI_IFR_DATE_OP 0x1A
-			else if(buffer[j] == EFI_IFR_DATE_OP) {
+			else if (buffer[j] == EFI_IFR_DATE_OP) {
 
 				// Create temp
 				EFI_IFR_DATE temp;
@@ -1072,7 +1072,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 				fout << "0x" << hex << uppercase << temp.year.header.offset << ' ';
 
 				// Display tabs
-				for(uint8_t k = 0; k < numberOfTabs; k++)
+				for (uint8_t k = 0; k < numberOfTabs; k++)
 					fout << '\t';
 
 				// Display temp
@@ -1080,7 +1080,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 			}
 
 			// Otherwise check if opcode is EFI_IFR_TIME_OP 0x1B
-			else if(buffer[j] == EFI_IFR_TIME_OP) {
+			else if (buffer[j] == EFI_IFR_TIME_OP) {
 
 				// Create temp
 				EFI_IFR_TIME temp;
@@ -1140,7 +1140,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 				fout << "0x" << hex << uppercase << temp.hour.header.offset << ' ';
 
 				// Display tabs
-				for(uint8_t k = 0; k < numberOfTabs; k++)
+				for (uint8_t k = 0; k < numberOfTabs; k++)
 					fout << '\t';
 
 				// Display temp
@@ -1148,7 +1148,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 			}
 
 			// Otherwise check if opcode is EFI_IFR_STRING_OP 0x1C
-			else if(buffer[j] == EFI_IFR_STRING_OP) {
+			else if (buffer[j] == EFI_IFR_STRING_OP) {
 
 				// Create temp
 				EFI_IFR_STRING temp;
@@ -1170,7 +1170,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 				fout << "0x" << hex << uppercase << temp.header.offset << ' ';
 
 				// Display tabs
-				for(uint8_t k = 0; k < numberOfTabs; k++)
+				for (uint8_t k = 0; k < numberOfTabs; k++)
 					fout << '\t';
 
 				// Display temp
@@ -1178,7 +1178,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 			}
 
 			// Otherwise check if opcode is EFI_IFR_LABEL_OP 0x1D
-			else if(buffer[j] == EFI_IFR_LABEL_OP) {
+			else if (buffer[j] == EFI_IFR_LABEL_OP) {
 
 				// Create temp
 				EFI_IFR_LABEL temp;
@@ -1193,7 +1193,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 				fout << "0x" << hex << uppercase << temp.header.offset << ' ';
 
 				// Display tabs
-				for(uint8_t k = 0; k < numberOfTabs; k++)
+				for (uint8_t k = 0; k < numberOfTabs; k++)
 					fout << '\t';
 
 				// Display temp
@@ -1201,7 +1201,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 			}
 
 			// Otherwise check if opcode is EFI_IFR_SAVE_DEFAULTS_OP 0x1E
-			else if(buffer[j] == EFI_IFR_SAVE_DEFAULTS_OP) {
+			else if (buffer[j] == EFI_IFR_SAVE_DEFAULTS_OP) {
 
 				// Create temp
 				EFI_IFR_SAVE_DEFAULTS temp;
@@ -1220,7 +1220,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 				fout << "0x" << hex << uppercase << temp.header.offset << ' ';
 
 				// Display tabs
-				for(uint8_t k = 0; k < numberOfTabs; k++)
+				for (uint8_t k = 0; k < numberOfTabs; k++)
 					fout << '\t';
 
 				// Display temp
@@ -1228,7 +1228,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 			}
 
 			// Otherwise check if opcode is EFI_IFR_RESTORE_DEFAULTS_OP 0x1F
-			else if(buffer[j] == EFI_IFR_RESTORE_DEFAULTS_OP) {
+			else if (buffer[j] == EFI_IFR_RESTORE_DEFAULTS_OP) {
 
 				// Create temp
 				EFI_IFR_RESTORE_DEFAULTS temp;
@@ -1247,7 +1247,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 				fout << "0x" << hex << uppercase << temp.header.offset << ' ';
 
 				// Display tabs
-				for(uint8_t k = 0; k < numberOfTabs; k++)
+				for (uint8_t k = 0; k < numberOfTabs; k++)
 					fout << '\t';
 
 				// Display temp
@@ -1255,7 +1255,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 			}
 
 			// Otherwise check if opcode is EFI_IFR_BANNER_OP 0x20
-			else if(buffer[j] == EFI_IFR_BANNER_OP) {
+			else if (buffer[j] == EFI_IFR_BANNER_OP) {
 
 				// Create temp
 				EFI_IFR_BANNER temp;
@@ -1272,7 +1272,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 				fout << "0x" << hex << uppercase << temp.header.offset << ' ';
 
 				// Display tabs
-				for(uint8_t k = 0; k < numberOfTabs; k++)
+				for (uint8_t k = 0; k < numberOfTabs; k++)
 					fout << '\t';
 
 				// Display temp
@@ -1280,7 +1280,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 			}
 
 			// Otherwise check if opcode is EFI_IFR_INVENTORY_OP 0x21
-			else if(buffer[j] == EFI_IFR_INVENTORY_OP) {
+			else if (buffer[j] == EFI_IFR_INVENTORY_OP) {
 
 				// Create temp
 				EFI_IFR_INVENTORY temp;
@@ -1297,7 +1297,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 				fout << "0x" << hex << uppercase << temp.header.offset << ' ';
 
 				// Display tabs
-				for(uint8_t k = 0; k < numberOfTabs; k++)
+				for (uint8_t k = 0; k < numberOfTabs; k++)
 					fout << '\t';
 
 				// Display temp
@@ -1305,7 +1305,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 			}
 
 			// Otherwise check if opcode is EFI_IFR_EQ_VAR_VAL_OP 0x22
-			else if(buffer[j] == EFI_IFR_EQ_VAR_VAL_OP) {
+			else if (buffer[j] == EFI_IFR_EQ_VAR_VAL_OP) {
 
 				// Create temp
 				EFI_IFR_EQ_VAR_VAL temp;
@@ -1321,21 +1321,21 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 				fout << "0x" << hex << uppercase << temp.header.offset << ' ';
 
 				// Display tabs
-				for(uint8_t k = 0; k < numberOfTabs; k++)
+				for (uint8_t k = 0; k < numberOfTabs; k++)
 					fout << '\t';
 
 				// Display temp
 				fout << "Variable 0x" << hex << uppercase << temp.variableId << " equals 0x" << temp.value;
 
 				// Check if there isn't a following conditional statement
-				if(endEFICondition(buffer, j))
+				if (endEFICondition(buffer, j))
 
 					// Increment number of tabs
 					numberOfTabs++;
 			}
 
 			// Otherwise check if opcode is EFI_IFR_ORDERED_LIST_OP 0x23
-			else if(buffer[j] == EFI_IFR_ORDERED_LIST_OP) {
+			else if (buffer[j] == EFI_IFR_ORDERED_LIST_OP) {
 
 				// Create temp
 				EFI_IFR_ORDERED_LIST temp;
@@ -1353,7 +1353,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 				fout << "0x" << hex << uppercase << temp.header.offset << ' ';
 
 				// Display tabs
-				for(uint8_t k = 0; k < numberOfTabs; k++)
+				for (uint8_t k = 0; k < numberOfTabs; k++)
 					fout << '\t';
 
 				// Display temp
@@ -1361,7 +1361,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 			}
 
 			// Otherwise check if opcode is EFI_IFR_VARSTORE_OP 0x24
-			else if(buffer[j] == EFI_IFR_VARSTORE_OP) {
+			else if (buffer[j] == EFI_IFR_VARSTORE_OP) {
 
 				// Create temp
 				EFI_IFR_VARSTORE temp;
@@ -1370,76 +1370,83 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 				temp.header.offset = j;
 				temp.header.opcode = buffer[j];
 				temp.header.length = static_cast<unsigned char>(buffer[j + 1]);
-				for(uint32_t k = j + 2; k < j + 6; k++) {
+				for (uint32_t k = j + 2; k < j + 6; k++) {
 					highNibble = ((buffer[k] >> 4) & 0x0F) + '0';
 					lowNibble = (buffer[k] & 0x0F) + '0';
-					if(highNibble > 0x39 && highNibble < 0x41)
+					if (highNibble > 0x39 && highNibble < 0x41)
 						highNibble += 0x07;
-					if(lowNibble > 0x39 && lowNibble < 0x41)
+					if (lowNibble > 0x39 && lowNibble < 0x41)
 						lowNibble += 0x07;
 					temp.guid.insert(0, 1, lowNibble);
 					temp.guid.insert(0, 1, highNibble);
 				}
 				temp.guid.push_back('-');
-				for(uint32_t k = j + 6; k < j + 8; k++) {
+				for (uint32_t k = j + 6; k < j + 8; k++) {
 					highNibble = ((buffer[k] >> 4) & 0x0F) + '0';
 					lowNibble = (buffer[k] & 0x0F) + '0';
-					if(highNibble > 0x39 && highNibble < 0x41)
+					if (highNibble > 0x39 && highNibble < 0x41)
 						highNibble += 0x07;
-					if(lowNibble > 0x39 && lowNibble < 0x41)
+					if (lowNibble > 0x39 && lowNibble < 0x41)
 						lowNibble += 0x07;
 					temp.guid.insert(9, 1, lowNibble);
 					temp.guid.insert(9, 1, highNibble);
 				}
 				temp.guid.push_back('-');
-				for(uint32_t k = j + 8; k < j + 10; k++) {
+				for (uint32_t k = j + 8; k < j + 10; k++) {
 					highNibble = ((buffer[k] >> 4) & 0x0F) + '0';
 					lowNibble = (buffer[k] & 0x0F) + '0';
-					if(highNibble > 0x39 && highNibble < 0x41)
+					if (highNibble > 0x39 && highNibble < 0x41)
 						highNibble += 0x07;
-					if(lowNibble > 0x39 && lowNibble < 0x41)
+					if (lowNibble > 0x39 && lowNibble < 0x41)
 						lowNibble += 0x07;
 					temp.guid.insert(14, 1, lowNibble);
 					temp.guid.insert(14, 1, highNibble);
 				}
 				temp.guid.push_back('-');
-				for(uint32_t k = j + 10; k < j + 12; k++) {
+				for (uint32_t k = j + 10; k < j + 12; k++) {
 					highNibble = ((buffer[k] >> 4) & 0x0F) + '0';
 					lowNibble = (buffer[k] & 0x0F) + '0';
-					if(highNibble > 0x39 && highNibble < 0x41)
+					if (highNibble > 0x39 && highNibble < 0x41)
 						highNibble += 0x07;
-					if(lowNibble > 0x39 && lowNibble < 0x41)
+					if (lowNibble > 0x39 && lowNibble < 0x41)
 						lowNibble += 0x07;
 					temp.guid.push_back(highNibble);
 					temp.guid.push_back(lowNibble);
 				}
 				temp.guid.push_back('-');
-				for(uint32_t k = j + 12; k < j + 18; k++) {
+				for (uint32_t k = j + 12; k < j + 18; k++) {
 					highNibble = ((buffer[k] >> 4) & 0x0F) + '0';
 					lowNibble = (buffer[k] & 0x0F) + '0';
-					if(highNibble > 0x39 && highNibble < 0x41)
+					if (highNibble > 0x39 && highNibble < 0x41)
 						highNibble += 0x07;
-					if(lowNibble > 0x39 && lowNibble < 0x41)
+					if (lowNibble > 0x39 && lowNibble < 0x41)
 						lowNibble += 0x07;
 					temp.guid.push_back(highNibble);
 					temp.guid.push_back(lowNibble);
 				}
 				temp.varId = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 18]) + (static_cast<unsigned char>(buffer[j + 19]) << 8));
 				temp.size = static_cast<uint16_t>(static_cast<unsigned char>(buffer[j + 20]) + (static_cast<unsigned char>(buffer[j + 21]) << 8));
+				strcpy_s((char *)temp.name, 233, (char *)&buffer[j + 22]); // Name can start at 22, and will be header_length - 22 long.
 
 				// Display offset
 				fout << "0x" << hex << uppercase << temp.header.offset << ' ';
 
 				// Display tabs
-				for(uint8_t k = 0; k < numberOfTabs; k++)
+				for (uint8_t k = 0; k < numberOfTabs; k++)
 					fout << '\t';
 
 				// Display temp
-				fout << "Variable Store: 0x" << hex << uppercase << temp.varId;
+				//fout << "Variable Store: 0x" << hex << uppercase << temp.varId;
+				fout << "Var Store: ";
+				//Display additional information: GUID:Name[]
+				fout << "[0x" << hex << uppercase << setw(4) << setfill('0') << temp.varId << "]";
+				fout << "[" << temp.guid << "]";
+				fout << "[" << dec << setw(3) << temp.size << "]";
+				fout << "[" << temp.name << "]";
 			}
 
 			// Otherwise check if opcode is EFI_IFR_VARSTORE_SELECT_OP 0x25
-			else if(buffer[j] == EFI_IFR_VARSTORE_SELECT_OP) {
+			else if (buffer[j] == EFI_IFR_VARSTORE_SELECT_OP) {
 
 				// Create temp
 				EFI_IFR_VARSTORE_SELECT temp;
@@ -1454,7 +1461,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 				fout << "0x" << hex << uppercase << temp.header.offset << ' ';
 
 				// Display tabs
-				for(uint8_t k = 0; k < numberOfTabs; k++)
+				for (uint8_t k = 0; k < numberOfTabs; k++)
 					fout << '\t';
 
 				// Display temp
@@ -1462,7 +1469,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 			}
 
 			// Otherwise check if opcode is EFI_IFR_VARSTORE_SELECT_PAIR_OP 0x26
-			else if(buffer[j] == EFI_IFR_VARSTORE_SELECT_PAIR_OP) {
+			else if (buffer[j] == EFI_IFR_VARSTORE_SELECT_PAIR_OP) {
 
 				// Create temp
 				EFI_IFR_VARSTORE_SELECT_PAIR temp;
@@ -1478,7 +1485,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 				fout << "0x" << hex << uppercase << temp.header.offset << ' ';
 
 				// Display tabs
-				for(uint8_t k = 0; k < numberOfTabs; k++)
+				for (uint8_t k = 0; k < numberOfTabs; k++)
 					fout << '\t';
 
 				// Display temp
@@ -1486,7 +1493,7 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 			}
 
 			// Otherwise check if opcode is EFI_IFR_TRUE_OP 0x27
-			else if(buffer[j] == EFI_IFR_TRUE_OP) {
+			else if (buffer[j] == EFI_IFR_TRUE_OP) {
 
 				// Create temp
 				EFI_IFR_TRUE temp;
@@ -1500,21 +1507,21 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 				fout << "0x" << hex << uppercase << temp.header.offset << ' ';
 
 				// Display tabs
-				for(uint8_t k = 0; k < numberOfTabs; k++)
+				for (uint8_t k = 0; k < numberOfTabs; k++)
 					fout << '\t';
 
 				// Display temp
 				fout << "True";
 
 				// Check if there isn't a following conditional statement
-				if(endEFICondition(buffer, j))
+				if (endEFICondition(buffer, j))
 
 					// Increment number of tabs
 					numberOfTabs++;
 			}
 
 			// Otherwise check if opcode is EFI_IFR_FALSE_OP 0x28
-			else if(buffer[j] == EFI_IFR_FALSE_OP) {
+			else if (buffer[j] == EFI_IFR_FALSE_OP) {
 
 				// Create temp
 				EFI_IFR_FALSE temp;
@@ -1528,21 +1535,21 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 				fout << "0x" << hex << uppercase << temp.header.offset << ' ';
 
 				// Display tabs
-				for(uint8_t k = 0; k < numberOfTabs; k++)
+				for (uint8_t k = 0; k < numberOfTabs; k++)
 					fout << '\t';
 
 				// Display temp
 				fout << "False";
 
 				// Check if there isn't a following conditional statement
-				if(endEFICondition(buffer, j))
+				if (endEFICondition(buffer, j))
 
 					// Increment number of tabs
 					numberOfTabs++;
 			}
 
 			// Otherwise check if opcode is EFI_IFR_GT_OP 0x29
-			else if(buffer[j] == EFI_IFR_GT_OP) {
+			else if (buffer[j] == EFI_IFR_GT_OP) {
 
 				// Create temp
 				EFI_IFR_GT temp;
@@ -1556,21 +1563,21 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 				fout << "0x" << hex << uppercase << temp.header.offset << ' ';
 
 				// Display tabs
-				for(uint8_t k = 0; k < numberOfTabs; k++)
+				for (uint8_t k = 0; k < numberOfTabs; k++)
 					fout << '\t';
 
 				// Display temp
 				fout << "GT";
-				
+
 				// Check if there isn't a following conditional statement
-				if(endEFICondition(buffer, j))
+				if (endEFICondition(buffer, j))
 
 					// Increment number of tabs
 					numberOfTabs++;
 			}
 
 			// Otherwise check if opcode is EFI_IFR_GE_OP 0x2A
-			else if(buffer[j] == EFI_IFR_GE_OP) {
+			else if (buffer[j] == EFI_IFR_GE_OP) {
 
 				// Create temp
 				EFI_IFR_GE temp;
@@ -1584,27 +1591,27 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 				fout << "0x" << hex << uppercase << temp.header.offset << ' ';
 
 				// Display tabs
-				for(uint8_t k = 0; k < numberOfTabs; k++)
+				for (uint8_t k = 0; k < numberOfTabs; k++)
 					fout << '\t';
 
 				// Display temp
 				fout << "GE";
-				
+
 				// Check if there isn't a following conditional statement
-				if(endEFICondition(buffer, j))
+				if (endEFICondition(buffer, j))
 
 					// Increment number of tabs
 					numberOfTabs++;
 			}
 
 			// Otherwise check if opcode is EFI_IFR_OEM_DEFINED_OP 0x2B
-			else if(buffer[j] == EFI_IFR_OEM_DEFINED_OP) {
+			else if (buffer[j] == EFI_IFR_OEM_DEFINED_OP) {
 
 				// Display offset
 				fout << "0x" << hex << uppercase << j << ' ';
 
 				// Display tabs
-				for(uint8_t k = 0; k < numberOfTabs; k++)
+				for (uint8_t k = 0; k < numberOfTabs; k++)
 					fout << '\t';
 
 				// Display temp
@@ -1612,13 +1619,13 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 			}
 
 			// Otherwise check if opcode is EFI_IFR_OEM_OP 0xFE
-			else if(buffer[j] == EFI_IFR_OEM_OP) {
+			else if (buffer[j] == EFI_IFR_OEM_OP) {
 
 				// Display offset
 				fout << "0x" << hex << uppercase << j << ' ';
 
 				// Display tabs
-				for(uint8_t k = 0; k < numberOfTabs; k++)
+				for (uint8_t k = 0; k < numberOfTabs; k++)
 					fout << '\t';
 
 				// Display temp
@@ -1626,29 +1633,29 @@ void generateEFIIFRDump(const string &outputFile, const vector<EFI_IFR_STRING_PA
 			}
 
 			// Otherwise check if opcode is EFI_IFR_NV_ACCESS_COMMAND 0xFF
-			else if(buffer[j] == EFI_IFR_NV_ACCESS_COMMAND) {
+			else if (buffer[j] == EFI_IFR_NV_ACCESS_COMMAND) {
 
 				// Display offset
 				fout << "0x" << hex << uppercase << j << ' ';
 
 				// Display tabs
-				for(uint8_t k = 0; k < numberOfTabs; k++)
+				for (uint8_t k = 0; k < numberOfTabs; k++)
 					fout << '\t';
 
 				// Display temp
 				fout << "NV Access Command:";
 			}
-		
+
 			// Display code
 			fout << " {";
-			for(int k = 0; k < static_cast<unsigned char>(buffer[j + 1]); k++) {
+			for (int k = 0; k < static_cast<unsigned char>(buffer[j + 1]); k++) {
 				fout << hex << uppercase << setw(2) << setfill('0') << static_cast<unsigned int>(static_cast<unsigned char>(buffer[j + k]));
-				if(k != static_cast<unsigned char>(buffer[j + 1]) - 1)
+				if (k != static_cast<unsigned char>(buffer[j + 1]) - 1)
 					fout << ' ';
 			}
 			fout << '}' << endl;
 		}
-	
+
 	// Close file
 	fout.close();
 }
