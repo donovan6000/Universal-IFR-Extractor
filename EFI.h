@@ -62,321 +62,321 @@ using namespace std;
 
 // Classes/structs
 struct EFI_HII_PACK_HEADER {
-	uint32_t offset;
-	uint32_t length;
-	uint16_t type;
+    uint32_t offset;
+    uint32_t length;
+    uint16_t type;
 };
 
 struct EFI_IFR_STRING_PACK {
-	EFI_HII_PACK_HEADER header;
-	uint32_t numberOfStrings;
-	uint32_t attributes;
-	string language;
-	uint32_t structureOffset;
+    EFI_HII_PACK_HEADER header;
+    uint32_t numberOfStrings;
+    uint32_t attributes;
+    string language;
+    uint32_t structureOffset;
 };
 
 struct EFI_IFR_FORM_SET_PACK {
-	EFI_HII_PACK_HEADER header;
-	uint16_t titleString;
-	uint32_t usingStringPackage;
-	string title;
+    EFI_HII_PACK_HEADER header;
+    uint16_t titleString;
+    uint32_t usingStringPackage;
+    string title;
 };
 
 struct EFI_IFR_OP_HEADER {
-	uint32_t offset;
-	uint8_t opcode;
-	uint8_t length;
+    uint32_t offset;
+    uint8_t opcode;
+    uint8_t length;
 };
 
 struct EFI_IFR_FORM_SET {
-	EFI_IFR_OP_HEADER header;
-	string guid;
-	uint16_t titleString;
-	uint16_t helpString;
-	uint64_t callbackHandle;
-	uint16_t mainClass;
-	uint16_t subClass;
-	uint16_t nvDataSize;
+    EFI_IFR_OP_HEADER header;
+    string guid;
+    uint16_t titleString;
+    uint16_t helpString;
+    uint64_t callbackHandle;
+    uint16_t mainClass;
+    uint16_t subClass;
+    uint16_t nvDataSize;
 };
 
 struct EFI_IFR_FORM {
-	EFI_IFR_OP_HEADER header;
-	uint16_t formId;
-	uint16_t titleString;
+    EFI_IFR_OP_HEADER header;
+    uint16_t formId;
+    uint16_t titleString;
 };
 
 struct EFI_IFR_LABEL {
-	EFI_IFR_OP_HEADER header;
-	uint16_t labelId;
+    EFI_IFR_OP_HEADER header;
+    uint16_t labelId;
 };
 
 struct EFI_IFR_SUBTITLE {
-	EFI_IFR_OP_HEADER header;
-	uint16_t subtitleString;
+    EFI_IFR_OP_HEADER header;
+    uint16_t subtitleString;
 };
 
 struct EFI_IFR_TEXT {
-	EFI_IFR_OP_HEADER header;
-	uint16_t helpString;
-	uint16_t primaryTextString;
-	uint16_t secondaryTextString;
-	uint8_t flags;
-	uint16_t key;
+    EFI_IFR_OP_HEADER header;
+    uint16_t helpString;
+    uint16_t primaryTextString;
+    uint16_t secondaryTextString;
+    uint8_t flags;
+    uint16_t key;
 };
 
 struct EFI_IFR_REF {
-	EFI_IFR_OP_HEADER header;
-	uint16_t formId;
-	uint16_t promptString;
-	uint16_t helpString;
-	uint8_t flags;
-	uint16_t key;
+    EFI_IFR_OP_HEADER header;
+    uint16_t formId;
+    uint16_t promptString;
+    uint16_t helpString;
+    uint8_t flags;
+    uint16_t key;
 };
 
 struct EFI_IFR_END_FORM {
-	EFI_IFR_OP_HEADER header;
+    EFI_IFR_OP_HEADER header;
 };
 
 struct EFI_IFR_END_FORM_SET {
-	EFI_IFR_OP_HEADER header;
+    EFI_IFR_OP_HEADER header;
 };
 
 struct EFI_IFR_ONE_OF {
-	EFI_IFR_OP_HEADER header;
-	uint16_t questionId;
-	uint8_t width;
-	uint16_t promptString;
-	uint16_t helpString;
+    EFI_IFR_OP_HEADER header;
+    uint16_t questionId;
+    uint8_t width;
+    uint16_t promptString;
+    uint16_t helpString;
 };
 
 struct EFI_IFR_CHECKBOX {
-	EFI_IFR_OP_HEADER header;
-	uint16_t questionId;
-	uint8_t width;
-	uint16_t promptString;
-	uint16_t helpString;
-	uint8_t flags;
-	uint16_t key;
+    EFI_IFR_OP_HEADER header;
+    uint16_t questionId;
+    uint8_t width;
+    uint16_t promptString;
+    uint16_t helpString;
+    uint8_t flags;
+    uint16_t key;
 };
 
 struct  EFI_IFR_ORDERED_LIST {
-	EFI_IFR_OP_HEADER header;
-	uint16_t questionId;
-	uint8_t maximumEntries;
-	uint16_t promptString;
-	uint16_t helpString;
+    EFI_IFR_OP_HEADER header;
+    uint16_t questionId;
+    uint8_t maximumEntries;
+    uint16_t promptString;
+    uint16_t helpString;
 };
 
 struct EFI_IFR_CHECK_BOX {
-	EFI_IFR_OP_HEADER header;
-	uint16_t option;
-	uint16_t value;
-	uint8_t flags;
-	uint16_t key;
+    EFI_IFR_OP_HEADER header;
+    uint16_t option;
+    uint16_t value;
+    uint8_t flags;
+    uint16_t key;
 };
 
 struct EFI_IFR_ONE_OF_OPTION {
-	EFI_IFR_OP_HEADER header;
-	uint16_t optionString;
-	uint16_t value;
-	uint8_t flags;
-	uint16_t key;
+    EFI_IFR_OP_HEADER header;
+    uint16_t optionString;
+    uint16_t value;
+    uint8_t flags;
+    uint16_t key;
 };
 
 struct EFI_IFR_NUMERIC {
-	EFI_IFR_OP_HEADER header;
-	uint16_t questionId;
-	uint8_t width;
-	uint16_t promptString;
-	uint16_t helpString;
-	uint8_t flags;
-	uint16_t key;
-	uint16_t minimum;
-	uint16_t maximum;
-	uint16_t step;
-	uint16_t defaultValue;
+    EFI_IFR_OP_HEADER header;
+    uint16_t questionId;
+    uint8_t width;
+    uint16_t promptString;
+    uint16_t helpString;
+    uint8_t flags;
+    uint16_t key;
+    uint16_t minimum;
+    uint16_t maximum;
+    uint16_t step;
+    uint16_t defaultValue;
 };
 
 struct EFI_IFR_TIME {
-	EFI_IFR_NUMERIC hour;
-	EFI_IFR_NUMERIC minute;
-	EFI_IFR_NUMERIC second;
+    EFI_IFR_NUMERIC hour;
+    EFI_IFR_NUMERIC minute;
+    EFI_IFR_NUMERIC second;
 };
 
 struct EFI_IFR_DATE {
-	EFI_IFR_NUMERIC year;
-	EFI_IFR_NUMERIC month;
-	EFI_IFR_NUMERIC day;
+    EFI_IFR_NUMERIC year;
+    EFI_IFR_NUMERIC month;
+    EFI_IFR_NUMERIC day;
 };
 
 struct EFI_IFR_PASSWORD {
-	EFI_IFR_OP_HEADER header;
-	uint16_t questionId;
-	uint8_t width;
-	uint16_t promptString;
-	uint16_t helpString;
-	uint8_t flags;
-	uint16_t key;
-	uint8_t minimumSize;
-	uint8_t maximumSize;
-	uint16_t encoding;
+    EFI_IFR_OP_HEADER header;
+    uint16_t questionId;
+    uint8_t width;
+    uint16_t promptString;
+    uint16_t helpString;
+    uint8_t flags;
+    uint16_t key;
+    uint8_t minimumSize;
+    uint8_t maximumSize;
+    uint16_t encoding;
 };
 
 struct EFI_IFR_STRING {
-	EFI_IFR_OP_HEADER header;
-	uint16_t questionId;
-	uint8_t width;
-	uint16_t promptString;
-	uint16_t helpString;
-	uint8_t flags;
-	uint16_t key;
-	uint8_t minimumSize;
-	uint8_t maximumSize;
+    EFI_IFR_OP_HEADER header;
+    uint16_t questionId;
+    uint8_t width;
+    uint16_t promptString;
+    uint16_t helpString;
+    uint8_t flags;
+    uint16_t key;
+    uint8_t minimumSize;
+    uint8_t maximumSize;
 };
 
 struct EFI_IFR_END_ONE_OF {
-	EFI_IFR_OP_HEADER header;
+    EFI_IFR_OP_HEADER header;
 };
 
 struct EFI_IFR_HIDDEN {
-	EFI_IFR_OP_HEADER header;
-	uint16_t value;
-	uint16_t key;
+    EFI_IFR_OP_HEADER header;
+    uint16_t value;
+    uint16_t key;
 };
 
 struct EFI_IFR_SUPPRESS {
-	EFI_IFR_OP_HEADER header;
-	uint8_t flags;
+    EFI_IFR_OP_HEADER header;
+    uint8_t flags;
 };
 
 struct EFI_IFR_GRAYOUT {
-	EFI_IFR_OP_HEADER header;
-	uint8_t flags;
+    EFI_IFR_OP_HEADER header;
+    uint8_t flags;
 };
 
 struct EFI_IFR_INCONSISTENT {
-	EFI_IFR_OP_HEADER header;
-	uint16_t popup;
-	uint8_t flags;
+    EFI_IFR_OP_HEADER header;
+    uint16_t popup;
+    uint8_t flags;
 };
 
 struct EFI_IFR_EQ_ID_VAL {
-	EFI_IFR_OP_HEADER header;
-	uint16_t questionId;
-	uint8_t width;
-	uint16_t value;
+    EFI_IFR_OP_HEADER header;
+    uint16_t questionId;
+    uint8_t width;
+    uint16_t value;
 };
 
 struct EFI_IFR_EQ_ID_LIST {
-	EFI_IFR_OP_HEADER header;
-	uint16_t questionId;
-	uint8_t width;
-	uint16_t listLength;
-	vector<uint16_t> valueList;
+    EFI_IFR_OP_HEADER header;
+    uint16_t questionId;
+    uint8_t width;
+    uint16_t listLength;
+    vector<uint16_t> valueList;
 };
 
 struct EFI_IFR_EQ_ID_ID {
-	EFI_IFR_OP_HEADER header;
-	uint16_t primaryQuestionId;
-	uint8_t width;
-	uint16_t secondaryQuestionId;
+    EFI_IFR_OP_HEADER header;
+    uint16_t primaryQuestionId;
+    uint8_t width;
+    uint16_t secondaryQuestionId;
 };
 
 struct EFI_IFR_EQ_VAR_VAL {
-	EFI_IFR_OP_HEADER header;
-	uint16_t variableId;
-	uint16_t value;
+    EFI_IFR_OP_HEADER header;
+    uint16_t variableId;
+    uint16_t value;
 };
 
 struct EFI_IFR_AND {
-	EFI_IFR_OP_HEADER header;
+    EFI_IFR_OP_HEADER header;
 };
 
 struct EFI_IFR_OR {
-	EFI_IFR_OP_HEADER header;
+    EFI_IFR_OP_HEADER header;
 };
 
 struct EFI_IFR_NOT {
-	EFI_IFR_OP_HEADER header;
+    EFI_IFR_OP_HEADER header;
 };
 
 struct EFI_IFR_END_IF {
-	EFI_IFR_OP_HEADER header;
+    EFI_IFR_OP_HEADER header;
 };
 
 struct EFI_IFR_SAVE_DEFAULTS {
-	EFI_IFR_OP_HEADER header;
-	uint16_t formId;
-	uint16_t promptString;
-	uint16_t helpString;
-	uint8_t flags;
-	uint16_t key;
+    EFI_IFR_OP_HEADER header;
+    uint16_t formId;
+    uint16_t promptString;
+    uint16_t helpString;
+    uint8_t flags;
+    uint16_t key;
 };
 
 struct EFI_IFR_RESTORE_DEFAULTS {
-	EFI_IFR_OP_HEADER header;
-	uint16_t formId;
-	uint16_t promptString;
-	uint16_t helpString;
-	uint8_t flags;
-	uint16_t key;
+    EFI_IFR_OP_HEADER header;
+    uint16_t formId;
+    uint16_t promptString;
+    uint16_t helpString;
+    uint8_t flags;
+    uint16_t key;
 };
 
 struct EFI_IFR_INVENTORY {
-	EFI_IFR_OP_HEADER header;
-	uint16_t helpString;
-	uint16_t primaryTextString;
-	uint16_t secondaryTextString;
+    EFI_IFR_OP_HEADER header;
+    uint16_t helpString;
+    uint16_t primaryTextString;
+    uint16_t secondaryTextString;
 };
 
 struct EFI_IFR_VARSTORE {
-	EFI_IFR_OP_HEADER header;
-	string guid;
-	uint16_t varId;
-	uint16_t size;
-	// 255 (max size allowed by EFI_IFR_OP_HEADER:Length - 2 - 16 - 2 - 2 = 233 bytes max name (?)
-	uint8_t name[233];
+    EFI_IFR_OP_HEADER header;
+    string guid;
+    uint16_t varId;
+    uint16_t size;
+    // 255 (max size allowed by EFI_IFR_OP_HEADER:Length - 2 - 16 - 2 - 2 = 233 bytes max name (?)
+    uint8_t name[233];
 };
 
 struct EFI_IFR_VARSTORE_SELECT {
-	EFI_IFR_OP_HEADER header;
-	uint16_t varId;
+    EFI_IFR_OP_HEADER header;
+    uint16_t varId;
 };
 
 struct EFI_IFR_VARSTORE_SELECT_PAIR {
-	EFI_IFR_OP_HEADER header;
-	uint16_t primaryVarId;
-	uint16_t secondaryVarId;
+    EFI_IFR_OP_HEADER header;
+    uint16_t primaryVarId;
+    uint16_t secondaryVarId;
 };
 
 struct EFI_IFR_TRUE {
-	EFI_IFR_OP_HEADER header;
+    EFI_IFR_OP_HEADER header;
 };
 
 struct EFI_IFR_FALSE {
-	EFI_IFR_OP_HEADER header;
+    EFI_IFR_OP_HEADER header;
 };
 
 struct EFI_IFR_GT {
-	EFI_IFR_OP_HEADER header;
+    EFI_IFR_OP_HEADER header;
 };
 
 struct EFI_IFR_GE {
-	EFI_IFR_OP_HEADER header;
+    EFI_IFR_OP_HEADER header;
 };
 
 struct EFI_IFR_BANNER {
-	EFI_IFR_OP_HEADER header;
-	uint16_t titleString;
-	uint16_t lineNumber;
-	uint8_t alignment;
+    EFI_IFR_OP_HEADER header;
+    uint16_t titleString;
+    uint16_t lineNumber;
+    uint8_t alignment;
 };
 
 struct EFI_IFR_NV_DATA {
-	EFI_IFR_OP_HEADER header;
-	uint16_t questionId;
-	uint8_t storageWidth;
-	vector<char> data;
+    EFI_IFR_OP_HEADER header;
+    uint16_t questionId;
+    uint8_t storageWidth;
+    vector<char> data;
 };
 
 
