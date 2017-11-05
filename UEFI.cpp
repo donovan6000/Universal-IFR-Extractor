@@ -169,12 +169,17 @@ void getUEFIFormSets(vector<UEFI_IFR_FORM_SET_PACK> &formSets, const string &buf
     for (uint32_t i = 0; i < buffer.size() - 4; i++) {
 
         // Check if form set was found
-        if ((buffer[i] != '\x00' || buffer[i + 1] != '\x00' || buffer[i + 2] != '\x00') && buffer[i + 3] == '\x02' && buffer[i + 4] == '\x0E' && i + static_cast<unsigned char>(buffer[i]) + (static_cast<unsigned char>(buffer[i + 1]) << 8) + (static_cast<unsigned char>(buffer[i + 2]) << 16) < buffer.size() && buffer[i + static_cast<unsigned char>(buffer[i]) + (static_cast<unsigned char>(buffer[i + 1]) << 8) + (static_cast<unsigned char>(buffer[i + 2]) << 16) - 1] == '\x02' && buffer[i + static_cast<unsigned char>(buffer[i]) + (static_cast<unsigned char>(buffer[i + 1]) << 8) + (static_cast<unsigned char>(buffer[i + 2]) << 16) - 2] == '\x29') {
+        if ((buffer[i] != '\x00' || buffer[i + 1] != '\x00' || buffer[i + 2] != '\x00') 
+			&& buffer[i + 3] == '\x02' 
+		    && buffer[i + 4] == '\x0E' 
+			&& i + static_cast<unsigned char>(buffer[i]) + (static_cast<unsigned char>(buffer[i + 1]) << 8) + (static_cast<unsigned char>(buffer[i + 2]) << 16) < buffer.size() 
+			&& buffer[i + static_cast<unsigned char>(buffer[i]) + (static_cast<unsigned char>(buffer[i + 1]) << 8) + (static_cast<unsigned char>(buffer[i + 2]) << 16) - 1] == '\x02' 
+			&& buffer[i + static_cast<unsigned char>(buffer[i]) + (static_cast<unsigned char>(buffer[i + 1]) << 8) + (static_cast<unsigned char>(buffer[i + 2]) << 16) - 2] == '\x29') {
 
             // Get chosen candidate for form set's string package
             chosenCandidate = stringCandidates[0];
             for (uint32_t j = 1; j < stringCandidates.size(); j++)
-                if (abs(static_cast<signed>(stringPackages[j].header.offset - i)) < abs(static_cast<signed>(stringPackages[chosenCandidate].header.offset - i)))
+                if (abs(static_cast<signed>(stringPackages[stringCandidates[j]].header.offset - i)) < abs(static_cast<signed>(stringPackages[stringCandidates[chosenCandidate]].header.offset - i)))
                     chosenCandidate = j;
 
             // Set temp form set

@@ -86,7 +86,7 @@ type getType(const string &buffer);
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine, int iCmdShow) {
 
     // Initialize variables
-    static TCHAR appName[] = TEXT("Universal IFR Extractor");
+    static TCHAR appName[] = TEXT("IFRExtractor LS");
     HWND hwnd;
     MSG msg;
     WNDCLASSEX wndclass;
@@ -110,7 +110,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 
     // Create window
     hwnd = CreateWindow(appName,
-        TEXT("IFRExtractor LS v0.2"),
+        TEXT("IFRExtractor LS v0.3"),
         WS_SYSMENU | WS_MINIMIZEBOX,
         0, 0,
         350, 120,
