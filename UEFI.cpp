@@ -179,7 +179,7 @@ void getUEFIFormSets(vector<UEFI_IFR_FORM_SET_PACK> &formSets, const string &buf
             // Get chosen candidate for form set's string package
             chosenCandidate = stringCandidates[0];
             for (uint32_t j = 1; j < stringCandidates.size(); j++)
-                if (abs(static_cast<signed>(stringPackages[stringCandidates[j]].header.offset - i)) < abs(static_cast<signed>(stringPackages[j].header.offset - i)))
+                if (abs(static_cast<signed>(stringPackages[stringCandidates[j]].header.offset - i)) < abs(static_cast<signed>(stringPackages[chosenCandidate].header.offset - i)))
                     chosenCandidate = stringCandidates[j];
 
             // Set temp form set
@@ -187,7 +187,7 @@ void getUEFIFormSets(vector<UEFI_IFR_FORM_SET_PACK> &formSets, const string &buf
             tempFormSet.header.length = static_cast<uint32_t>(static_cast<unsigned char>(buffer[i]) + (static_cast<unsigned char>(buffer[i + 1]) << 8) + (static_cast<unsigned char>(buffer[i + 2]) << 16));
             tempFormSet.header.type = static_cast<unsigned char>(buffer[i + 3]);
             tempFormSet.titleString = static_cast<uint16_t>(static_cast<unsigned char>(buffer[i + 22]) + (static_cast<unsigned char>(buffer[i + 23]) << 8));
-            tempFormSet.usingStringPackage = stringCandidates[chosenCandidate];
+            tempFormSet.usingStringPackage = chosenCandidate
             tempFormSet.title = strings[tempFormSet.titleString + stringPackages[tempFormSet.usingStringPackage].structureOffset];
 
             // Add temp form set to list

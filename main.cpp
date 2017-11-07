@@ -110,7 +110,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 
     // Create window
     hwnd = CreateWindow(appName,
-        TEXT("IFRExtractor LS v0.3"),
+        TEXT("IFRExtractor LS v0.3.2"),
         WS_SYSMENU | WS_MINIMIZEBOX,
         0, 0,
         350, 120,
