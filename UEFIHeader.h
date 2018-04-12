@@ -3,7 +3,7 @@
 #include <stdint.h>
 
 typedef char CHAR8;
-typedef wchar_t CHAR16;
+typedef char16_t CHAR16;
 typedef uint8_t BOOLEAN;
 typedef uint8_t UINT8;
 typedef uint16_t UINT16;

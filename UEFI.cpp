@@ -1,10 +1,14 @@
-// Header files
+#define _CRT_SECURE_NO_WARNINGS
 #include <iostream>
 #include <fstream>
 #include <iomanip>
 
 #include "UEFI.h"
 #include "UEFIHeader.h"
+
+#if defined (__unix__) || defined (__APPLE__)
+#define _strcmpi strcasecmp
+#endif
 
 // Supporting function implementation
 void getUEFIStringPackages(vector<UEFI_IFR_STRING_PACK> &stringPackages, const string &buffer) {
@@ -90,10 +94,11 @@ void getUEFIStrings(vector<UEFI_IFR_STRING_PACK> &stringPackages, vector<string>
             if ((strBlock + offset)->BlockType == EFI_HII_SIBT_STRING_UCS2) {
                 EFI_HII_SIBT_STRING_UCS2_BLOCK* str = (EFI_HII_SIBT_STRING_UCS2_BLOCK*)(strBlock + offset);
 
-                std::wstring ws = str->StringText;
-                strings.push_back(std::string(ws.begin(), ws.end()));
+                std::u16string ws = (CHAR16*)&(str->StringText);
+                std::string s = std::string(ws.begin(), ws.end());
+                strings.push_back(s);
 
-                offset += (wcslen(str->StringText) + 1) * sizeof(CHAR16) + 1;
+                offset += (s.length() + 1) * sizeof(CHAR16) + 1;
             }
             else if ((strBlock + offset)->BlockType == EFI_HII_SIBT_SKIP2) {
                 EFI_HII_SIBT_SKIP2_BLOCK* skipBlock = (EFI_HII_SIBT_SKIP2_BLOCK*)(strBlock + offset);
@@ -107,7 +112,8 @@ void getUEFIStrings(vector<UEFI_IFR_STRING_PACK> &stringPackages, vector<string>
                 offset += sizeof(EFI_HII_SIBT_END_BLOCK);
             }
             else {
-                // TODO: unhandled blocks...
+				// Don't know how to handle this one
+				break;
             }
         }
     }

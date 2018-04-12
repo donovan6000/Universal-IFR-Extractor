@@ -83,8 +83,8 @@ type getType(const string &buffer);
 
 
 // Main function
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine, int iCmdShow) {
-
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR szCmdLine, int iCmdShow) 
+{
     // Initialize variables
     static TCHAR appName[] = TEXT("IFRExtractor LS");
     HWND hwnd;
@@ -110,7 +110,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine,
 
     // Create window
     hwnd = CreateWindow(appName,
-        TEXT("IFRExtractor LS v0.3.2"),
+        TEXT("IFRExtractor LS v0.3.3"),
         WS_SYSMENU | WS_MINIMIZEBOX,
         0, 0,
         350, 120,
@@ -274,7 +274,6 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) 
 
                 // Check if output file was canceled
                 if (!saveFile(hwnd))
-
                     // Break
                     break;
 
