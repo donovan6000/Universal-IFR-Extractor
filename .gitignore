@@ -231,3 +231,9 @@ pip-log.txt
 #############
 *.o
 Makefile
+CMakeCache.txt
+CMakeFiles
+CMakeScripts
+DerivedData
+IFRExtractor.xcodeproj
+cmake_install.cmake

@@ -172,7 +172,12 @@ void getUEFIFormSets(vector<UEFI_IFR_FORM_SET_PACK> &formSets, const string &buf
     }
 
     // Go through buffer
-    for (uint32_t i = 0; i < buffer.size() - 4; i++) {
+    //FIXME: This is a very rough hack to workaround https://github.com/LongSoft/Universal-IFR-Extractor/issues/10,
+    // where a spurious section is detected within PE header. Address it later.
+    static const uint32_t DosHeaderSize = 64;
+    static const uint32_t DosStubSize = 128;
+    static const uint32_t ImageNtHeader = 24;
+    for (uint32_t i = DosHeaderSize + DosStubSize + ImageNtHeader; i < buffer.size() - 4; i++) {
 
         // Check if form set was found
         if ((buffer[i] != '\x00' || buffer[i + 1] != '\x00' || buffer[i + 2] != '\x00')
