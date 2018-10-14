@@ -7,6 +7,7 @@
 #include "UEFIHeader.h"
 
 #if defined (__unix__) || defined (__APPLE__)
+#include <cstring>
 #define _strcmpi strcasecmp
 #endif
 
