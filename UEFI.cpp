@@ -446,8 +446,8 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
 
                 // Display temp
                 fout << "Password: " << GetString(strings, temp->Question.Header.Prompt + strPackageOffset) << ", VarStoreInfo (VarOffset/VarName): 0x" << hex << uppercase << temp->Question.VarStoreInfo.VarOffset << ", VarStore: 0x" << temp->Question.VarStoreId << ", QuestionId: 0x" << temp->Question.QuestionId;
-                fout << ", MinSize: 0x" << temp->MinSize;
-                fout << ", MaxSize 0x" << temp->MaxSize;
+				fout << ", MinSize: 0x" << (unsigned)temp->MinSize;
+				fout << ", MaxSize 0x" << (unsigned)temp->MaxSize;
             }
             else if (buffer[j] == EFI_IFR_ONE_OF_OPTION_OP) {
 
@@ -649,7 +649,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
                 EFI_IFR_STRING *temp = (EFI_IFR_STRING*)&buffer[j];
 
                 // Display temp
-                fout << "String: " << GetString(strings, temp->Question.Header.Prompt + strPackageOffset) << ", VarStoreInfo (VarOffset/VarName): 0x" << hex << uppercase << temp->Question.VarStoreInfo.VarOffset << ", VarStore: 0x" << temp->Question.VarStoreId << ", QuestionId: 0x" << temp->Question.QuestionId << ", MinSize: 0x" << temp->MinSize << ", MaxSize: 0x" << temp->MaxSize;
+                fout << "String: " << GetString(strings, temp->Question.Header.Prompt + strPackageOffset) << ", VarStoreInfo (VarOffset/VarName): 0x" << hex << uppercase << temp->Question.VarStoreInfo.VarOffset << ", VarStore: 0x" << temp->Question.VarStoreId << ", QuestionId: 0x" << temp->Question.QuestionId << ", MinSize: 0x" << (unsigned) temp->MinSize << ", MaxSize: 0x" << (unsigned)temp->MaxSize;
             }
             else if (buffer[j] == EFI_IFR_REFRESH_OP) {
 
