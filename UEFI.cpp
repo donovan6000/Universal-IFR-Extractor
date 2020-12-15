@@ -263,6 +263,11 @@ std::string GuidToString(EFI_GUID &guid)
     return std::string(guid_cstr);
 }
 
+static const char *GetString(const vector<string> &strings, size_t index)
+{
+    return strings.size() > index ? strings[index].c_str() : "<invalid offset>";
+}
+
 void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_PACK> &stringPackages, const vector<UEFI_IFR_FORM_SET_PACK> &formSets, const string &buffer, const vector<string> &strings) {
 
     // Initialize variables
@@ -328,7 +333,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
                 EFI_IFR_FORM *temp = (EFI_IFR_FORM*)&buffer[j];
 
                 // Display temp
-                fout << "Form: " << strings[temp->FormTitle + strPackageOffset] << ", FormId: 0x" << hex << uppercase << temp->FormId;
+                fout << "Form: " << GetString(strings, temp->FormTitle + strPackageOffset) << ", FormId: 0x" << hex << uppercase << temp->FormId;
             }
             else if (buffer[j] == EFI_IFR_SUBTITLE_OP) {
 
@@ -336,7 +341,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
                 EFI_IFR_SUBTITLE *temp = (EFI_IFR_SUBTITLE*)&buffer[j];
 
                 // Display temp
-                fout << "Subtitle: Statement.Prompt: " << strings[temp->Statement.Prompt + strPackageOffset];
+                fout << "Subtitle: Statement.Prompt: " << GetString(strings, temp->Statement.Prompt + strPackageOffset);
                 //fout << ", Statement.Help: " << strings[temp->Statement.Help + strPackageOffset];
                 fout << ", Flags: 0x" << hex << uppercase << (uint16_t)temp->Flags;
             }
@@ -346,9 +351,9 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
                 EFI_IFR_TEXT *temp = (EFI_IFR_TEXT*)&buffer[j];
 
                 // Display temp
-                fout << "Text: Statement.Prompt: " << strings[temp->Statement.Prompt + strPackageOffset];
+                fout << "Text: Statement.Prompt: " << GetString(strings, temp->Statement.Prompt + strPackageOffset);
                 //fout << ", Statement.Help: " << strings[temp->Statement.Help + strPackageOffset];
-                fout << ", TextTwo: " << strings[temp->TextTwo + strPackageOffset];
+                fout << ", TextTwo: " << GetString(strings, temp->TextTwo + strPackageOffset);
             }
             else if (buffer[j] == EFI_IFR_IMAGE_OP) {
 
@@ -366,7 +371,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
                 // If VarStoreId refers to Buffer Storage (EFI_IFR_VARSTORE or EFI_IFR_VARSTORE_EFI), then VarStoreInfo contains a 16-bit Buffer Storage offset (VarOffset). If VarStoreId refers to Name/Value Storage (EFI_IFR_VARSTORE_NAME_VALUE), then VarStoreInfo contains the String ID of the name (VarName) for this name/value pair.
 
                 // Display temp
-                fout << "One Of: " << strings[temp->Question.Header.Prompt + strPackageOffset] << ", VarStoreInfo (VarOffset/VarName): 0x" << hex << uppercase << temp->Question.VarStoreInfo.VarOffset << ", VarStore: 0x" << temp->Question.VarStoreId << ", QuestionId: 0x" << temp->Question.QuestionId;
+                fout << "One Of: " << GetString(strings, temp->Question.Header.Prompt + strPackageOffset) << ", VarStoreInfo (VarOffset/VarName): 0x" << hex << uppercase << temp->Question.VarStoreInfo.VarOffset << ", VarStore: 0x" << temp->Question.VarStoreId << ", QuestionId: 0x" << temp->Question.QuestionId;
 
                 if ((temp->Flags & EFI_IFR_NUMERIC_SIZE) == EFI_IFR_NUMERIC_SIZE_1) {
                     fout << ", Size: 1";
@@ -399,7 +404,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
                 EFI_IFR_CHECKBOX *temp = (EFI_IFR_CHECKBOX*)&buffer[j];
 
                 // Display temp
-                fout << "Checkbox: " << strings[temp->Question.Header.Prompt + strPackageOffset] << ", VarStoreInfo (VarOffset/VarName): 0x" << hex << uppercase << temp->Question.VarStoreInfo.VarOffset << ", VarStore: 0x" << temp->Question.VarStoreId << ", QuestionId: 0x" << temp->Question.QuestionId;
+                fout << "Checkbox: " << GetString(strings, temp->Question.Header.Prompt + strPackageOffset) << ", VarStoreInfo (VarOffset/VarName): 0x" << hex << uppercase << temp->Question.VarStoreInfo.VarOffset << ", VarStore: 0x" << temp->Question.VarStoreId << ", QuestionId: 0x" << temp->Question.QuestionId;
             }
             else if (buffer[j] == EFI_IFR_NUMERIC_OP) {
 
@@ -407,7 +412,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
                 EFI_IFR_NUMERIC *temp = (EFI_IFR_NUMERIC*)&buffer[j];
 
                 // Display temp
-                fout << "Numeric: " << strings[temp->Question.Header.Prompt + strPackageOffset] << ", VarStoreInfo (VarOffset/VarName): 0x" << hex << uppercase << temp->Question.VarStoreInfo.VarOffset << ", VarStore: 0x" << temp->Question.VarStoreId << ", QuestionId: 0x" << temp->Question.QuestionId;
+                fout << "Numeric: " << GetString(strings, temp->Question.Header.Prompt + strPackageOffset) << ", VarStoreInfo (VarOffset/VarName): 0x" << hex << uppercase << temp->Question.VarStoreInfo.VarOffset << ", VarStore: 0x" << temp->Question.VarStoreId << ", QuestionId: 0x" << temp->Question.QuestionId;
 
                 if ((temp->Flags & EFI_IFR_NUMERIC_SIZE) == EFI_IFR_NUMERIC_SIZE_1) {
                     fout << ", Size: 1";
@@ -440,7 +445,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
                 EFI_IFR_PASSWORD *temp = (EFI_IFR_PASSWORD*)&buffer[j];
 
                 // Display temp
-                fout << "Password: " << strings[temp->Question.Header.Prompt + strPackageOffset] << ", VarStoreInfo (VarOffset/VarName): 0x" << hex << uppercase << temp->Question.VarStoreInfo.VarOffset << ", VarStore: 0x" << temp->Question.VarStoreId << ", QuestionId: 0x" << temp->Question.QuestionId;
+                fout << "Password: " << GetString(strings, temp->Question.Header.Prompt + strPackageOffset) << ", VarStoreInfo (VarOffset/VarName): 0x" << hex << uppercase << temp->Question.VarStoreInfo.VarOffset << ", VarStore: 0x" << temp->Question.VarStoreId << ", QuestionId: 0x" << temp->Question.QuestionId;
                 fout << ", MinSize: 0x" << temp->MinSize;
                 fout << ", MaxSize 0x" << temp->MaxSize;
             }
@@ -450,7 +455,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
                 EFI_IFR_ONE_OF_OPTION *temp = (EFI_IFR_ONE_OF_OPTION*)&buffer[j];
 
                 // Display temp
-                fout << "One Of Option: " << strings[temp->Option + strPackageOffset] << ", Value ";
+                fout << "One Of Option: " << GetString(strings, temp->Option + strPackageOffset) << ", Value ";
 
                 if (temp->Type == EFI_IFR_TYPE_NUM_SIZE_8)
                     fout << "(8 bit): 0x" << hex << uppercase << (uint16_t)temp->Value.u8;
@@ -467,7 +472,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
                 else if (temp->Type == EFI_IFR_TYPE_DATE)
                     fout << "(Date)";
                 else if (temp->Type == EFI_IFR_TYPE_STRING)
-                    fout << "(String): " << strings[temp->Value.string + strPackageOffset];
+                    fout << "(String): " << GetString(strings, temp->Value.string + strPackageOffset);
                 else if (temp->Type == EFI_IFR_TYPE_OTHER)
                     fout << "(Other)";
                 else if (temp->Type == EFI_IFR_TYPE_UNDEFINED)
@@ -506,7 +511,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
                 EFI_IFR_ACTION *temp = (EFI_IFR_ACTION*)&buffer[j];
 
                 // Display temp
-                fout << "Action: " << strings[temp->Question.Header.Prompt + strPackageOffset] << ", VarStoreInfo (VarOffset/VarName): 0x" << hex << uppercase << temp->Question.VarStoreInfo.VarOffset << ", VarStore: 0x" << temp->Question.VarStoreId << ", QuestionId: 0x" << temp->Question.QuestionId << ", QuestionConfig: " << strings[temp->QuestionConfig + strPackageOffset];
+                fout << "Action: " << GetString(strings, temp->Question.Header.Prompt + strPackageOffset) << ", VarStoreInfo (VarOffset/VarName): 0x" << hex << uppercase << temp->Question.VarStoreInfo.VarOffset << ", VarStore: 0x" << temp->Question.VarStoreId << ", QuestionId: 0x" << temp->Question.QuestionId << ", QuestionConfig: " << GetString(strings, temp->QuestionConfig + strPackageOffset);
             }
             else if (buffer[j] == EFI_IFR_RESET_BUTTON_OP) {
 
@@ -514,7 +519,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
                 EFI_IFR_RESET_BUTTON *temp = (EFI_IFR_RESET_BUTTON*)&buffer[j];
 
                 // Display temp
-                fout << "Reset Button: " << strings[temp->Statement.Prompt + strPackageOffset] << ", DefaultId: " << hex << uppercase << temp->DefaultId;
+                fout << "Reset Button: " << GetString(strings, temp->Statement.Prompt + strPackageOffset) << ", DefaultId: " << hex << uppercase << temp->DefaultId;
             }
             else if (buffer[j] == EFI_IFR_FORM_SET_OP) {
 
@@ -522,7 +527,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
                 EFI_IFR_FORM_SET *temp = (EFI_IFR_FORM_SET*)&buffer[j];
 
                 // Display temp
-                fout << "Form Set: " << strings[temp->FormSetTitle + strPackageOffset] << " [" << GuidToString(temp->Guid) << "]";
+                fout << "Form Set: " << GetString(strings, temp->FormSetTitle + strPackageOffset) << " [" << GuidToString(temp->Guid) << "]";
 
                 for (uint8_t idx = 0; idx < (temp->Flags & 0x3); idx++)
                     fout << ", ClassGuid" << (uint16_t)idx << " [" << GuidToString(temp->ClassGuid[idx]) << "]";
@@ -533,7 +538,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
                 EFI_IFR_REF *temp = (EFI_IFR_REF*)&buffer[j];
 
                 // Display temp
-                fout << "Ref: " << strings[temp->Question.Header.Prompt + strPackageOffset] << ", VarStoreInfo (VarOffset/VarName): 0x" << hex << uppercase << temp->Question.VarStoreInfo.VarOffset << ", VarStore: 0x" << temp->Question.VarStoreId << ", QuestionId: 0x" << temp->Question.QuestionId << ", FormId: 0x" << hex << uppercase << temp->FormId;
+                fout << "Ref: " << GetString(strings, temp->Question.Header.Prompt + strPackageOffset) << ", VarStoreInfo (VarOffset/VarName): 0x" << hex << uppercase << temp->Question.VarStoreInfo.VarOffset << ", VarStore: 0x" << temp->Question.VarStoreId << ", QuestionId: 0x" << temp->Question.QuestionId << ", FormId: 0x" << hex << uppercase << temp->FormId;
             }
             else if (buffer[j] == EFI_IFR_NO_SUBMIT_IF_OP) {
 
@@ -541,7 +546,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
                 EFI_IFR_NO_SUBMIT_IF *temp = (EFI_IFR_NO_SUBMIT_IF*)&buffer[j];
 
                 // Display temp
-                fout << "No Submit If: " << strings[temp->Error + strPackageOffset];
+                fout << "No Submit If: " << GetString(strings, temp->Error + strPackageOffset);
             }
             else if (buffer[j] == EFI_IFR_INCONSISTENT_IF_OP) {
 
@@ -549,7 +554,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
                 EFI_IFR_INCONSISTENT_IF *temp = (EFI_IFR_INCONSISTENT_IF*)&buffer[j];
 
                 // Display temp
-                fout << "Inconsistent If: " << strings[temp->Error + strPackageOffset];
+                fout << "Inconsistent If: " << GetString(strings, temp->Error + strPackageOffset);
             }
             else if (buffer[j] == EFI_IFR_EQ_ID_VAL_OP) {
 
@@ -628,7 +633,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
                 EFI_IFR_DATE *temp = (EFI_IFR_DATE*)&buffer[j];
 
                 // Display temp
-                fout << "Date: " << strings[temp->Question.Header.Prompt + strPackageOffset] << ", VarStoreInfo (VarOffset/VarName): 0x" << hex << uppercase << temp->Question.VarStoreInfo.VarOffset << ", VarStore: 0x" << temp->Question.VarStoreId << ", QuestionId: 0x" << temp->Question.QuestionId;
+                fout << "Date: " << GetString(strings, temp->Question.Header.Prompt + strPackageOffset) << ", VarStoreInfo (VarOffset/VarName): 0x" << hex << uppercase << temp->Question.VarStoreInfo.VarOffset << ", VarStore: 0x" << temp->Question.VarStoreId << ", QuestionId: 0x" << temp->Question.QuestionId;
             }
             else if (buffer[j] == EFI_IFR_TIME_OP) {
 
@@ -636,7 +641,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
                 EFI_IFR_TIME *temp = (EFI_IFR_TIME*)&buffer[j];
 
                 // Display temp
-                fout << "Time: " << strings[temp->Question.Header.Prompt + strPackageOffset] << ", VarStoreInfo (VarOffset/VarName): 0x" << hex << uppercase << temp->Question.VarStoreInfo.VarOffset << ", VarStore: 0x" << temp->Question.VarStoreId << ", QuestionId: 0x" << temp->Question.QuestionId;
+                fout << "Time: " << GetString(strings, temp->Question.Header.Prompt + strPackageOffset) << ", VarStoreInfo (VarOffset/VarName): 0x" << hex << uppercase << temp->Question.VarStoreInfo.VarOffset << ", VarStore: 0x" << temp->Question.VarStoreId << ", QuestionId: 0x" << temp->Question.QuestionId;
             }
             else if (buffer[j] == EFI_IFR_STRING_OP) {
 
@@ -644,7 +649,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
                 EFI_IFR_STRING *temp = (EFI_IFR_STRING*)&buffer[j];
 
                 // Display temp
-                fout << "String: " << strings[temp->Question.Header.Prompt + strPackageOffset] << ", VarStoreInfo (VarOffset/VarName): 0x" << hex << uppercase << temp->Question.VarStoreInfo.VarOffset << ", VarStore: 0x" << temp->Question.VarStoreId << ", QuestionId: 0x" << temp->Question.QuestionId << ", MinSize: 0x" << temp->MinSize << ", MaxSize: 0x" << temp->MaxSize;
+                fout << "String: " << GetString(strings, temp->Question.Header.Prompt + strPackageOffset) << ", VarStoreInfo (VarOffset/VarName): 0x" << hex << uppercase << temp->Question.VarStoreInfo.VarOffset << ", VarStore: 0x" << temp->Question.VarStoreId << ", QuestionId: 0x" << temp->Question.QuestionId << ", MinSize: 0x" << temp->MinSize << ", MaxSize: 0x" << temp->MaxSize;
             }
             else if (buffer[j] == EFI_IFR_REFRESH_OP) {
 
@@ -700,7 +705,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
                 EFI_IFR_ORDERED_LIST *temp = (EFI_IFR_ORDERED_LIST*)&buffer[j];
 
                 // Display temp
-                fout << "Ordered List: " << strings[temp->Question.Header.Prompt + strPackageOffset] << ", VarStoreInfo (VarOffset/VarName): 0x" << hex << uppercase << temp->Question.VarStoreInfo.VarOffset << ", VarStore: 0x" << temp->Question.VarStoreId << ", QuestionId: 0x" << temp->Question.QuestionId << ", MaxContainers: 0x" << (uint16_t)temp->MaxContainers << ", Flags: 0x" << (uint16_t)temp->Flags;
+                fout << "Ordered List: " << GetString(strings, temp->Question.Header.Prompt + strPackageOffset) << ", VarStoreInfo (VarOffset/VarName): 0x" << hex << uppercase << temp->Question.VarStoreInfo.VarOffset << ", VarStore: 0x" << temp->Question.VarStoreId << ", QuestionId: 0x" << temp->Question.QuestionId << ", MaxContainers: 0x" << (uint16_t)temp->MaxContainers << ", Flags: 0x" << (uint16_t)temp->Flags;
             }
             else if (buffer[j] == EFI_IFR_VARSTORE_OP) {
 
@@ -732,7 +737,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
                 EFI_IFR_VARSTORE_DEVICE *temp = (EFI_IFR_VARSTORE_DEVICE*)&buffer[j];
 
                 // Display temp
-                fout << "VarStoreDevice: " << strings[temp->DevicePath + strPackageOffset];
+                fout << "VarStoreDevice: " << GetString(strings, temp->DevicePath + strPackageOffset);
             }
             else if (buffer[j] == EFI_IFR_VERSION_OP) {
 
@@ -1057,7 +1062,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
                 EFI_IFR_STRING_REF1 *temp = (EFI_IFR_STRING_REF1*)&buffer[j];
 
                 // Display temp
-                fout << "String Ref: " << strings[temp->StringId + strPackageOffset] << " (0x" << hex << uppercase << temp->StringId << ")";
+                fout << "String Ref: " << GetString(strings, temp->StringId + strPackageOffset) << " (0x" << hex << uppercase << temp->StringId << ")";
             }
             else if (buffer[j] == EFI_IFR_STRING_REF2_OP) {
 
@@ -1178,7 +1183,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
                 else if (temp->Type == EFI_IFR_TYPE_DATE)
                     fout << "(Date)";
                 else if (temp->Type == EFI_IFR_TYPE_STRING)
-                    fout << "(String): " << strings[temp->Value.string + strPackageOffset];
+                    fout << "(String): " << GetString(strings, temp->Value.string + strPackageOffset);
                 else if (temp->Type == EFI_IFR_TYPE_OTHER)
                     fout << "(Other)";
                 else if (temp->Type == EFI_IFR_TYPE_UNDEFINED)
@@ -1196,7 +1201,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
                 EFI_IFR_DEFAULTSTORE *temp = (EFI_IFR_DEFAULTSTORE*)&buffer[j];
 
                 // Display temp
-                fout << "Default Store: " << strings[temp->DefaultName + strPackageOffset] << ", DefaultId: 0x" << hex << uppercase << temp->DefaultId;
+                fout << "Default Store: " << GetString(strings, temp->DefaultName + strPackageOffset) << ", DefaultId: 0x" << hex << uppercase << temp->DefaultId;
             }
             else if (buffer[j] == EFI_IFR_FORM_MAP_OP) {
 
@@ -1254,7 +1259,7 @@ void generateUEFIIFRDump(const string &outputFile, const vector<UEFI_IFR_STRING_
                 EFI_IFR_WARNING_IF *temp = (EFI_IFR_WARNING_IF*)&buffer[j];
 
                 // Display temp
-                fout << "Warning If: " << strings[temp->Warning + strPackageOffset] << ", TimeOut: 0x" << hex << uppercase << temp->TimeOut;
+                fout << "Warning If: " << GetString(strings, temp->Warning + strPackageOffset) << ", TimeOut: 0x" << hex << uppercase << temp->TimeOut;
             }
             else if (buffer[j] == EFI_IFR_MATCH2_OP) {
 

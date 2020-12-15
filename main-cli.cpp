@@ -85,7 +85,7 @@ int main(int argc, char **argv)
 {
 	if (argc != 3)
 	{
-        cout << "EFI/UEFI IFR Extractor LS v0.3.6" << endl;
+        cout << "EFI/UEFI IFR Extractor LS v0.3.7" << endl;
 		cout << "Usage: ifrextract input_file output_file" << endl;
 		return 1;
 	}
