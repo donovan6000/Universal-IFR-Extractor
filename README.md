@@ -1,3 +1,11 @@
+End of Support
+=======================
+
+This tool don't get supported anymore. 
+Please use https://github.com/LongSoft/IFRExtractor-RS for anything which is newer then the Aptio4 era (SandyBridge, IvyBridge, Hasswell and alike)
+
+As long as we don't have feature parity https://github.com/LongSoft/IFRExtractor-RS/issues/6 we keep the outdated Universal-IFR-Extractor repo alive for older platforms but don't support it anymore.
+
 IFR Extractor LS v0.3
 =======================
 
