@@ -1,12 +1,11 @@
-End of Support
+End of Life Notification
 =======================
 
-This tool don't get supported anymore. 
-Please use https://github.com/LongSoft/IFRExtractor-RS for anything which is newer then the Aptio4 era (SandyBridge, IvyBridge, Hasswell and alike)
+This fork is not supported anymore, and this repository is archived.
 
-As long as we don't have feature parity https://github.com/LongSoft/IFRExtractor-RS/issues/6 we keep the outdated Universal-IFR-Extractor repo alive for older platforms but don't support it anymore.
+Please consider using https://github.com/LongSoft/IFRExtractor-RS instead.
 
-IFR Extractor LS v0.3
+IFR Extractor LS
 =======================
 
 Utility to extract the internal forms representation from both EFI and UEFI drivers/applications into human readable text file.
