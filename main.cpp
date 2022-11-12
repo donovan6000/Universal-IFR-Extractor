@@ -19,13 +19,13 @@ processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 // Global constants
 
 // Handel actions
-enum {NO_ACTION, EXTRACT_BUTTON_ACTION, BROWSE_BUTTON_ACTION, FILE_LOCATION_EDIT_ACTION};
+enum { NO_ACTION, EXTRACT_BUTTON_ACTION, BROWSE_BUTTON_ACTION, FILE_LOCATION_EDIT_ACTION };
 
 // Error codes
-enum {IFR_EXTRACTED, FILE_NOT_FOUND, UNKNOWN_PROTOCOL};
+enum { IFR_EXTRACTED, FILE_NOT_FOUND, UNKNOWN_PROTOCOL };
 
 // Global definitions
-enum type {EFI, UEFI, UNKNOWN};
+enum type { EFI, UEFI, UNKNOWN };
 
 
 // Global variables
@@ -83,379 +83,364 @@ type getType(const string &buffer);
 
 
 // Main function
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine, int iCmdShow) {
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR szCmdLine, int iCmdShow) 
+{
+    // Initialize variables
+    static TCHAR appName[] = TEXT("IFRExtractor LS");
+    HWND hwnd;
+    MSG msg;
+    WNDCLASSEX wndclass;
 
-	// Initialize variables
-	static TCHAR appName[] = TEXT("Universal IFR Extractor");
-	HWND hwnd;
-	MSG msg;
-	WNDCLASSEX wndclass;
-		
-	// Initialize window class
-	wndclass.cbSize = sizeof(WNDCLASSEX);
-	wndclass.style = 0;
-	wndclass.lpfnWndProc = WndProc;
-	wndclass.cbClsExtra = 0;
-	wndclass.cbWndExtra = 0;
-	wndclass.hInstance = hInstance;
-	wndclass.hIcon = HICON(LoadImage(GetModuleHandle(NULL), "MY_ICON", IMAGE_ICON, 256, 256, 0));
-	wndclass.hIconSm = NULL;
-	wndclass.hCursor = LoadCursor(NULL, IDC_ARROW);
-	wndclass.hbrBackground = HBRUSH((COLOR_WINDOW + 1));
-	wndclass.lpszMenuName = NULL;
-	wndclass.lpszClassName = appName;
+    // Initialize window class
+    wndclass.cbSize = sizeof(WNDCLASSEX);
+    wndclass.style = 0;
+    wndclass.lpfnWndProc = WndProc;
+    wndclass.cbClsExtra = 0;
+    wndclass.cbWndExtra = 0;
+    wndclass.hInstance = hInstance;
+    wndclass.hIcon = HICON(LoadImage(GetModuleHandle(NULL), TEXT("IDI_ICON1"), IMAGE_ICON, 16, 16, 0));
+    wndclass.hIconSm = NULL;
+    wndclass.hCursor = LoadCursor(NULL, IDC_ARROW);
+    wndclass.hbrBackground = HBRUSH((COLOR_WINDOW + 1));
+    wndclass.lpszMenuName = NULL;
+    wndclass.lpszClassName = appName;
 
-	// Register windows class
-	RegisterClassEx(&wndclass);
+    // Register windows class
+    RegisterClassEx(&wndclass);
 
-	// Create window
-	hwnd = CreateWindow(appName,
-		TEXT("Universal IFR Extractor v0.6"),
-		WS_SYSMENU | WS_MINIMIZEBOX,
-		0, 0,
-		354, 135,
-		NULL,
-		NULL,
-		hInstance,
-		NULL);
+    // Create window
+    hwnd = CreateWindow(appName,
+        TEXT("IFRExtractor LS v0.3.7"),
+        WS_SYSMENU | WS_MINIMIZEBOX,
+        0, 0,
+        350, 120,
+        NULL,
+        NULL,
+        hInstance,
+        NULL);
 
-	// Show window
-	ShowWindow(hwnd, iCmdShow);
-	UpdateWindow(hwnd);
+    // Show window
+    ShowWindow(hwnd, iCmdShow);
+    UpdateWindow(hwnd);
 
-	// Message loop
-	while(GetMessage(&msg, NULL, 0, 0)) {
-		TranslateMessage(&msg);
-		DispatchMessage(&msg);
-	}
+    // Message loop
+    while (GetMessage(&msg, NULL, 0, 0)) {
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+    }
 
-	// Return
-	return msg.wParam;
+    // Return
+    return msg.wParam;
 }
 
 
 // Supporting function implementation
 LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) {
 
-	// Check message
-	switch (message) {
+    // Check message
+    switch (message) {
+    
+	// Create
+    case WM_CREATE:
+        // Center window
+        RECT rectangle;
+        GetWindowRect(hwnd, &rectangle);
+        int xPos;
+        xPos = (GetSystemMetrics(SM_CXSCREEN) - rectangle.right) / 2;
+        int yPos;
+        yPos = (GetSystemMetrics(SM_CYSCREEN) - rectangle.bottom) / 2;
+        SetWindowPos(hwnd, 0, xPos, yPos, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
 
-		// Create
-		case WM_CREATE:
+        // Create module location text
+        HWND moduleLocationText;
+        moduleLocationText = CreateWindowEx(WS_EX_TRANSPARENT,
+            TEXT("static"),
+            TEXT("Module Location"),
+            WS_CHILD | WS_VISIBLE,
+            10, 16,
+            100, 25,
+            hwnd,
+            HMENU(NO_ACTION),
+            NULL,
+            NULL);
+        SendMessage(moduleLocationText, WM_SETFONT, WPARAM(GetStockObject(DEFAULT_GUI_FONT)), MAKELPARAM(FALSE, 0));
 
-			// Center window
-			RECT rectangle;
-			GetWindowRect(hwnd, &rectangle);
-			int xPos;
-			xPos = (GetSystemMetrics(SM_CXSCREEN) - rectangle.right) / 2;
-			int yPos;
-			yPos = (GetSystemMetrics(SM_CYSCREEN) - rectangle.bottom) / 2;
-			SetWindowPos(hwnd, 0, xPos, yPos, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
+        // Create protocol text
+        HWND protocolText;
+        protocolText = CreateWindowEx(WS_EX_TRANSPARENT,
+            TEXT("static"),
+            TEXT("Protocol:"),
+            WS_CHILD | WS_VISIBLE,
+            10, 52,
+            100, 25,
+            hwnd,
+            HMENU(NO_ACTION),
+            NULL,
+            NULL);
+        SendMessage(protocolText, WM_SETFONT, WPARAM(GetStockObject(DEFAULT_GUI_FONT)), MAKELPARAM(FALSE, 0));
 
-			// Create module location text
-			HWND moduleLocationText;
-			moduleLocationText = CreateWindowEx(WS_EX_TRANSPARENT,
-				TEXT("static"),
-				TEXT("Module Location"),
-				WS_CHILD | WS_VISIBLE,
-				10, 16,
-				100, 25,
-				hwnd,
-				HMENU(NO_ACTION),
-				NULL,
-				NULL);
-			SendMessage(moduleLocationText, WM_SETFONT, WPARAM(GetStockObject(DEFAULT_GUI_FONT)), MAKELPARAM(FALSE, 0));
+        // Create type text
+        typeText = CreateWindowEx(WS_EX_TRANSPARENT,
+            TEXT("static"),
+            TEXT(""),
+            WS_CHILD | WS_VISIBLE,
+            55, 50,
+            100, 25,
+            hwnd,
+            HMENU(NO_ACTION),
+            NULL,
+            NULL);
 
-			// Create protocol text
-			HWND protocolText;
-			protocolText = CreateWindowEx(WS_EX_TRANSPARENT,
-				TEXT("static"),
-				TEXT("Protocol:"),
-				WS_CHILD | WS_VISIBLE,
-				10, 52,
-				100, 25,
-				hwnd,
-				HMENU(NO_ACTION),
-				NULL,
-				NULL);
-			SendMessage(protocolText, WM_SETFONT, WPARAM(GetStockObject(DEFAULT_GUI_FONT)), MAKELPARAM(FALSE, 0));
+        // Create file location edit
+        fileLocationEdit = CreateWindow(TEXT("edit"),
+            NULL,
+            WS_CHILD | WS_VISIBLE | WS_BORDER | ES_AUTOHSCROLL | WS_EX_CLIENTEDGE,
+            93, 13,
+            200, 17,
+            hwnd,
+            HMENU(FILE_LOCATION_EDIT_ACTION),
+            NULL,
+            NULL);
+        SendMessage(fileLocationEdit, WM_SETFONT, WPARAM(GetStockObject(DEFAULT_GUI_FONT)), MAKELPARAM(FALSE, 0));
+        TCHAR fileLocationEditValue[MAX_PATH];
+        if (__argc < 2) {
+            GetEnvironmentVariable(("userprofile"), fileLocationEditValue, MAX_PATH);
+            strcat_s(fileLocationEditValue, TEXT("\\module.rom"));
+        }
+        else
+            strcpy_s(fileLocationEditValue, TEXT(__argv[1]));
+        SetWindowText(fileLocationEdit, TEXT(fileLocationEditValue));
 
-			// Create type text
-			typeText = CreateWindowEx(WS_EX_TRANSPARENT,
-				TEXT("static"),
-				TEXT(""),
-				WS_CHILD | WS_VISIBLE,
-				55, 50,
-				100, 25,
-				hwnd,
-				HMENU(NO_ACTION),
-				NULL,
-				NULL);
+        // Create browse button
+        HWND browseButton;
+        browseButton = CreateWindow(TEXT("button"),
+            TEXT(".."),
+            WS_VISIBLE | WS_CHILD,
+            298, 12,
+            30, 19,
+            hwnd,
+            HMENU(BROWSE_BUTTON_ACTION),
+            NULL,
+            NULL);
+        SendMessage(browseButton, WM_SETFONT, WPARAM(GetStockObject(DEFAULT_GUI_FONT)), MAKELPARAM(FALSE, 0));
 
-			// Create copyright text
-			HWND copyrightText;
-			copyrightText = CreateWindowEx(WS_EX_TRANSPARENT,
-				TEXT("static"),
-				TEXT("© 2014 donovan6000"),
-				WS_CHILD | WS_VISIBLE,
-				198, 81,
-				200, 25,
-				hwnd,
-				HMENU(NO_ACTION),
-				NULL,
-				NULL);
+        // Create extract button
+        HWND extractButton;
+        extractButton = CreateWindow(TEXT("button"),
+            TEXT("Extract"),
+            WS_VISIBLE | WS_CHILD,
+            248, 45,
+            80, 25,
+            hwnd,
+            HMENU(EXTRACT_BUTTON_ACTION),
+            NULL,
+            NULL);
+        SendMessage(extractButton, WM_SETFONT, WPARAM(GetStockObject(DEFAULT_GUI_FONT)), MAKELPARAM(FALSE, 0));
 
-			// Create file location edit
-			fileLocationEdit = CreateWindow(TEXT("edit"),
-				NULL,
-				WS_CHILD | WS_VISIBLE | WS_BORDER | ES_AUTOHSCROLL | WS_EX_CLIENTEDGE,
-				93, 13,
-				200, 17,
-				hwnd,
-				HMENU(FILE_LOCATION_EDIT_ACTION),
-				NULL,
-				NULL);
-			SendMessage(fileLocationEdit, WM_SETFONT, WPARAM(GetStockObject(DEFAULT_GUI_FONT)), MAKELPARAM(FALSE, 0));
-			TCHAR fileLocationEditValue[MAX_PATH];
-			if(__argc < 2) {
-				GetEnvironmentVariable(("userprofile"), fileLocationEditValue, MAX_PATH);
-				strcat_s(fileLocationEditValue, TEXT("\\module.rom"));
-			}
-			else
-				strcpy_s(fileLocationEditValue, TEXT(__argv[1]));
-			SetWindowText(fileLocationEdit, TEXT(fileLocationEditValue));
+        // Break
+        break;
 
-			// Create browse button
-			HWND browseButton;
-			browseButton = CreateWindow(TEXT("button"),
-				TEXT(".."),
-				WS_VISIBLE | WS_CHILD,
-				298, 12,
-				30, 19,
-				hwnd,
-				HMENU(BROWSE_BUTTON_ACTION),
-				NULL,
-				NULL);
-			SendMessage(browseButton, WM_SETFONT, WPARAM(GetStockObject(DEFAULT_GUI_FONT)), MAKELPARAM(FALSE, 0));
+    // Command
+    case WM_COMMAND:
 
-			// Create extract button
-			HWND extractButton;
-			extractButton = CreateWindow(TEXT("button"),
-				TEXT("Extract"),
-				WS_VISIBLE | WS_CHILD,
-				248, 45,
-				80, 25,
-				hwnd,
-				HMENU(EXTRACT_BUTTON_ACTION),
-				NULL,
-				NULL);
-			SendMessage(extractButton, WM_SETFONT, WPARAM(GetStockObject(DEFAULT_GUI_FONT)), MAKELPARAM(FALSE, 0));
-			
-			// Break
-			break;
+        // Check if extract button action
+        if (LOWORD(wParam) == EXTRACT_BUTTON_ACTION) {
 
-		// Command
-		case WM_COMMAND:
+            // Reset error code
+            errorCode = IFR_EXTRACTED;
 
-			// Check if extract button action
-			if(LOWORD(wParam) == EXTRACT_BUTTON_ACTION) {
+            // Refresh file location settings
+            SetWindowText(fileLocationEdit, TEXT(fileLocation.c_str()));
 
-				// Reset error code
-				errorCode = IFR_EXTRACTED;
+            // Check if file exists
+            if (fileExists(fileLocation)) {
 
-				// Refresh file location settings
-				SetWindowText(fileLocationEdit, TEXT(fileLocation.c_str()));
+                // Check if protocol is unknown
+                if (protocol == UNKNOWN) {
 
-				// Check if file exists
-				if(fileExists(fileLocation)) {
+                    // Set error code
+                    errorCode = UNKNOWN_PROTOCOL;
 
-					// Check if protocol is unknown
-					if(protocol == UNKNOWN) {
+                    // Display message
+                    showDialog(hwnd);
 
-						// Set error code
-						errorCode = UNKNOWN_PROTOCOL;
+                    // Break
+                    break;
+                }
 
-						// Display message
-						showDialog(hwnd);
+                // Clear strings
+                strings.clear();
 
-						// Break
-						break;
-					}
+                // Check if output file was canceled
+                if (!saveFile(hwnd))
+                    // Break
+                    break;
 
-					// Clear strings
-					strings.clear();
+                // Check if protocol is EFI
+                if (protocol == EFI) {
 
-					// Check if output file was canceled
-					if(!saveFile(hwnd))
+                    // Initialize EFI variables
+                    vector<EFI_IFR_STRING_PACK> stringPackages;
+                    vector<EFI_IFR_FORM_SET_PACK> formSets;
 
-						// Break
-						break;
+                    // Get EFI string packages
+                    getEFIStringPackages(stringPackages, buffer);
 
-					// Check if protocol is EFI
-					if(protocol == EFI) {
+                    // Get EFI strings
+                    getEFIStrings(stringPackages, strings, buffer);
 
-						// Initialize EFI variables
-						vector<EFI_IFR_STRING_PACK> stringPackages;
-						vector<EFI_IFR_FORM_SET_PACK> formSets;
+                    // Get EFI form sets
+                    getEFIFormSets(formSets, buffer, stringPackages, strings);
 
-						// Get EFI string packages
-						getEFIStringPackages(stringPackages, buffer);
+                    // Generate EFI IFR dump
+                    generateEFIIFRDump(outputFile, stringPackages, formSets, buffer, strings);
+                }
 
-						// Get EFI strings
-						getEFIStrings(stringPackages, strings, buffer);
+                // Otherwise check if protocol is UEFI
+                else if (protocol == UEFI) {
 
-						// Get EFI form sets
-						getEFIFormSets(formSets, buffer, stringPackages, strings);
+                    // Initialize UEFI variables
+                    vector<UEFI_IFR_STRING_PACK> stringPackages;
+                    vector<UEFI_IFR_FORM_SET_PACK> formSets;
 
-						// Generate EFI IFR dump
-						generateEFIIFRDump(outputFile, stringPackages, formSets, buffer, strings);
-					}
+                    // Get UEFI string packages
+                    getUEFIStringPackages(stringPackages, buffer);
 
-					// Otherwise check if protocol is UEFI
-					else if(protocol == UEFI) {
+                    // Get UEFI strings
+                    getUEFIStrings(stringPackages, strings, buffer);
 
-						// Initialize UEFI variables
-						vector<UEFI_IFR_STRING_PACK> stringPackages;
-						vector<UEFI_IFR_FORM_SET_PACK> formSets;
+                    // Get UEFI form sets
+                    getUEFIFormSets(formSets, buffer, stringPackages, strings);
 
-						// Get UEFI string packages
-						getUEFIStringPackages(stringPackages, buffer);
+                    // Generate UEFI IFR dump
+                    generateUEFIIFRDump(outputFile, stringPackages, formSets, buffer, strings);
+                }
+            }
 
-						// Get UEFI strings
-						getUEFIStrings(stringPackages, strings, buffer);
+            // Otherwise
+            else
 
-						// Get UEFI form sets
-						getUEFIFormSets(formSets, buffer, stringPackages, strings);
+                // Set error code
+                errorCode = FILE_NOT_FOUND;
 
-						// Generate UEFI IFR dump
-						generateUEFIIFRDump(outputFile, stringPackages, formSets, buffer, strings);
-					}
-				}
+            // Display message
+            showDialog(hwnd);
+        }
 
-				// Otherwise
-				else
+        // Otherwise check if browse button action
+        else if (LOWORD(wParam) == BROWSE_BUTTON_ACTION)
 
-					// Set error code
-					errorCode = FILE_NOT_FOUND;
+            // Browse folders
+            fileBrowser(hwnd);
 
-				// Display message
-				showDialog(hwnd);
-			}
+        // Otherwise check if file location edit action
+        else if (LOWORD(wParam) == FILE_LOCATION_EDIT_ACTION)
 
-			// Otherwise check if browse button action
-			else if(LOWORD(wParam) == BROWSE_BUTTON_ACTION)
+            // Check if file location edit was changed
+            if (HIWORD(wParam) == EN_CHANGE) {
 
-				// Browse folders
-				fileBrowser(hwnd);
+                // Set file location
+                TCHAR tempBuffer[MAX_PATH];
+                GetWindowText(fileLocationEdit, tempBuffer, MAX_PATH);
+                fileLocation = tempBuffer;
 
-			// Otherwise check if file location edit action
-			else if(LOWORD(wParam) == FILE_LOCATION_EDIT_ACTION)
+                // Check if file exists
+                if (fileExists(fileLocation)) {
 
-				// Check if file location edit was changed
-				if(HIWORD(wParam) == EN_CHANGE) {
+                    // Read in file
+                    readFile(fileLocation, buffer);
 
-					// Set file location
-					TCHAR tempBuffer[MAX_PATH];
-					GetWindowText(fileLocationEdit, tempBuffer, MAX_PATH);
-					fileLocation = tempBuffer;
+                    // Get protocol
+                    protocol = getType(buffer);
+                }
 
-					// Check if file exists
-					if(fileExists(fileLocation)) {
+                // Otherwise
+                else
 
-						// Read in file
-						readFile(fileLocation, buffer);
+                    // Set protocol
+                    protocol = UNKNOWN;
 
-						// Get protocol
-						protocol = getType(buffer);
-					}
+                // Clear type text
+                RECT rectangle;
+                GetClientRect(typeText, &rectangle);
+                InvalidateRect(typeText, &rectangle, TRUE);
+                MapWindowPoints(typeText, hwnd, (POINT *)&rectangle, 2);
+                RedrawWindow(hwnd, &rectangle, NULL, RDW_ERASE | RDW_INVALIDATE);
 
-					// Otherwise
-					else
+                // Update type text
+                SendMessage(typeText, WM_SETTEXT, NULL, NULL);
+            }
 
-						// Set protocol
-						protocol = UNKNOWN;
+        break;
 
-					// Clear type text
-					RECT rectangle;
-					GetClientRect(typeText, &rectangle);
-					InvalidateRect(typeText, &rectangle, TRUE);
-					MapWindowPoints(typeText, hwnd, (POINT *)&rectangle, 2);
-					RedrawWindow(hwnd, &rectangle, NULL, RDW_ERASE | RDW_INVALIDATE);
+    // Static color
+    case WM_CTLCOLORSTATIC:
 
-					// Update type text
-					SendMessage(typeText, WM_SETTEXT, NULL, NULL);
-				}
+        // Make static control transparent
+        HDC hdcStatic;
+        hdcStatic = (HDC)wParam;
 
-			break;
+        // Check if caller is type text
+        if ((HWND)lParam == typeText) {
 
-		// Static color
-		case WM_CTLCOLORSTATIC:
+            // Check if protocol is unknown
+            if (protocol == UNKNOWN) {
 
-			// Make static control transparent
-			HDC hdcStatic;
-			hdcStatic = (HDC)wParam;
-			
-			// Check if caller is type text
-			if((HWND)lParam == typeText) {
-			
-				// Check if protocol is unknown
-				if(protocol == UNKNOWN) {
-				
-					// Set text
-					SetWindowText(typeText, TEXT("Unknown"));
-					
-					// Set colot
-					SetTextColor(hdcStatic, RGB(255, 0, 0));
-				}
+                // Set text
+                SetWindowText(typeText, TEXT("Unknown"));
 
-				// Otherwise
-				else {
+                // Set colot
+                SetTextColor(hdcStatic, RGB(255, 0, 0));
+            }
 
-					// Check if protocol is EFI
-					if(protocol == EFI)
-					
-						// Set text
-						SetWindowText(typeText, TEXT("EFI"));
+            // Otherwise
+            else {
 
-					// Otherwise check if protocol is UEFI
-					else if(protocol == UEFI)
-					
-						// Set text
-						SetWindowText(typeText, TEXT("UEFI"));
+                // Check if protocol is EFI
+                if (protocol == EFI)
 
-					// Set color
-					SetTextColor(hdcStatic, RGB(0, 255, 0));
-				}
-			}
-			
-			// Otherwise
-			else
-			
-				// Set colot
-				SetTextColor(hdcStatic, RGB(0, 0, 0));
-			
-			// Make background transparent
-			SetBkMode(hdcStatic, TRANSPARENT);
-			
-			// Return result
-			return (LRESULT)GetStockObject(NULL_BRUSH);
+                    // Set text
+                    SetWindowText(typeText, TEXT("EFI"));
 
-		// Close
-		case WM_DESTROY:
-		
-			// Quit
-			PostQuitMessage(0);
-			
-			// Break
-			break;
-	}
+                // Otherwise check if protocol is UEFI
+                else if (protocol == UEFI)
 
-	// Return
-	return DefWindowProc(hwnd, message, wParam, lParam);
+                    // Set text
+                    SetWindowText(typeText, TEXT("UEFI"));
+
+                // Set color
+                SetTextColor(hdcStatic, RGB(0, 255, 0));
+            }
+        }
+
+        // Otherwise
+        else
+
+            // Set colot
+            SetTextColor(hdcStatic, RGB(0, 0, 0));
+
+        // Make background transparent
+        SetBkMode(hdcStatic, TRANSPARENT);
+
+        // Return result
+        return (LRESULT)GetStockObject(NULL_BRUSH);
+
+    // Close
+    case WM_DESTROY:
+
+        // Quit
+        PostQuitMessage(0);
+
+        // Break
+        break;
+    }
+
+    // Return
+    return DefWindowProc(hwnd, message, wParam, lParam);
 }
 
-void fileBrowser(HWND hwnd) {
-
+void fileBrowser(HWND hwnd) 
+{
 	// Initialize variables
 	OPENFILENAME browserInfo;
 	CHAR szFile[MAX_PATH];
@@ -474,125 +459,135 @@ void fileBrowser(HWND hwnd) {
 	browserInfo.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
 
 	// Check if file was selected
-	if(GetOpenFileName(&browserInfo))
-
+	if (GetOpenFileName(&browserInfo)) {
 		// Update file location edit
 		SetWindowText(fileLocationEdit, TEXT(browserInfo.lpstrFile));
-}
-
-bool saveFile(HWND hwnd) {
-
-	// Initialize variables
-	OPENFILENAME browserInfo;
-	string fileName = fileLocation.substr(0, fileLocation.find_last_of('.')) + " IFR";
-
-	// Set dialog options
-	ZeroMemory(&browserInfo, sizeof(browserInfo));
-	browserInfo.lStructSize = sizeof(browserInfo);
-	browserInfo.hwndOwner = hwnd;
-	browserInfo.lpstrFilter = (LPCSTR)"Text Files (*.txt)\0*.txt\0All Files (*.*)\0*.*\0";
-	browserInfo.lpstrFile = (LPSTR)fileName.c_str();
-	browserInfo.nMaxFile = MAX_PATH;
-	browserInfo.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT;
-	browserInfo.lpstrDefExt = (LPCSTR)"txt";
-
-	// Check if file was selected
-	if(GetSaveFileName(&browserInfo)) {
-
-		// Set output file
-		outputFile = browserInfo.lpstrFile;
-		
-		// Return true
-		return true;
-	}
-
-	// Return false
-	return false;
-}
-
-void showDialog(HWND hwnd) {
-
-	// Initialize variables
-	string header, message;
-
-	// Check if error code is IFR extracted
-	if(errorCode == IFR_EXTRACTED) {
-
-		// Set header
-		header = "Message";
-
-		// Set message
-		message = "IFR extracted successfully";
-
-		// Display message
-		MessageBox(hwnd, TEXT(message.c_str()), TEXT(header.c_str()), MB_OK | MB_ICONINFORMATION);
-	}
-
-	// Otherwise
-	else {
-
-		// Set header
-		header = "Error";
-
-		// Check if error code equals file not found
-		if(errorCode == FILE_NOT_FOUND)
-
-			// Set message
-			message = "File not found";
-
-		// Otherwise check if error code equals unknown protocol
-		else if(errorCode == UNKNOWN_PROTOCOL)
-
-			// Set message
-			message = "Unknown protocol detected";
-
-		// Display message
-		MessageBox(hwnd, TEXT(message.c_str()), TEXT(header.c_str()), MB_OK | MB_ICONWARNING);
 	}
 }
 
-bool fileExists(const string &file) {
+bool saveFile(HWND hwnd) 
+{
+    // Initialize variables
+    OPENFILENAME browserInfo;
+    string fileName = fileLocation.substr(0, fileLocation.find_last_of('.')) + " IFR";
+    fileName.reserve(MAX_PATH);
 
-	// Open file
-	ifstream fin(file);
+    // Set dialog options
+    ZeroMemory(&browserInfo, sizeof(browserInfo));
+    browserInfo.lStructSize = sizeof(browserInfo);
+    browserInfo.hwndOwner = hwnd;
+    browserInfo.lpstrFilter = (LPCSTR)"Text Files (*.txt)\0*.txt\0All Files (*.*)\0*.*\0";
+    browserInfo.lpstrFile = (LPSTR)fileName.c_str();
+    browserInfo.nMaxFile = MAX_PATH;
+    browserInfo.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT;
+    browserInfo.lpstrDefExt = (LPCSTR)"txt";
 
-	// Return if first characetr doesn't equal EOF
-	return fin.peek() != EOF;
+    // Check if file was selected
+    if (GetSaveFileName(&browserInfo)) {
+
+        // Set output file
+        outputFile = browserInfo.lpstrFile;
+
+        // Return true
+        return true;
+    }
+
+    // Return false
+    return false;
 }
 
-void readFile(const string &file, string &buffer) {
+void showDialog(HWND hwnd) 
+{
+    // Initialize variables
+    string header, message;
 
-	// Initialize variables
-	ifstream fin(file, ios::binary);
+    // Check if error code is IFR extracted
+    if (errorCode == IFR_EXTRACTED) {
 
-	// Clear buffer
-	buffer.clear();
+        // Set header
+        header = "Message";
 
-	// Read in file
-	while(fin.peek() != EOF)
-		buffer.push_back(fin.get());
+        // Set message
+        message = "IFR extracted successfully";
 
-	// Close file
-	fin.close();
+        // Display message
+        MessageBox(hwnd, TEXT(message.c_str()), TEXT(header.c_str()), MB_OK | MB_ICONINFORMATION);
+    }
+
+    // Otherwise
+    else {
+
+        // Set header
+        header = "Error";
+
+        // Check if error code equals file not found
+        if (errorCode == FILE_NOT_FOUND)
+
+            // Set message
+            message = "File not found";
+
+        // Otherwise check if error code equals unknown protocol
+        else if (errorCode == UNKNOWN_PROTOCOL)
+
+            // Set message
+            message = "Unknown protocol detected";
+
+        // Display message
+        MessageBox(hwnd, TEXT(message.c_str()), TEXT(header.c_str()), MB_OK | MB_ICONWARNING);
+    }
 }
 
-type getType(const string &buffer) {
+bool fileExists(const string &file) 
+{
+    // Open file
+#if (_MSC_VER < 1600)
+    ifstream fin(file.c_str());
+#else
+    ifstream fin(file);
+#endif
 
-	// Go through buffer
-	for(unsigned int i = 0; i < buffer.size() - 9; i++)
-	
-		// Check if an EFI string pakage was found
-		if((buffer[i] != '\x00' || buffer[i + 1] != '\x00' || buffer[i + 2] != '\x00' || buffer[i + 3] != '\x00') && buffer[i + 4] == '\x02' && buffer[i + 5] == '\x00' && (buffer[i + 6] != '\x00' || buffer[i + 7] != '\x00' || buffer[i + 8] != '\x00' || buffer[i + 9] != '\x00') && i + static_cast<unsigned char>(buffer[i + 6]) + (static_cast<unsigned char>(buffer[i + 7]) << 8) + (static_cast<unsigned char>(buffer[i + 8]) << 16) + (static_cast<unsigned char>(buffer[i + 9]) << 24) < buffer.size() && buffer[i + static_cast<unsigned char>(buffer[i + 6]) + (static_cast<unsigned char>(buffer[i + 7]) << 8) + (static_cast<unsigned char>(buffer[i + 8]) << 16) + (static_cast<unsigned char>(buffer[i + 9]) << 24) + 4] >= 'a' && buffer[i + static_cast<unsigned char>(buffer[i + 6]) + (static_cast<unsigned char>(buffer[i + 7]) << 8) + (static_cast<unsigned char>(buffer[i + 8]) << 16) + (static_cast<unsigned char>(buffer[i + 9]) << 24) + 4] <= 'z' && i + static_cast<unsigned char>(buffer[i]) + (static_cast<unsigned char>(buffer[i + 1]) << 8) + (static_cast<unsigned char>(buffer[i + 2]) << 16) + (static_cast<unsigned char>(buffer[i + 3]) << 24) < buffer.size() && buffer[i + static_cast<unsigned char>(buffer[i]) + (static_cast<unsigned char>(buffer[i + 1]) << 8) + (static_cast<unsigned char>(buffer[i + 2]) << 16) + (static_cast<unsigned char>(buffer[i + 3]) << 24) + 4] == '\x02' && buffer[i + static_cast<unsigned char>(buffer[i]) + (static_cast<unsigned char>(buffer[i + 1]) << 8) + (static_cast<unsigned char>(buffer[i + 2]) << 16) + (static_cast<unsigned char>(buffer[i + 3]) << 24) + 5] == '\x00')
-		
-			// Return EFI
-			return EFI;
-	
-		// Otherwise check if a UEFI string pakage was found
-		else if((buffer[i] != '\x00' || buffer[i + 1] != '\x00' || buffer[i + 2] != '\x00') && buffer[i + 3] == '\x04' && buffer[i + 4] == '\x34' && buffer[i + 44] == '\x01' && buffer[i + 45] == '\x00' && buffer[i + 48] == '\x2D' && i + static_cast<unsigned char>(buffer[i]) + (static_cast<unsigned char>(buffer[i + 1]) << 8) + (static_cast<unsigned char>(buffer[i + 2]) << 16) < buffer.size() && buffer[i + static_cast<unsigned char>(buffer[i]) + (static_cast<unsigned char>(buffer[i + 1]) << 8) + (static_cast<unsigned char>(buffer[i + 2]) << 16) - 1] == '\x00' && buffer[i + static_cast<unsigned char>(buffer[i]) + (static_cast<unsigned char>(buffer[i + 1]) << 8) + (static_cast<unsigned char>(buffer[i + 2]) << 16) - 2] == '\x00')
-	
-			// Return UEFI
-			return UEFI;
-	
-	// Return unknown
-	return UNKNOWN;
+    // Return if first character doesn't equal EOF
+    return fin.peek() != EOF;
+}
+
+void readFile(const string &file, string &buffer) 
+{
+    // Initialize variables
+#if (_MSC_VER < 1600)
+    ifstream fin(file.c_str(), ios::binary);
+#else
+    ifstream fin(file, ios::binary);
+#endif
+
+    // Clear buffer
+    buffer.clear();
+
+    // Read in file
+    while (fin.peek() != EOF)
+        buffer.push_back(fin.get());
+
+    // Close file
+    fin.close();
+}
+
+type getType(const string &buffer)
+{
+
+    type currtype = UNKNOWN;
+
+    // Go through buffer
+    for(unsigned int i = 0; i < buffer.size() - 9; i++) {
+    
+        // Check if an EFI string package was found
+        if((buffer[i] != '\x00' || buffer[i + 1] != '\x00' || buffer[i + 2] != '\x00' || buffer[i + 3] != '\x00') && buffer[i + 4] == '\x02' && buffer[i + 5] == '\x00' && (buffer[i + 6] != '\x00' || buffer[i + 7] != '\x00' || buffer[i + 8] != '\x00' || buffer[i + 9] != '\x00') && i + static_cast<unsigned char>(buffer[i + 6]) + (static_cast<unsigned char>(buffer[i + 7]) << 8) + (static_cast<unsigned char>(buffer[i + 8]) << 16) + (static_cast<unsigned char>(buffer[i + 9]) << 24) < buffer.size() && buffer[i + static_cast<unsigned char>(buffer[i + 6]) + (static_cast<unsigned char>(buffer[i + 7]) << 8) + (static_cast<unsigned char>(buffer[i + 8]) << 16) + (static_cast<unsigned char>(buffer[i + 9]) << 24) + 4] >= 'a' && buffer[i + static_cast<unsigned char>(buffer[i + 6]) + (static_cast<unsigned char>(buffer[i + 7]) << 8) + (static_cast<unsigned char>(buffer[i + 8]) << 16) + (static_cast<unsigned char>(buffer[i + 9]) << 24) + 4] <= 'z' && i + static_cast<unsigned char>(buffer[i]) + (static_cast<unsigned char>(buffer[i + 1]) << 8) + (static_cast<unsigned char>(buffer[i + 2]) << 16) + (static_cast<unsigned char>(buffer[i + 3]) << 24) < buffer.size() && buffer[i + static_cast<unsigned char>(buffer[i]) + (static_cast<unsigned char>(buffer[i + 1]) << 8) + (static_cast<unsigned char>(buffer[i + 2]) << 16) + (static_cast<unsigned char>(buffer[i + 3]) << 24) + 4] == '\x02' && buffer[i + static_cast<unsigned char>(buffer[i]) + (static_cast<unsigned char>(buffer[i + 1]) << 8) + (static_cast<unsigned char>(buffer[i + 2]) << 16) + (static_cast<unsigned char>(buffer[i + 3]) << 24) + 5] == '\x00') {
+            // Notice legacy EFI
+            currtype = EFI;
+        // Otherwise check if a UEFI string package was found
+        } else if((buffer[i] != '\x00' || buffer[i + 1] != '\x00' || buffer[i + 2] != '\x00') && buffer[i + 3] == '\x04' && buffer[i + 4] == '\x34' && buffer[i + 44] == '\x01' && buffer[i + 45] == '\x00' && buffer[i + 48] == '\x2D' && i + static_cast<unsigned char>(buffer[i]) + (static_cast<unsigned char>(buffer[i + 1]) << 8) + (static_cast<unsigned char>(buffer[i + 2]) << 16) < buffer.size() && buffer[i + static_cast<unsigned char>(buffer[i]) + (static_cast<unsigned char>(buffer[i + 1]) << 8) + (static_cast<unsigned char>(buffer[i + 2]) << 16) - 1] == '\x00' && buffer[i + static_cast<unsigned char>(buffer[i]) + (static_cast<unsigned char>(buffer[i + 1]) << 8) + (static_cast<unsigned char>(buffer[i + 2]) << 16) - 2] == '\x00') {
+            // Prefer UEFI over EFI
+            return UEFI;
+        }
+    }
+    
+    return currtype;
 }
